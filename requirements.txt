@@ -19,3 +19,5 @@ Pillow==10.0.1
 beautifulsoup4==4.12.2
 lxml==4.9.3
 whitenoise==6.5.0
+fuzzywuzzy==0.18.0
+python-Levenshtein==0.23.0
