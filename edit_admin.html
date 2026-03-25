@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بونص فارما - تعديل المدير - نظام حجز المواعيد</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .role-card {
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .role-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .role-card.selected {
+            border-color: #007bff;
+            background-color: #f8f9ff;
+        }
+
+        .permission-list {
+            max-height: 150px;
+            overflow-y: auto;
+            border-top: 1px dashed #eee;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .permission-checkbox-list {
+            max-height: 200px; /* تحديد ارتفاع لخانة الصلاحيات المخصصة */
+            overflow-y: auto; /* إضافة شريط تمرير عند الحاجة */
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background-color: #fcfcfc;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+                <i class="fas fa-shield-alt me-2"></i>
+                لوحة الإدارة
+            </a>
+
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                    <i class="fas fa-home me-2"></i>
+                    الرئيسية
+                </a>
+                <a class="nav-link" href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    تسجيل الخروج
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h4>
+                            <i class="fas fa-user-edit me-2"></i>
+                            تعديل المدير: {{ admin.full_name or admin.username }}
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
+                                        <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <form method="POST">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="username" class="form-label">
+                                        <i class="fas fa-user me-2"></i>
+                                        اسم المستخدم
+                                    </label>
+                                    <input type="text" class="form-control" id="username" value="{{ admin.username }}" disabled>
+                                    <div class="form-text">لا يمكن تغيير اسم المستخدم</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="password" class="form-label">
+                                        <i class="fas fa-lock me-2"></i>
+                                        كلمة المرور الجديدة
+                                    </label>
+                                    <input type="password" class="form-control" id="password" name="password">
+                                    <div class="form-text">اتركها فارغة إذا كنت لا تريد تغييرها</div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="full_name" class="form-label">
+                                        <i class="fas fa-id-card me-2"></i>
+                                        الاسم الكامل *
+                                    </label>
+                                    <input type="text" class="form-control" id="full_name" name="full_name" value="{{ admin.full_name or '' }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">
+                                        <i class="fas fa-envelope me-2"></i>
+                                        البريد الإلكتروني
+                                    </label>
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ admin.email or '' }}">
+                                </div>
+                            </div>
+
+                            {% if is_super_admin %} {# هذا الشرط للتحكم في ظهور قسم الأدوار والصلاحيات #}
+                            <div class="mb-4">
+                                <label class="form-label">
+                                    <i class="fas fa-user-tag me-2"></i>
+                                    دور المدير
+                                </label>
+                                <div class="row">
+                                    {% for role_key, role_info in admin_roles.items() %}
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card role-card {{ 'selected' if admin.role == role_key else '' }}" data-role-key="{{ role_key }}" onclick="selectRole('{{ role_key }}', this)">
+                                            <div class="card-body">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="role" id="role_{{ role_key }}" value="{{ role_key }}" {{ 'checked' if admin.role == role_key else '' }}>
+                                                    <label class="form-check-label w-100" for="role_{{ role_key }}">
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            {% if role_key == 'super' %}
+                                                                <i class="fas fa-crown fa-2x text-danger me-3"></i>
+                                                            {% elif role_key == 'manager' %}
+                                                                <i class="fas fa-user-tie fa-2x text-warning me-3"></i>
+                                                            {% elif role_key == 'editor' %}
+                                                                <i class="fas fa-user-edit fa-2x text-success me-3"></i>
+                                                            {% else %}
+                                                                <i class="fas fa-user fa-2x text-secondary me-3"></i>
+                                                            {% endif %}
+                                                            <div>
+                                                                <h6 class="mb-0">{{ role_info.name }}</h6>
+                                                            </div>
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="mb-4" id="customPermissionsSection" style="display: none;">
+                                <label class="form-label">
+                                    <i class="fas fa-sliders-h me-2"></i>
+                                    تخصيص صلاحيات إضافية/خاصة لهذا المدير
+                                </label>
+                                <div class="alert alert-info small">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    الصلاحيات المحددة هنا ستُضاف (أو تحل محل إذا كانت متعارضة) على صلاحيات الدور الأساسي المختار.
+                                </div>
+                                <div class="permission-checkbox-list">
+                                    {% for perm_key, perm_name in ALL_PERMISSIONS.items() %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="custom_permissions" value="{{ perm_key }}" id="perm_{{ perm_key }}"
+                                            {% if perm_key in current_admin_permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="perm_{{ perm_key }}">
+                                            {{ perm_name }}
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                الدور الحالي: <strong>{{ admin_roles[admin.role].name }}</strong>
+                                <br><small>فقط المدير العام يمكنه تغيير الأدوار وتخصيص الصلاحيات.</small>
+                            </div>
+                            {% endif %}
+
+                            <div class="card bg-light mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        معلومات الحساب
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <small><strong>تاريخ الإنشاء:</strong> {{ admin.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <small><strong>آخر دخول:</strong>
+                                                {% if admin.last_login %}
+                                                    {{ admin.last_login.strftime('%Y-%m-%d %H:%M') }}
+                                                {% else %}
+                                                    لم يسجل دخول بعد
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-save me-2"></i>حفظ التعديلات
+                                </button>
+                                <a href="{{ url_for('manage_admins') }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-right me-2"></i>إلغاء
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteConfirmModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        تأكيد حذف المدير
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>هل أنت متأكد أنك تريد حذف المدير <strong id="adminNameDeleteModal"></strong>؟</p>
+                    <p class="text-danger">**تحذير**: هذا الإجراء لا يمكن التراجع عنه وسيحذف جميع بيانات المدير المرتبطة (المواعيد التي تعامل معها، الإشعارات التي أرسلها، ملفات الأصناف التي رفعها).</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>إلغاء
+                    </button>
+                    <form id="deleteAdminForm" method="POST">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash-alt me-2"></i>تأكيد الحذف
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function confirmDelete(adminId, adminName) {
+            document.getElementById('deleteAdminForm').action = '/delete_admin/' + adminId;
+            document.getElementById('adminNameDeleteModal').textContent = adminName;
+            var deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            deleteConfirmModal.show();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بونص فارما - تقارير الأرصدة - نظام حجز المواعيد</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* NEW: Root CSS variables for consistent theming */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Matching dashboard primary gradient */
+            --secondary-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); /* Cyan to bright blue */
+            --text-color-dark: #2d3748;
+            --text-color-light: #f7fafc;
+            --accent-color: #00f2fe; /* Brighter cyan for actions */
+            --shadow-light: rgba(0, 0, 0, 0.08);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+            --highlight-color: #4facfe; /* Used for some borders/highlights */
+            --success-color: #0bab7c; /* A vibrant green */
+            --error-color: #dc3545; /* Red for notifications, matches original file's #dc3545 */
+            --border-radius-lg: 15px;
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Cairo', sans-serif;
+            min-height: 100vh;
+            padding-top: 70px; /* نفس قيمة صفحة البحث لضبط ارتفاع الناف بار */
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes particleFloat {
+            0%, 100% {
+                background-position: 0% 0%, 100% 100%, 50% 50%, 80% 20%, 20% 80%, 90% 10%, 10% 90%;
+                opacity: 1;
+            }
+            50% {
+                background-position: 100% 100%, 0% 0%, 70% 30%, 30% 70%, 60% 40%, 40% 60%, 80% 20%;
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes orbFloat {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg) scale(1);
+                opacity: 0.8;
+            }
+            33% {
+                transform: translateY(-20px) rotate(120deg) scale(1.1);
+                opacity: 1;
+            }
+            66% {
+                transform: translateY(-35px) rotate(240deg) scale(0.9);
+                opacity: 0.9;
+            }
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(2px 2px at 20% 30%, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(2px 2px at 60% 70%, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(3px 3px at 50% 50%, rgba(255, 255, 255, 0.3), transparent),
+                radial-gradient(2px 2px at 80% 10%, rgba(255, 255, 255, 0.5), transparent),
+                radial-gradient(2px 2px at 10% 60%, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(3px 3px at 90% 80%, rgba(255, 255, 255, 0.3), transparent),
+                radial-gradient(2px 2px at 30% 90%, rgba(255, 255, 255, 0.4), transparent);
+            background-size: 200% 200%;
+            animation: particleFloat 30s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(102, 126, 234, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(118, 75, 162, 0.15) 0%, transparent 50%);
+            animation: orbFloat 25s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+            background: rgba(248, 249, 250, 0.78);
+            min-height: calc(100vh - 70px);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 32px 32px 0 0;
+            margin-top: 20px;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .reports-container {
+            padding-top: 1rem;
+            padding-bottom: 2rem;
+        }
+
+        /* Navbar styles copied from search_products.html for consistent look */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            background-size: 200% 200% !important;
+            animation: navbarGradient 15s ease infinite !important;
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.2),
+                0 5px 20px rgba(102, 126, 234, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1030;
+            backdrop-filter: blur(15px) !important;
+            -webkit-backdrop-filter: blur(15px) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            color: #000000 !important;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand span {
+            color: #000000 !important;
+        }
+
+        .navbar-logo {
+            height: 40px;
+            width: auto;
+            margin-left: 10px;
+        }
+
+        .navbar .nav-link {
+            color: #000000 !important;
+        }
+
+        .navbar .nav-link:hover {
+            color: #ffffff !important;
+        }
+
+        .navbar-text {
+            color: rgba(0, 0, 0, 0.8) !important;
+        }
+
+        @keyframes navbarGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Navbar notification wrapper copied from search_products */
+        .navbar-nav-notification-wrapper {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            margin-right: 15px;
+            flex-grow: 0;
+            justify-content: flex-end;
+            flex-shrink: 0;
+            gap: 5px !important;
+        }
+
+        .navbar-nav-notification-wrapper .nav-link {
+            padding: 0.4rem !important;
+            position: relative;
+            color: #000000;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .navbar-nav-notification-wrapper .nav-link:hover {
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        .navbar-nav-notification-wrapper .nav-link .fa-lg {
+            font-size: 1.25em;
+        }
+
+        @media (max-width: 991.98px) {
+            .navbar-nav-notification-wrapper {
+                order: -1;
+                margin-left: auto;
+                margin-right: 10px;
+                gap: 3px !important;
+                max-width: 140px;
+                justify-content: space-between;
+                flex-grow: 1;
+            }
+            .navbar-nav-notification-wrapper .nav-link {
+                padding: 0.35rem !important;
+            }
+            .navbar-nav-notification-wrapper .notification-badge {
+                top: 0px;
+                right: 0px;
+                font-size: 0.65em;
+                padding: 3px 6px;
+            }
+            .navbar-nav-user-info {
+                display: none;
+            }
+            .navbar-collapse .navbar-nav {
+                width: 100%;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+            .navbar-collapse .nav-item {
+                text-align: center;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .navbar-collapse .nav-item:last-child {
+                border-bottom: none;
+            }
+            .navbar-collapse .nav-link {
+                padding: 12px 15px;
+                color: rgba(255, 255, 255, 0.9);
+                font-size: 1.1rem;
+                transition: background-color 0.3s ease;
+            }
+            .navbar-collapse .nav-link:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                border-radius: 5px;
+            }
+            .navbar-collapse .navbar-text {
+                display: block;
+                padding: 12px 15px;
+                color: rgba(255, 255, 255, 0.7);
+                font-weight: 600;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        @media (min-width: 992px) {
+            .navbar-nav-notification-wrapper {
+                margin-left: 15px;
+                margin-right: 0;
+                gap: 5px !important;
+            }
+            .navbar-nav-notification-wrapper .nav-link {
+                padding: 0.4rem 0.5rem !important;
+            }
+            .navbar-nav-notification-wrapper .notification-badge {
+                top: -5px;
+                right: -5px;
+                font-size: 0.75em;
+                padding: 5px 8px;
+            }
+            .navbar-nav-user-info {
+                display: flex;
+            }
+        }
+
+        .reports-header {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .reports-title {
+            font-weight: 700;
+            color: var(--text-color-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0;
+        }
+        .reports-title span { font-size: 1.05rem; font-weight: 700; }
+
+        .reports-icon-circle {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .reports-subtitle {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .reports-header-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .reports-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: #6b7280;
+            color: #fff;
+            border-radius: 999px;
+            padding: 0.45rem 1rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+        }
+        .back-btn:hover { opacity: 0.95; }
+        .back-btn:active { transform: scale(0.98); }
+
+        .date-filter-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 999px;
+            padding: 0.45rem 0.75rem;
+            box-shadow: 0 4px 14px rgba(102, 126, 234, 0.25);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .date-filter-form {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .date-filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .date-filter-label {
+            font-size: 0.8rem;
+            color: #4a5568;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .date-filter-input {
+            max-width: 150px;
+            border-radius: 999px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.8rem;
+            padding: 0.35rem 0.6rem;
+            box-shadow: none;
+        }
+
+        .date-filter-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.15rem rgba(102, 126, 234, 0.25);
+        }
+
+        .date-filter-submit {
+            border-radius: 999px;
+            font-weight: 600;
+            padding: 0.4rem 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            border: none !important;
+        }
+
+        .date-filter-submit:focus,
+        .date-filter-submit:focus-visible {
+            box-shadow: 0 0 0 0.15rem rgba(102, 126, 234, 0.25) !important;
+            outline: none;
+        }
+
+        .date-filter-back-btn {
+            border-radius: 999px;
+            padding: 0.4rem 0.9rem;
+            font-size: 0.8rem;
+        }
+
+        .reports-back-btn {
+            border-radius: 999px;
+            padding: 0.6rem 1.4rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .reports-header {
+                align-items: flex-start;
+            }
+
+            .reports-title span { font-size: 1rem; }
+
+            .reports-header-actions {
+                width: 100%;
+                margin-top: 0.75rem;
+                justify-content: flex-start;
+            }
+
+            .date-filter-card {
+                width: 100%;
+                border-radius: 18px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.5rem;
+            }
+
+            .date-filter-form {
+                width: 100%;
+                flex-wrap: wrap;
+                justify-content: space-between;
+            }
+
+            .date-filter-input {
+                max-width: none;
+                width: 100%;
+            }
+
+            .date-filter-submit {
+                width: 100%;
+                justify-content: center;
+                margin-top: 0.25rem;
+            }
+
+            .date-filter-back-btn { align-self: flex-end; }
+        }
+
+        .reports-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .reports-stat-card {
+            flex: 1 1 200px;
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            padding: 1rem 1.25rem;
+            border: 1px solid rgba(102, 126, 234, 0.12);
+        }
+
+        .reports-stat-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 0.25rem;
+        }
+
+        .reports-stat-value {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-color-dark);
+        }
+
+        .report-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(102, 126, 234, 0.12);
+        }
+
+        .report-header {
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+            padding: 1.5rem;
+            margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+            text-align: center;
+        }
+
+        .product-report-item {
+            border: 1px solid rgba(233, 236, 239, 0.8);
+            border-radius: 14px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            background-color: #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .product-report-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.18);
+            border-color: rgba(102, 126, 234, 0.35);
+        }
+
+        .alert-info-custom {
+            background-color: rgba(224, 247, 250, 0.95);
+            border-color: #b2ebf2;
+            color: #006064;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .premium-message-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        .premium-message-box h5 {
+            color: #ffc107;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .premium-message-box p {
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+        }
+        .premium-message-box .btn {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 10px 25px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .premium-message-box .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('company_dashboard') }}">
+                {% if current_logo_path %}
+                    <img src="{{ current_logo_path }}" alt="Logo" class="navbar-logo">
+                {% else %}
+                    <img src="{{ url_for('static', filename='images/default_logo.png') }}" alt="Default Logo" class="navbar-logo">
+                {% endif %}
+                <span class="full-text">{{ system_subtitle }}</span>
+                <span class="short-text d-none"></span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavCompany" aria-controls="navbarNavCompany" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="navbar-nav-notification-wrapper">
+                <a class="nav-link" href="{{ url_for('company_profile') }}" title="ملفي الشخصي">
+                    <i class="fas fa-user-circle fa-lg"></i>
+                </a>
+                <a class="nav-link" href="{{ url_for('company_messages') }}" title="المراسلات">
+                    <i class="fas fa-comments fa-lg"></i>
+                    <span class="notification-badge" id="community-count" style="display: none;">0</span>
+                </a>
+                <a class="nav-link" href="{{ url_for('instructions') }}" title="تعليمات وإرشادات">
+                    <i class="fas fa-question-circle fa-lg"></i>
+                </a>
+                <a class="nav-link position-relative" href="{{ url_for('notifications') }}" title="الإشعارات">
+                    <i class="fas fa-bell fa-lg"></i>
+                    <span class="notification-badge" id="notification-count" style="display: none;">0</span>
+                </a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="navbarNavCompany">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item d-lg-none">
+                        <span class="navbar-text">
+                            <i class="fas fa-building me-2"></i>
+                            {{ current_user.company_name }}
+                        </span>
+                    </li>
+                    <li class="nav-item d-none d-lg-flex align-items-center me-3">
+                        <span class="navbar-text">
+                            <i class="fas fa-building me-2"></i>
+                            {{ current_user.company_name }}
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('company_dashboard') }}">
+                            <i class="fas fa-home me-2"></i>
+                            الرئيسية
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('my_products') }}">
+                            <i class="fas fa-boxes me-2"></i>
+                            أصنافي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('search_products') }}">
+                            <i class="fas fa-search me-2"></i>
+                            البحث في الأصناف
+                        </a>
+                    </li>
+                    <li class="nav-item active" aria-current="page">
+                        <a class="nav-link" href="{{ url_for('company_stock_reports') }}">
+                            <i class="fas fa-chart-line me-2"></i>
+                            تقارير الأرصدة
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('appointments') }}">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            مواعيدي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            تسجيل الخروج
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container reports-container">
+            <div class="reports-header mb-4">
+                <div class="reports-top-bar">
+                    <div class="reports-title">
+                        <div class="reports-icon-circle">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <span>تقارير الأرصدة</span>
+                    </div>
+                    <a href="{{ url_for('company_dashboard') }}" class="back-btn" id="reportsBackBtn">
+                        العودة للوحة الرئيسية <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+                <p class="reports-subtitle">
+                    نظرة تحليلية على حركة الأرصدة والاستهلاك لأصنافك المفضلة خلال الفترة المحددة.
+                </p>
+                <div class="reports-header-actions">
+                    <div class="date-filter-card">
+                        <form method="get" action="{{ url_for('company_stock_reports') }}" class="date-filter-form">
+                            <div class="date-filter-group">
+                                <span class="date-filter-label">
+                                    <i class="fas fa-calendar-day"></i>
+                                    من
+                                </span>
+                                <input type="date" name="start_date" class="date-filter-input" value="{{ start_date }}">
+                            </div>
+                            <div class="date-filter-group">
+                                <span class="date-filter-label">
+                                    <i class="fas fa-calendar-day"></i>
+                                    إلى
+                                </span>
+                                <input type="date" name="end_date" class="date-filter-input" value="{{ end_date }}">
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm date-filter-submit">
+                                <i class="fas fa-filter"></i>
+                                عرض التقرير
+                            </button>
+                            
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            {# NEW: Add an ID to the container of flash messages for JavaScript targeting #}
+            <div id="flash-messages-container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% for category, message in messages %}
+                        {% if message %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" style="border-radius: 14px;" role="alert">
+                                <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endwith %}
+            </div>
+
+            {# NEW: Check for premium features access #}
+            {% if not company.is_premium and premium_features_enabled %}
+                <div class="premium-message-box">
+                    <i class="fas fa-star fa-3x text-warning mb-3"></i>
+                    <h5>هذه الميزة متاحة فقط للمشتركين في STOCKFLOW PLUS!</h5>
+                    <p>للأسف، لا يمكنك عرض تقارير الأرصدة لأن هذه الميزة تتطلب اشتراكًا مميزًا.</p>
+                    <p>{{ premium_message }}</p>
+                    <a class="btn" href="{{ url_for('subscribe_payment') }}">
+                        <i class="fas fa-crown me-2"></i> اشترك الآن في STOCKFLOW PLUS!
+                    </a>
+                </div>
+            {% else %}
+                {# Original content for stock reports #}
+
+                <div class="reports-stats">
+                    <div class="reports-stat-card">
+                        <div class="reports-stat-label"><i class="fas fa-calendar-alt me-1"></i>الفترة</div>
+                        <div class="reports-stat-value">{{ start_date }} - {{ end_date }}</div>
+                    </div>
+                    <div class="reports-stat-card">
+                        <div class="reports-stat-label"><i class="fas fa-layer-group me-1"></i>إجمالي الأصناف في التقرير</div>
+                        <div class="reports-stat-value">{{ reports_data|length }}</div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info-custom mb-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    هذا التقرير يعرض تحليلاً لأرصدة الأصناف التي قمت بإضافتها إلى قائمة أصنافك المفضلة خلال آخر 30 يوماً. يتم تحديث البيانات عند كل رفع جديد لملفات الأصناف بواسطة الإدارة.
+                    <br>
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    بيانات التقرير من تاريخ <strong>{{ start_date }}</strong> إلى <strong>{{ end_date }}</strong>.
+                </div>
+
+                <div class="report-card">
+                    <div class="report-header">
+                        <h4 class="mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            تقرير الأصناف المفضلة ({{ reports_data|length }} صنف)
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        {% if reports_data %}
+                            {% for product_name, data in reports_data.items() %}
+                            <div class="product-report-item">
+                                <div class="row align-items-center">
+                                    <div class="col-md-12">
+                                        <h5><i class="fas fa-box-open me-2"></i>الصنف: <strong>{{ product_name }}</strong></h5>
+
+                                        {# عرض رسالة عدم وجود بيانات تاريخية إذا كانت موجودة وتخص هذا السيناريو #}
+                                        {% if "لا توجد بيانات تاريخية كافية. ننصح بتوريد" in data.suggested_restock_message %}
+                                            <p class="text-danger mt-2">{{ data.suggested_restock_message.split('. ننصح بتوريد')[0] }}.</p>
+                                        {% elif data.message %}
+                                            <p class="text-danger mt-2">{{ data.message }}</p>
+                                        {% endif %}
+
+                                        {# عرض التفاصيل التاريخية (الكميات، الزيادة، النقصان، المتوسط) فقط إذا كانت ذات صلة (أي ليست حالة "لا توجد بيانات تاريخية كافية") #}
+                                        {% if not ("لا توجد بيانات تاريخية كافية" in data.suggested_restock_message) %}
+                                            <div class="row mt-3">
+                                                <div class="col-md-4 mb-2">
+                                                    <strong><i class="fas fa-chart-line me-2"></i>الكمية عند بداية الفترة:</strong> {{ data.start_quantity }}
+                                                </div>
+                                                <div class="col-md-4 mb-2">
+                                                    <strong><i class="fas fa-chart-line me-2"></i>الكمية عند نهاية الفترة:</strong> {{ data.end_quantity }}
+                                                </div>
+                                                <div class="col-md-4 mb-2">
+                                                    <strong><i class="fas fa-exchange-alt me-2"></i>إجمالي النقصان في الفترة:</strong>
+                                                    <span class="text-danger">{{ data.total_decrease_in_period | round }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col-md-4 mb-2">
+                                                    <strong><i class="fas fa-arrow-up me-2"></i>إجمالي الزيادة في الفترة:</strong>
+                                                    <span class="text-success">{{ data.total_increase_in_period | round }}</span>
+                                                </div>
+                                                <div class="col-md-4 mb-2">
+                                                    <strong><i class="fas fa-calculator me-2"></i>متوسط البيع اليومي:</strong>
+                                                    <span>{{ data.daily_sales_average | round }}</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-2">
+                                                <div class="col-md-3 mb-2">
+                                                    <strong><i class="fas fa-wave-square me-2"></i>المتوسط المتحرك (7 أيام):</strong>
+                                                    <span>{{ data.moving_average_sales | round }}</span>
+                                                </div>
+                                                <div class="col-md-3 mb-2">
+                                                    <strong><i class="fas fa-chart-trend-up me-2"></i>الاتجاه آخر 7 أيام:</strong>
+                                                    <span class="{{ 'text-danger' if data.trend_last_7_days < 0 else 'text-success' }}">{{ data.trend_last_7_days | round }}</span>
+                                                </div>
+                                                <div class="col-md-3 mb-2">
+                                                    <strong><i class="fas fa-crystal-ball me-2"></i>توقع 30 يوماً:</strong>
+                                                    <span>{{ data.forecast_next_30_days | round }}</span>
+                                                </div>
+                                                <div class="col-md-3 mb-2">
+                                                    <strong><i class="fas fa-shield-alt me-2"></i>مخزون الأمان:</strong>
+                                                    <span>{{ data.safety_stock | round }}</span>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        {# عرض اقتراح التوريد بالطريقة المطلوبة #}
+                                        <div class="row mt-2">
+                                            <div class="col-md-12 mb-2">
+                                                <strong><i class="fas fa-truck me-2"></i>اقتراح التوريد: </strong>
+                                                {% if data.suggested_restock_quantity > 0 %}
+                                                    <span class="text-primary">
+                                                        <i class="fas fa-truck-loading me-2"></i>
+                                                        {% if "لا توجد بيانات تاريخية كافية. ننصح بتوريد" in data.suggested_restock_message %}
+                                                            {{ data.suggested_restock_message.split('. ننصح بتوريد')[1] }}
+                                                        {% else %}
+                                                            {{ data.suggested_restock_message }}
+                                                        {% endif %}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="text-success">
+                                                        <i class="fas fa-info-circle me-2"></i>
+                                                        {% if "لا توجد بيانات تاريخية كافية. ننصح بتوريد" in data.suggested_restock_message %}
+                                                            {{ data.suggested_restock_message.split('. ننصح بتوريد')[1] }}
+                                                        {% else %}
+                                                            {{ data.suggested_restock_message }}
+                                                        {% endif %}
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-chart-pie fa-4x text-muted mb-3"></i>
+                                <h5 class="text-muted">لا توجد تقارير أرصدة متاحة حالياً.</h5>
+                                <p class="text-muted">يرجى التأكد من إضافة أصناف إلى <a href="{{ url_for('my_products') }}">قائمة أصنافك المفضلة</a>، والتأكد من أن الإدارة تقوم برفع ملفات الأصناف بانتظام.</p>
+                                <a href="{{ url_for('search_products') }}" class="btn btn-primary mt-3">
+                                    <i class="fas fa-search me-2"></i>
+                                    البحث عن أصناف وإضافتها
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %} {# END NEW: Check for premium features access #}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Unified update function for all counts
+        function updateCounts() {
+            fetch('/api/unread_counts')
+                .then(response => response.json())
+                .then(data => {
+                    const notificationBadge = document.getElementById('notification-count');
+                    if (notificationBadge) {
+                        if (data.unread_notifications_count > 0) {
+                            notificationBadge.textContent = data.unread_notifications_count;
+                            notificationBadge.style.display = 'block';
+                        } else {
+                            notificationBadge.style.display = 'none';
+                        }
+                    }
+
+                    const communityBadge = document.getElementById('community-count');
+                    if (communityBadge) {
+                        if (data.unread_community_messages_count > 0) {
+                            communityBadge.textContent = data.unread_community_messages_count;
+                            communityBadge.style.display = 'block';
+                        } else {
+                            communityBadge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching unread counts:', error));
+        }
+
+        function ensurePageSpinner(){
+            var spinner=document.getElementById('pageSpinner');
+            if(!spinner){
+                var style=document.createElement('style');
+                style.textContent=".spinner-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;justify-content:center;align-items:center}.spinner-overlay.active{display:flex;animation:fadeIn 0.3s ease}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.elegant-spinner{position:relative;width:80px;height:80px}.elegant-spinner::before,.elegant-spinner::after{content:'';position:absolute;border-radius:50%}.elegant-spinner::before{width:80px;height:80px;border:4px solid transparent;border-top-color:#667eea;border-right-color:#764ba2;animation:spinOuter 1.2s linear infinite}.elegant-spinner::after{width:50px;height:50px;top:15px;left:15px;border:4px solid transparent;border-bottom-color:#667eea;border-left-color:#764ba2;animation:spinInner 1.2s linear infinite reverse}@keyframes spinOuter{to{transform:rotate(360deg)}}@keyframes spinInner{to{transform:rotate(360deg)}}";
+                document.head.appendChild(style);
+                spinner=document.createElement('div');
+                spinner.className='spinner-overlay';
+                spinner.id='pageSpinner';
+                spinner.innerHTML='<div class=\"elegant-spinner\"><div class=\"spinner-dot\"></div></div>';
+                document.body.appendChild(spinner);
+            }
+            return spinner;
+        }
+        window.addEventListener('pageshow',function(){var s=document.getElementById('pageSpinner');if(s){s.classList.remove('active');}});
+        window.addEventListener('popstate',function(){var s=document.getElementById('pageSpinner');if(s){s.classList.remove('active');}});
+        document.addEventListener('visibilitychange',function(){if(!document.hidden){var s=document.getElementById('pageSpinner');if(s){s.classList.remove('active');}}});
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCounts(); // Initial call to update counts
+            setInterval(updateCounts, 30000); // Update every 30 seconds
+
+            // JavaScript to hide empty flash messages container
+            const flashMessagesContainer = document.getElementById('flash-messages-container');
+            if (flashMessagesContainer) {
+                // Remove any empty text nodes (which can be caused by Jinja2 whitespace)
+                flashMessagesContainer.childNodes.forEach(node => {
+                    if (node.nodeType === Node.TEXT_NODE && node.nodeValue.trim() === '') {
+                        node.remove();
+                    }
+                });
+
+                // Check if the container still has any child elements (actual alerts)
+                if (flashMessagesContainer.children.length === 0) {
+                    flashMessagesContainer.style.display = 'none'; // Hide the container if no alerts are present
+                }
+            }
+            var backBtn=document.getElementById('reportsBackBtn');
+            if(backBtn){
+                backBtn.addEventListener('click',function(e){
+                    e.preventDefault();
+                    var s=ensurePageSpinner();
+                    s.classList.add('active');
+                    var href=this.getAttribute('href');
+                    setTimeout(function(){window.location.href=href;},150);
+                },{passive:false});
+            }
+        });
+        // No Toby Popup on this page, so removed relevant JS.
+        // Removed Device detection and navbar positioning logic.
+    </script>
+</body>
+</html>

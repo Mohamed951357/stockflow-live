@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بونص فارما - التقارير والإحصائيات</title>
+
+    <!-- External Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --info-gradient: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+
+            --bg-light: #f8f9fa;
+            --bg-dark: #1a1d29;
+            --card-light: #ffffff;
+            --card-dark: #242837;
+            --text-light: #2d3748;
+            --text-dark: #e2e8f0;
+            --border-light: #e2e8f0;
+            --border-dark: #3a3f51;
+
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-light);
+            transition: var(--transition);
+            min-height: 100vh;
+        }
+
+        body.dark-mode {
+            background: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background: var(--primary-gradient);
+            box-shadow: var(--shadow-md);
+            padding: 1rem 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-brand i {
+            font-size: 1.8rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            z-index: 1000;
+            background: var(--card-light);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .dark-mode .theme-toggle {
+            background: var(--card-dark);
+            color: var(--text-dark);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Page Header */
+        .page-header {
+            background: var(--card-light);
+            padding: 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dark-mode .page-header {
+            background: var(--card-dark);
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--primary-gradient);
+        }
+
+        .page-header h2 {
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: var(--card-light);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .dark-mode .filter-section {
+            background: var(--card-dark);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-light);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .dark-mode .stat-card {
+            background: var(--card-dark);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .stat-card.primary::before {
+            background: var(--primary-gradient);
+        }
+
+        .stat-card.success::before {
+            background: var(--success-gradient);
+        }
+
+        .stat-card.info::before {
+            background: var(--info-gradient);
+        }
+
+        .stat-card.warning::before {
+            background: var(--warning-gradient);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .stat-card.primary .stat-icon {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            color: #667eea;
+        }
+
+        .stat-card.success .stat-icon {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+            color: #4facfe;
+        }
+
+        .stat-card.info .stat-icon {
+            background: linear-gradient(135deg, rgba(48, 207, 208, 0.1) 0%, rgba(51, 8, 103, 0.1) 100%);
+            color: #30cfd0;
+        }
+
+        .stat-card.warning .stat-icon {
+            background: linear-gradient(135deg, rgba(250, 112, 154, 0.1) 0%, rgba(254, 225, 64, 0.1) 100%);
+            color: #fa709a;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .stat-change.positive {
+            color: #48bb78;
+        }
+
+        .stat-change.negative {
+            color: #f56565;
+        }
+
+        /* Chart Section */
+        .chart-container {
+            background: var(--card-light);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+        }
+
+        .dark-mode .chart-container {
+            background: var(--card-dark);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-header h5 {
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Table Styles */
+        .table-card {
+            background: var(--card-light);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+        }
+
+        .dark-mode .table-card {
+            background: var(--card-dark);
+        }
+
+        .table-card .card-header {
+            background: transparent;
+            border: none;
+            padding: 0 0 1rem 0;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .dark-mode .table {
+            color: var(--text-dark);
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            color: var(--text-light);
+            font-weight: 600;
+            border: none;
+            padding: 1rem;
+        }
+
+        .dark-mode .table thead th {
+            color: var(--text-dark);
+            background: rgba(102, 126, 234, 0.15);
+        }
+
+        .table tbody tr {
+            transition: var(--transition);
+        }
+
+        .table tbody tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+            transform: scale(1.01);
+        }
+
+        .dark-mode .table tbody tr:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-color: var(--border-light);
+        }
+
+        .dark-mode .table tbody td {
+            border-color: var(--border-dark);
+        }
+
+        /* Badges */
+        .badge {
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        /* Buttons */
+        .btn {
+            border-radius: 12px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-export {
+            background: var(--success-gradient);
+            color: white;
+        }
+
+        .btn-export:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Collapsible Section */
+        .collapsible-card {
+            background: var(--card-light);
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .dark-mode .collapsible-card {
+            background: var(--card-dark);
+        }
+
+        /* Top Lists */
+        .top-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 12px;
+            margin-bottom: 0.8rem;
+            transition: var(--transition);
+        }
+
+        .dark-mode .top-list-item {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .top-list-item:hover {
+            transform: translateX(-5px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .top-list-item .rank {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-left: 1rem;
+        }
+
+        .top-list-item:nth-child(1) .rank {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #000;
+        }
+
+        .top-list-item:nth-child(2) .rank {
+            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+            color: #000;
+        }
+
+        .top-list-item:nth-child(3) .rank {
+            background: linear-gradient(135deg, #cd7f32 0%, #e69a5c 100%);
+            color: #fff;
+        }
+
+        .top-list-item:nth-child(n+4) .rank {
+            background: var(--primary-gradient);
+            color: #fff;
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .theme-toggle {
+                top: 70px;
+                left: 10px;
+                width: 45px;
+                height: 45px;
+            }
+
+            .page-header {
+                padding: 1.5rem;
+            }
+
+            .page-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .chart-container {
+                padding: 1rem;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+
+            .filter-section {
+                padding: 1rem;
+            }
+
+            .table-card {
+                padding: 1rem;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+
+            .theme-toggle,
+            .btn,
+            .navbar,
+            .filter-section {
+                display: none !important;
+            }
+
+            body {
+                background: white;
+                color: black;
+            }
+
+            .stat-card,
+            .chart-container,
+            .table-card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                page-break-inside: avoid;
+            }
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="themeToggle" title="تبديل الوضع الداكن/الفاتح">
+        <i class="fas fa-moon" id="themeIcon"></i>
+    </button>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+                <i class="fas fa-shield-alt"></i>
+                لوحة الإدارة
+            </a>
+
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                    <i class="fas fa-home me-2"></i>
+                    الرئيسية
+                </a>
+                <a class="nav-link" href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    تسجيل الخروج
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4 mb-5">
+        <!-- Page Header -->
+        <div class="page-header fade-in">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <h2>
+                    <i class="fas fa-chart-line"></i>
+                    التقارير والإحصائيات
+                </h2>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-export" onclick="exportToExcel()">
+                        <i class="fas fa-file-excel me-2"></i>
+                        Excel
+                    </button>
+                    <button class="btn btn-export" onclick="window.print()">
+                        <i class="fas fa-print me-2"></i>
+                        طباعة
+                    </button>
+                    {% if session.get('user_type') == 'admin' %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-right me-2"></i>
+                        العودة
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('company_dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-right me-2"></i>
+                        العودة
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section slide-in">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-calendar me-2"></i>
+                        الفترة الزمنية
+                    </label>
+                    <select class="form-select" id="periodFilter" onchange="filterData()">
+                        <option value="all">كل الفترات</option>
+                        <option value="today">اليوم</option>
+                        <option value="week">هذا الأسبوع</option>
+                        <option value="month" selected>هذا الشهر</option>
+                        <option value="year">هذه السنة</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-building me-2"></i>
+                        الشركة
+                    </label>
+                    <select class="form-select" id="companyFilter" onchange="filterData()">
+                        <option value="all">جميع الشركات</option>
+                        {% for company_name, _ in searches_per_rep_this_month %}
+                        <option value="{{ company_name }}">{{ company_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-search me-2"></i>
+                        بحث سريع
+                    </label>
+                    <input type="text" class="form-control" id="quickSearch" placeholder="ابحث في البيانات..."
+                        onkeyup="quickSearch()">
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid fade-in">
+            <div class="stat-card primary" data-bs-toggle="collapse" data-bs-target="#companiesDetails">
+                <div class="stat-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="stat-value" id="totalCompaniesCountReports">{{ total_companies }}</div>
+                <div class="stat-label">إجمالي الشركات</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span id="activeCompaniesCountReports">{{ active_companies }} نشط</span>
+                </div>
+            </div>
+
+            <div class="stat-card success" data-bs-toggle="collapse" data-bs-target="#searchesTable">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="stat-value">{{ searches_per_rep_this_month|length }}</div>
+                <div class="stat-label">عدد البحثات لكل مندوب</div>
+                <div class="stat-change">
+                    <i class="fas fa-hand-pointer"></i>
+                    <span>اضغط للتفاصيل</span>
+                </div>
+            </div>
+
+            <div class="stat-card info">
+                <div class="stat-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="stat-value">{{ total_searches }}</div>
+                <div class="stat-label">إجمالي عمليات البحث</div>
+                <small class="text-muted d-block">كلمات فريدة: {{ unique_search_terms_count or 0 }}</small>
+                <small class="text-muted">متوسط النتائج: {{ "%.2f"|format(average_results_per_search) }}</small>
+            </div>
+
+            <div class="stat-card warning">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-value">{{ searches_per_rep_this_month|length }}</div>
+                <div class="stat-label">الشركات النشطة بالبحث</div>
+                <small class="text-muted">خلال الشهر الحالي</small>
+            </div>
+        </div>
+
+        <!-- Collapsible Searches Table -->
+        <div class="collapse mb-4" id="searchesTable">
+            <div class="collapsible-card slide-in">
+                <div class="table-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            تفاصيل عدد البحثات لكل مندوب
+                        </h5>
+                        <button class="btn btn-sm btn-secondary" data-bs-toggle="collapse"
+                            data-bs-target="#searchesTable">
+                            <i class="fas fa-times me-1"></i>
+                            إغلاق
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="searchesPerRepTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>اسم الشركة/المندوب</th>
+                                    <th>عدد البحثات</th>
+                                    <th>النسبة المئوية</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set total_count = searches_per_rep_this_month|map(attribute='1')|sum %}
+                                {% for company_name, search_count in searches_per_rep_this_month %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ company_name }}</td>
+                                    <td><span class="badge bg-success">{{ search_count }}</span></td>
+                                    <td>
+                                        <div class="progress" style="height: 25px;">
+                                            <div class="progress-bar bg-success" role="progressbar"
+                                                style="width: {{ (search_count / total_count * 100)|round(1) if total_count > 0 else 0 }}%">
+                                                {{ (search_count / total_count * 100)|round(1) if total_count > 0 else 0
+                                                }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% if not searches_per_rep_this_month %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">لا توجد عمليات بحث خلال هذا الشهر
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Lists -->
+        <div class="row mb-4">
+            <div class="col-lg-6 mb-3">
+                <div class="chart-container slide-in">
+                    <div class="chart-header">
+                        <h5>
+                            <i class="fas fa-trophy me-2 text-warning"></i>
+                            أكثر الشركات نشاطاً في البحث
+                        </h5>
+                    </div>
+                    {% for company_name, search_count in top_companies %}
+                    <div class="top-list-item">
+                        <div class="d-flex align-items-center">
+                            <div class="rank">{{ loop.index }}</div>
+                            <div>
+                                <strong>{{ company_name }}</strong>
+                            </div>
+                        </div>
+                        <span class="badge" style="background: var(--primary-gradient);">{{ search_count }} بحث</span>
+                    </div>
+                    {% endfor %}
+                    {% if not top_companies %}
+                    <p class="text-muted text-center">لا توجد عمليات بحث بعد</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-lg-6 mb-3">
+                <div class="chart-container slide-in">
+                    <div class="chart-header">
+                        <h5>
+                            <i class="fas fa-fire me-2 text-danger"></i>
+                            أكثر الكلمات البحثية استخداماً
+                        </h5>
+                    </div>
+                    {% if top_search_terms %}
+                    {% for term, count in top_search_terms %}
+                    <div class="top-list-item">
+                        <div class="d-flex align-items-center">
+                            <div class="rank">{{ loop.index }}</div>
+                            <div>
+                                <strong>{{ term }}</strong>
+                            </div>
+                        </div>
+                        <span class="badge" style="background: var(--info-gradient);">{{ count }} مرة</span>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted text-center">لا توجد كلمات بحثية مسجلة بعد</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Searches Table -->
+        <div class="table-card fade-in">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i>
+                    أحدث عمليات البحث
+                </h5>
+                <form method="GET" action="{{ url_for('reports') }}" class="d-flex align-items-center gap-2">
+                    <label for="search_limit" class="form-label mb-0 small">عرض:</label>
+                    <select class="form-select form-select-sm" id="search_limit" name="search_limit"
+                        onchange="this.form.submit()" style="width: auto;">
+                        <option value="10" {% if search_limit==10 %}selected{% endif %}>10</option>
+                        <option value="25" {% if search_limit==25 %}selected{% endif %}>25</option>
+                        <option value="50" {% if search_limit==50 %}selected{% endif %}>50</option>
+                        <option value="100" {% if search_limit==100 %}selected{% endif %}>100</option>
+                    </select>
+                    <input type="hidden" name="dummy" value="1">
+                </form>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover" id="recentSearchesTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>الشركة</th>
+                            <th>اسم المستخدم</th>
+                            <th>كلمة البحث</th>
+                            <th>عدد النتائج</th>
+                            <th>التاريخ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for search in recent_searches %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ search.company.company_name }}</td>
+                            <td>{{ search.company.username }}</td>
+                            <td><span class="badge bg-info">{{ search.search_term }}</span></td>
+                            <td><span class="badge bg-primary">{{ search.results_count }}</span></td>
+                            <td>{{ search.search_date_cairo_formatted or (search.search_date and
+                                search.search_date.strftime('%Y-%m-%d %I:%M %p')) or '' }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% if not recent_searches %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">لا توجد عمليات بحث بعد</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const body = document.body;
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            themeIcon.classList.toggle('fa-moon', !isDark);
+            themeIcon.classList.toggle('fa-sun', isDark);
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+            // Update charts colors
+            updateChartsTheme(isDark);
+        });
+
+        // Initialize DataTables
+        $(document).ready(function () {
+            $('#recentSearchesTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json'
+                },
+                order: [[0, 'desc']],
+                pageLength: {{ search_limit or 25 }},
+            responsive: true
+            });
+
+        $('#searchesPerRepTable').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json'
+            },
+            order: [[2, 'desc']],
+            pageLength: 10,
+            responsive: true
+        });
+        });
+
+        // Chart.js Configuration
+        const isDarkMode = body.classList.contains('dark-mode');
+        const textColor = isDarkMode ? '#e2e8f0' : '#2d3748';
+        const gridColor = isDarkMode ? '#3a3f51' : '#e2e8f0';
+
+        // Company Distribution Chart
+        const companyDistributionCtx = document.getElementById('companyDistributionChart').getContext('2d');
+        const companyDistributionChart = new Chart(companyDistributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    {% for company_name, _ in searches_per_rep_this_month[: 5] %}
+                    '{{ company_name }}'{{ ',' if not loop.last else '' }}
+        {% endfor %}
+                ],
+        datasets: [{
+            data: [
+                {% for _, count in searches_per_rep_this_month[: 5] %}
+        { { count } } { { ',' if not loop.last else '' } }
+        {% endfor %}
+                    ],
+        backgroundColor: [
+            'rgba(102, 126, 234, 0.8)',
+            'rgba(79, 172, 254, 0.8)',
+            'rgba(250, 112, 154, 0.8)',
+            'rgba(48, 207, 208, 0.8)',
+            'rgba(254, 225, 64, 0.8)'
+        ],
+            borderWidth: 3,
+                borderColor: isDarkMode ? '#242837' : '#ffffff'
+                }]
+            },
+        options: {
+            responsive: true,
+                maintainAspectRatio: true,
+                    plugins: {
+                legend: {
+                    position: 'bottom',
+                        labels: {
+                        color: textColor,
+                            font: {
+                            family: 'Cairo',
+                                size: 12
+                        },
+                        padding: 15
+                    }
+                }
+            }
+        }
+        });
+
+        // Update Charts Theme
+        function updateChartsTheme(isDark) {
+            const newTextColor = isDark ? '#e2e8f0' : '#2d3748';
+
+            companyDistributionChart.options.plugins.legend.labels.color = newTextColor;
+            companyDistributionChart.data.datasets[0].borderColor = isDark ? '#242837' : '#ffffff';
+            companyDistributionChart.update();
+        }
+
+        // Export to Excel
+        function exportToExcel() {
+            const wb = XLSX.utils.book_new();
+
+            // Export Recent Searches
+            const recentSearchesData = [];
+            recentSearchesData.push(['الشركة', 'اسم المستخدم', 'كلمة البحث', 'عدد النتائج', 'التاريخ']);
+
+            {% for search in recent_searches %}
+            recentSearchesData.push([
+                '{{ search.company.company_name }}',
+                '{{ search.company.username }}',
+                '{{ search.search_term }}',
+                {{ search.results_count }},
+        '{{ search.search_date_cairo_formatted or (search.search_date and search.search_date.strftime(' % Y -% m -% d % I:% M % p')) or '' }}'
+            ]);
+        {% endfor %}
+
+        const ws1 = XLSX.utils.aoa_to_sheet(recentSearchesData);
+        XLSX.utils.book_append_sheet(wb, ws1, 'أحدث عمليات البحث');
+
+        // Export Searches Per Rep
+        const searchesPerRepData = [];
+        searchesPerRepData.push(['اسم الشركة/المندوب', 'عدد البحثات']);
+
+        {% for company_name, search_count in searches_per_rep_this_month %}
+        searchesPerRepData.push(['{{ company_name }}', {{ search_count }}]);
+        {% endfor %}
+
+        const ws2 = XLSX.utils.aoa_to_sheet(searchesPerRepData);
+        XLSX.utils.book_append_sheet(wb, ws2, 'البحثات لكل مندوب');
+
+        // Save file
+        XLSX.writeFile(wb, 'تقرير_البحثات_' + new Date().toISOString().split('T')[0] + '.xlsx');
+        }
+
+        // Quick Search
+        function quickSearch() {
+            const input = document.getElementById('quickSearch').value.toLowerCase();
+            const tables = document.querySelectorAll('table tbody tr');
+
+            tables.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(input) ? '' : 'none';
+            });
+        }
+
+        // Filter Data (placeholder for future implementation)
+        function filterData() {
+            console.log('Filter functionality - to be implemented with backend');
+        }
+
+        // Add entrance animations on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in, .slide-in').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease-out';
+            observer.observe(el);
+        });
+
+        function parseNumberFromElement(el) {
+            const text = el.innerText || '';
+            const numMatch = text.match(/\d+/);
+            return numMatch ? parseInt(numMatch[0], 10) : 0;
+        }
+
+        function animateNumber(el, target, suffix) {
+            const start = parseNumberFromElement(el);
+            const diff = target - start;
+            if (diff === 0) return;
+            const duration = 400;
+            const startTime = performance.now();
+            function step(now) {
+                const t = Math.min(1, (now - startTime) / duration);
+                const value = Math.round(start + diff * t);
+                el.innerText = suffix ? (value + ' ' + suffix) : String(value);
+                if (t < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        async function refreshCompanyCountsReports() {
+            try {
+                const res = await fetch('/stats/company_counts', { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                const data = await res.json();
+                if (res.ok && data && data.success) {
+                    const totalEl = document.getElementById('totalCompaniesCountReports');
+                    const activeEl = document.getElementById('activeCompaniesCountReports');
+                    if (totalEl && typeof data.total_companies === 'number') {
+                        animateNumber(totalEl, data.total_companies, null);
+                    }
+                    if (activeEl && typeof data.active_companies === 'number') {
+                        animateNumber(activeEl, data.active_companies, 'نشطة');
+                    }
+                }
+            } catch (e) {}
+        }
+
+        refreshCompanyCountsReports();
+        setInterval(refreshCompanyCountsReports, 10000);
+    </script>
+</body>
+
+</html>

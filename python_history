@@ -1,0 +1,98 @@
+17:32 ~ $ # 1. افتح Python Console
+python3
+
+# 2. استورد المكتبات المطلوبة
+from app import app, db
+from sqlalchemy import text
+
+# 3. أضف العمود الجديد
+with app.app_context():
+    try:
+        # إضافة حقل force_password_change
+        db.session.execute(text('ALTER TABLE company ADD COLUMN force_password_change BOOLEAN DEFAULT 0 NOT NULL'))
+        db.session.commit()
+        print("✅ تم إضافة حقل force_password_change بنجاح!")
+    except Exception as e:
+        print(f"❌ خطأ: {str(e)}")
+        db.session.rollback()
+
+# 4. تحديث السجلات الموجودة (للتأكيد)
+with app.app_context():
+    try:
+        db.session.execute(text('UPDATE company SET force_password_change = 0 WHERE force_password_change IS NULL'))
+        db.session.commit()
+        print("✅ تم تحديث جميع السجلات!")
+    except Exception as e:
+        print(f"❌ خطأ: {str(e)}")
+
+# 5. تأكد من النجاح
+with app.app_context():
+    result = db.session.execute(text('SHOW COLUMNS FROM company LIKE "force_password_change"'))
+    if result.fetchone():
+        print("✅✅ العمود موجود بنجاح في قاعدة البيانات!")
+    else:
+        print("❌ العمود غير موجود!")
+
+# 6. اخرج من Python
+exit()
+Python 3.13.1 (main, Jan 16 2025, 13:50:41) [GCC 11.4.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> 
+>>> 
+exit()
+from app import app, db
+from sqlalchemy import text
+
+with app.app_context():
+    try:
+        db.session.execute(text('ALTER TABLE company ADD COLUMN force_password_change BOOLEAN DEFAULT 0 NOT NULL'))
+        db.session.commit()
+        print("✅ تم إضافة حقل force_password_change بنجاح!")
+    except Exception as e:
+        print(f"❌ خطأ: {str(e)}")
+        db.session.rollback()
+
+with app.app_context():
+    try:
+        db.session.execute(text('UPDATE company SET force_password_change = 0 WHERE force_password_change IS NULL'))
+        db.session.commit()
+        print("✅ تم تحديث جميع السجلات!")
+    except Exception as e:
+        print(f"❌ خطأ: {str(e)}")
+
+with app.app_context():
+    result = db.session.execute(text('SHOW COLUMNS FROM company LIKE "force_password_change"'))
+    if result.fetchone():
+        print("✅✅ العمود موجود بنجاح في قاعدة البيانات!")
+    else:
+        print("❌ العمود غير موجود!")
+
+exit()
+from app import app, db
+from sqlalchemy import text
+
+with app.app_context():
+    result = db.session.execute(text('PRAGMA table_info(company)'))
+    columns = result.fetchall()
+    for col in columns:
+        if 'force_password_change' in str(col):
+            print(f"✅✅ العمود موجود: {col}")
+            break
+
+exit()
+from app import create_app
+from models import db, Company, ProductFile, Admin
+
+app = create_app()
+
+with app.app_context():
+    companies = Company.query.count()
+    products = ProductFile.query.count()
+    admins = Admin.query.count()
+    print('=' * 60)
+    print(f'الشركات: {companies}')
+    print(f'المنتجات: {products}')
+    print(f'المدراء: {admins}')
+    print('=' * 60)
+    
+exit()

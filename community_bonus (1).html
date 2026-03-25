@@ -1,0 +1,2185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مجتمع ستوك فلو - ستوك فلو</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --border-radius: 16px;
+            --mobile-padding: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            position: relative;
+            background-attachment: fixed;
+        }
+
+        /* Mobile-First Container - ثابتة بارتفاع الشاشة والتمرير داخل المنشورات فقط */
+        .mobile-container {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            height: 100vh;
+            max-width: 100%;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* منع سكرول عام، سكرول داخل منطقة المنشورات فقط */
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 16px var(--mobile-padding);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .header-title {
+            flex: 1;
+            text-align: center;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .header-subtitle {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Mobile Navigation Tabs */
+        .mobile-tabs {
+            display: flex;
+            background: white;
+            border-radius: var(--border-radius);
+            margin: 12px var(--mobile-padding);
+            padding: 4px;
+            box-shadow: var(--card-shadow);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            position: sticky;
+            top: 70px; /* يظهر تحت الـ header مباشرة */
+            z-index: 999;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 12px 8px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #6c757d;
+            transition: var(--transition);
+            white-space: nowrap;
+            min-width: 80px;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Mobile Post Form */
+        .post-form-mobile {
+            background: white;
+            border-radius: var(--border-radius);
+            margin: 8px var(--mobile-padding) 0;
+            padding: 10px 12px;
+            box-shadow: var(--card-shadow);
+            position: sticky;
+            top: 126px; /* رفع البوكس شوية لتقليل المساحة بينه وبين الهيدر */
+            z-index: 998;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .post-input-wrapper {
+            position: relative;
+            margin-bottom: 6px;
+        }
+
+        .post-textarea {
+            width: 100%;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 6px 12px;
+            font-size: 0.95rem;
+            resize: none;
+            transition: var(--transition);
+            font-family: inherit;
+            min-height: 24px;
+            overflow-y: hidden;
+        }
+
+        .post-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            min-height: 96px; /* يكبر عند التركيز لكتابة مريحة */
+            overflow-y: auto;
+        }
+
+        .char-counter {
+            position: absolute;
+            bottom: 8px;
+            left: 12px;
+            font-size: 0.7rem;
+            color: #6c757d;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+            margin-top: 2px;
+        }
+
+        .anonymous-toggle {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.78rem;
+            color: #6c757d;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 40px;
+            height: 20px;
+            background: #ccc;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .toggle-switch.active {
+            background: #667eea;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .toggle-switch.active::after {
+            left: 22px;
+        }
+
+        .submit-btn {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 4px 14px;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            line-height: 1.1;
+        }
+
+        .submit-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Mobile Posts Container - هي المنطقة الوحيدة القابلة للتمرير */
+        .posts-container-mobile {
+            flex: 1;
+            padding: 12px var(--mobile-padding) 80px; /* مساحة أسفل للـ bottom nav */
+            margin-top: 12px; /* مسافة بسيطة عن الـ post form */
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* سكرول ناعم على الموبايل */
+        }
+
+        /* Mobile Post Card */
+        .post-card-mobile {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* مسافة إضافية بين فورم كتابة المنشور وأول بوست */
+        #posts-list .post-card-mobile:first-child {
+            margin-top: 40px; /* زيادة أكبر للفصل بين الفورم وأول منشور */
+        }
+
+        .post-card-mobile:active {
+            transform: scale(0.98);
+        }
+
+        .post-header-mobile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .avatar-mobile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .post-meta-mobile {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .company-name-mobile {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #2c3e50;
+            margin: 0;
+            line-height: 1.2;
+            word-wrap: break-word;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .verification-badge {
+            color: #1da1f2;
+            font-size: 0.85rem;
+            margin-left: 2px;
+        }
+
+        .post-time-mobile {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+
+        .post-menu-btn {
+            background: none;
+            border: none;
+            color: #6c757d;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
+        }
+
+        .post-menu-btn:active,
+        .post-menu-btn.active {
+            background: #f8f9fa;
+            color: #495057;
+        }
+
+        .post-content-mobile {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #495057;
+            margin-bottom: 12px;
+            word-wrap: break-word;
+        }
+
+        .post-content-mobile a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .post-content-mobile a:hover {
+            text-decoration: underline;
+        }
+
+        /* Mobile Post Actions */
+        .post-actions-mobile {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #f1f3f4;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn-mobile {
+            background: none;
+            border: none;
+            color: #6c757d;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: var(--transition);
+            min-width: 60px;
+            justify-content: center;
+        }
+
+        .action-btn-mobile:active {
+            background: #f8f9fa;
+            transform: scale(0.95);
+        }
+
+        .action-btn-mobile.liked {
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .action-btn-mobile.message-btn {
+            color: #27ae60;
+            background: rgba(39, 174, 96, 0.1);
+        }
+
+        /* Mobile Comments Section */
+        .comments-section-mobile {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f1f3f4;
+            display: none;
+        }
+
+        .comments-section-mobile.show {
+            display: block;
+        }
+
+        .comment-item-mobile {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+
+        .comment-header-mobile {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .comment-delete-btn {
+            background: none;
+            border: none;
+            color: #dc3545;
+            padding: 4px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+            opacity: 0.7;
+        }
+
+        .comment-delete-btn:hover {
+            background: rgba(220, 53, 69, 0.1);
+            opacity: 1;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .comment-edit-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            padding: 4px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+            opacity: 0.7;
+        }
+
+        .comment-edit-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+            opacity: 1;
+        }
+
+        /* Post Edit Form */
+        .post-edit-form {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 12px 0;
+            border: 2px solid #e9ecef;
+        }
+
+        .post-edit-textarea {
+            width: 100%;
+            min-height: 100px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            resize: vertical;
+            transition: var(--transition);
+            margin-bottom: 12px;
+        }
+
+        .post-edit-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .post-edit-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .post-edit-save,
+        .post-edit-cancel {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .post-edit-save {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .post-edit-save:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .post-edit-cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+        .post-edit-cancel:hover {
+            background: #5a6268;
+        }
+
+        /* Comment Edit Form */
+        .comment-edit-form {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .comment-edit-input {
+            width: 100%;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            transition: var(--transition);
+            margin-bottom: 8px;
+        }
+
+        .comment-edit-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .comment-edit-actions {
+            display: flex;
+                gap: 6px;
+            justify-content: flex-end;
+        }
+
+        .comment-edit-save,
+        .comment-edit-cancel {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+        }
+
+        .comment-edit-save {
+            background: #667eea;
+            color: white;
+        }
+
+        .comment-edit-save:hover {
+            background: #5a6fd8;
+        }
+
+        .comment-edit-cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+        .comment-edit-cancel:hover {
+            background: #5a6268;
+        }
+
+        .comment-author-mobile {
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #2c3e50;
+        }
+
+        .comment-time-mobile {
+            font-size: 0.7rem;
+            color: #6c757d;
+        }
+
+        .comment-content-mobile {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: #495057;
+        }
+
+        .comment-input-mobile {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .comment-input-field {
+            flex: 1;
+            border: 2px solid #e9ecef;
+            border-radius: 20px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+
+        .comment-input-field:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .comment-submit-btn {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .comment-submit-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* Loading States */
+        .loading-mobile {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-state-mobile {
+                text-align: center;
+            padding: 40px 20px;
+            color: #dc3545;
+        }
+
+        .error-state-mobile i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .retry-btn {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 16px;
+            transition: var(--transition);
+        }
+
+        .retry-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Empty State */
+        .empty-state-mobile {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state-mobile i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state-mobile h3 {
+            font-size: 1.1rem;
+                margin-bottom: 8px;
+            color: #495057;
+        }
+
+        .empty-state-mobile p {
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* Mobile Menu Dropdown */
+        .post-menu-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            padding: 8px 0;
+            min-width: 180px;
+            z-index: 1000;
+            display: none;
+            animation: slideDown 0.2s ease-out;
+            margin-top: 4px;
+            border: 1px solid #e9ecef;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .post-menu-dropdown.show {
+            display: block;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: right;
+                font-size: 0.9rem;
+            color: #495057;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .menu-item:active {
+            background: #f8f9fa;
+        }
+
+        .menu-item i {
+            width: 16px;
+            text-align: center;
+        }
+
+        .menu-item.danger {
+            color: #dc3545;
+        }
+
+        /* Mobile Bottom Navigation */
+        .bottom-nav-mobile {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.1);
+            transform: translateZ(0); /* Force hardware acceleration for better performance */
+            will-change: transform; /* Optimize for animations */
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            border: none;
+            background: none;
+            color: #6c757d;
+            font-size: 0.7rem;
+            transition: var(--transition);
+            min-width: 60px;
+        }
+
+        .bottom-nav-item.active {
+            color: #667eea;
+        }
+
+        .bottom-nav-item i {
+            font-size: 1.2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 320px) {
+            :root {
+                --mobile-padding: 8px;
+            }
+
+            .tab-btn {
+                font-size: 0.75rem;
+                padding: 10px 6px;
+            }
+
+            .company-name-mobile {
+                font-size: 0.85rem;
+            }
+
+            .action-btn-mobile {
+                font-size: 0.75rem;
+                padding: 6px 8px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .mobile-container {
+                max-width: 768px;
+                margin: 20px auto;
+                border-radius: 20px;
+                min-height: calc(100vh - 40px);
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            }
+
+            .mobile-header {
+                border-radius: 20px 20px 0 0;
+            }
+
+            .bottom-nav-mobile {
+                border-radius: 0 0 20px 20px;
+            }
+        }
+
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .action-btn-mobile,
+            .submit-btn,
+            .comment-submit-btn,
+            .retry-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            .post-menu-btn,
+            .header-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
+
+        /* Safe area for modern phones */
+        @supports (padding: max(0px)) {
+            .mobile-header {
+                padding-top: max(16px, env(safe-area-inset-top));
+            }
+
+            .bottom-nav-mobile {
+                padding-bottom: max(8px, env(safe-area-inset-bottom));
+            }
+
+            .posts-container-mobile {
+                padding-bottom: max(80px, calc(80px + env(safe-area-inset-bottom)));
+            }
+        }
+
+        /* Smooth scrolling للصفحة، لكن التمرير الفعلي داخل posts-container-mobile */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* الجسم نفسه بدون سكرول، التمرير داخل الحاوية الداخلية */
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* منع سكرول عام */
+            min-height: 100vh;
+        }
+
+        /* على الموبايل نفس السلوك: بدون padding إضافي للجسم */
+        @media (max-width: 768px) {
+            body {
+                overflow: hidden;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body data-user-id="{{ current_user.id|default(0) }}">
+    <div class="mobile-container">
+        <!-- Mobile Header -->
+        <div class="mobile-header">
+            <div class="header-content">
+                <button class="header-btn" onclick="window.location.href='{{ url_for('company_dashboard') }}'" title="الرئيسية">
+                    <i class="fas fa-home"></i>
+                </button>
+                <div class="header-title">
+                    <h1>مجتمع ستوك فلو</h1>
+                    <div class="header-subtitle">شارك واستفد من تجارب الآخرين</div>
+                </div>
+                <div class="header-actions">
+                    <button class="header-btn" onclick="refreshPosts()" title="تحديث">
+                        <i class="fas fa-sync-alt" id="refresh-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Tabs -->
+        <div class="mobile-tabs">
+            <button class="tab-btn active" id="all-tab" onclick="switchTab('all')">
+                <i class="fas fa-globe"></i>
+                العامة
+            </button>
+            <button class="tab-btn" id="my-tab" onclick="switchTab('my')">
+                <i class="fas fa-user"></i>
+                منشوراتي
+            </button>
+            <button class="tab-btn" id="messages-tab" onclick="openMessagesPage()">
+                <i class="fas fa-envelope"></i>
+                مراسلاتي
+            </button>
+        </div>
+
+        <!-- Mobile Post Form -->
+        <div class="post-form-mobile" id="post-form">
+            <div class="post-input-wrapper">
+                <textarea
+                    class="post-textarea"
+                    id="post-content"
+                    placeholder="ماذا يخطر ببالك؟ شارك مع المجتمع..."
+                    maxlength="500"
+                    rows="1"
+                ></textarea>
+                <div class="char-counter">
+                    <span id="char-count">0</span>/500
+                </div>
+            </div>
+            <div class="form-actions">
+                <div class="anonymous-toggle" onclick="toggleAnonymous()">
+                    <div class="toggle-switch" id="anonymous-toggle"></div>
+                    <span>نشر مجهول</span>
+                </div>
+                <button class="submit-btn" onclick="createPost()" id="submit-post-btn">
+                    <i class="fas fa-paper-plane"></i>
+                    نشر
+                </button>
+            </div>
+        </div>
+
+        <!-- Posts Container -->
+        <div class="posts-container-mobile" id="posts-container">
+            <!-- Loading State -->
+            <div class="loading-mobile" id="loading-state">
+                <div class="loading-spinner"></div>
+                <p>جاري تحميل المنشورات...</p>
+            </div>
+
+            <!-- Error State -->
+            <div class="error-state-mobile" id="error-state" style="display: none;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h4>حدث خطأ في التحميل</h4>
+                <p>تعذر تحميل المنشورات</p>
+                <button class="retry-btn" onclick="loadPosts()">حاول مرة أخرى</button>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state-mobile" id="empty-state" style="display: none;">
+                <i class="fas fa-comments"></i>
+                <h3>لا توجد منشورات حالياً</h3>
+                <p>كن أول من يشارك في مجتمع بونص فارما!</p>
+            </div>
+
+            <!-- Posts will be loaded here -->
+            <div id="posts-list"></div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav-mobile">
+            <button class="bottom-nav-item active" onclick="scrollToTop()">
+                <i class="fas fa-home"></i>
+                <span>الرئيسية</span>
+            </button>
+            <button class="bottom-nav-item" onclick="focusPostForm()">
+                <i class="fas fa-plus-circle"></i>
+                <span>نشر</span>
+            </button>
+            <button class="bottom-nav-item" onclick="refreshPosts()">
+                <i class="fas fa-sync-alt"></i>
+                <span>تحديث</span>
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let currentTab = 'all';
+        let isAnonymous = false;
+        let posts = [];
+        let isLoading = false;
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPosts();
+            setupEventListeners();
+            setupCharacterCounter();
+        });
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Post content textarea
+            const postContent = document.getElementById('post-content');
+            if (postContent) {
+                postContent.addEventListener('input', function() {
+                    updateCharacterCounter();
+                });
+
+                postContent.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && e.ctrlKey) {
+                        e.preventDefault();
+                        createPost();
+                    }
+                });
+            }
+
+            // Pull to refresh for mobile
+            let touchStartY = 0;
+            let touchEndY = 0;
+
+            document.addEventListener('touchstart', function(e) {
+                touchStartY = e.changedTouches[0].screenY;
+            });
+
+            document.addEventListener('touchend', function(e) {
+                touchEndY = e.changedTouches[0].screenY;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                if (touchEndY - touchStartY > 100 && window.scrollY === 0) {
+                    refreshPosts();
+                }
+            }
+        }
+
+        // Setup character counter
+        function setupCharacterCounter() {
+            const textarea = document.getElementById('post-content');
+            const counter = document.getElementById('char-count');
+
+            if (textarea && counter) {
+                textarea.addEventListener('input', updateCharacterCounter);
+                updateCharacterCounter();
+            }
+        }
+
+        function updateCharacterCounter() {
+            const textarea = document.getElementById('post-content');
+            const counter = document.getElementById('char-count');
+
+            if (textarea && counter) {
+                const length = textarea.value.length;
+                counter.textContent = length;
+
+                if (length > 450) {
+                    counter.style.color = '#dc3545';
+                } else if (length > 400) {
+                    counter.style.color = '#ffc107';
+                } else {
+                    counter.style.color = '#6c757d';
+                }
+            }
+        }
+
+        // Toggle anonymous posting
+        function toggleAnonymous() {
+            isAnonymous = !isAnonymous;
+            const toggle = document.getElementById('anonymous-toggle');
+            if (toggle) {
+                toggle.classList.toggle('active', isAnonymous);
+            }
+        }
+
+        // Switch tabs
+        function switchTab(tab) {
+            if (isLoading) return;
+
+            currentTab = tab;
+
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tab + '-tab').classList.add('active');
+
+            // Load posts for the selected tab
+            loadPosts();
+        }
+
+        // Get filter value for server
+        function getFilterValue(tab) {
+            // Convert frontend tab names to server filter names
+            if (tab === 'my') {
+                return 'my_posts';
+            } else if (tab === 'liked') {
+                return 'liked';
+            }
+            return 'all';
+        }
+
+        // Load posts
+        async function loadPosts() {
+            if (isLoading) return;
+
+            isLoading = true;
+            showLoadingState();
+
+            try {
+                // Use test endpoint for demo
+                const filterValue = getFilterValue(currentTab);
+                const endpoint = window.location.hostname === 'localhost' && window.location.port === '8080'
+                    ? 'http://127.0.0.1:5000/community_bonus/get_posts_test'
+                    : `/community_bonus/get_posts?filter=${filterValue}`;
+
+                const response = await fetch(endpoint, {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        throw new Error('Authentication required');
+                    }
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Handle both response formats: {success: true, posts: []} or {posts: []}
+                if (data.posts !== undefined) {
+                    posts = data.posts || [];
+                    renderPosts();
+                } else if (data.success && data.posts) {
+                    posts = data.posts || [];
+                    renderPosts();
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                showErrorState(error.message);
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        // Render posts
+        function renderPosts() {
+            const container = document.getElementById('posts-list');
+
+            if (!container) return;
+
+            if (posts.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            hideLoadingState();
+            hideErrorState();
+            hideEmptyState();
+
+            container.innerHTML = posts.map(post => createPostHTML(post)).join('');
+
+            // Record views for visible posts
+            setTimeout(() => {
+                posts.forEach(post => {
+                    if (isElementInViewport(document.getElementById(`post-${post.id}`))) {
+                        recordView(post.id);
+                    }
+                });
+            }, 1000);
+        }
+
+        // Create post HTML
+        function createPostHTML(post) {
+            // Get current user ID from a data attribute or use 0 as fallback
+            let currentUserId = parseInt(document.body.getAttribute('data-user-id') || '0');
+
+            // For local testing - if the template wasn't processed, use a test user ID
+            if (isNaN(currentUserId) || currentUserId === 0) {
+                currentUserId = 1; // Test user ID for local development
+            }
+
+            // Check local storage for liked status (fixes duplicate like bug)
+            const likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]');
+            const isLikedLocal = likedPosts.includes(post.id);
+            const isLiked = post.is_liked || isLikedLocal;
+            
+            // Check local storage for my comments to ensure delete permission
+            // This is handled in renderComments, but good to keep in mind
+
+            const isMyPost = post.company_id === currentUserId;
+            const avatarKey = post.is_anonymous ? 'male-1' : (post.avatar || 'male-1');
+            const avatarUrl = `/static/images/avatars/${avatarKey}.jpg`;
+            const displayName = post.is_anonymous ? 'مجهول الهوية' : post.company_name;
+
+            return `
+                <div class="post-card-mobile" id="post-${post.id}">
+                    <div class="post-header-mobile">
+                        <img src="${avatarUrl}" alt="Avatar" class="avatar-mobile" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                        <div class="avatar-mobile" style="display: none; width: 40px; height: 40px; border-radius: 50%; background: var(--primary-gradient); color: white; align-items: center; justify-content: center; font-weight: 600;">${post.is_anonymous ? '?' : (post.company_name ? post.company_name.charAt(0) : 'U')}</div>
+                        <div class="post-meta-mobile">
+                            <div class="company-name-mobile">
+                                ${displayName}
+                                ${post.is_premium ? '<i class="fas fa-check-circle verification-badge" title="حساب موثق"></i>' : ''}
+                            </div>
+                            <div class="post-time-mobile">${formatTimeAgo(post.created_at)}</div>
+                        </div>
+                        <button class="post-menu-btn" onclick="togglePostMenu(${post.id})" id="menu-btn-${post.id}">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="post-menu-dropdown" id="menu-${post.id}">
+                            ${isMyPost ? `
+                                <button class="menu-item" onclick="editPost(${post.id})">
+                                    <i class="fas fa-edit"></i>
+                                    تعديل المنشور
+                                </button>
+                                <button class="menu-item danger" onclick="deletePost(${post.id})">
+                                    <i class="fas fa-trash"></i>
+                                    حذف المنشور
+                                </button>
+                            ` : ''}
+                            <button class="menu-item" onclick="reportPost(${post.id})">
+                                <i class="fas fa-flag"></i>
+                                إبلاغ عن المنشور
+                            </button>
+                            ${post.is_anonymous ? '' : `
+                            <button class="menu-item" onclick="messageCompany(${post.company_id})">
+                                <i class="fas fa-envelope"></i>
+                                مراسلة الشركة
+                            </button>
+                            `}
+                        </div>
+                    </div>
+
+                    <div class="post-content-mobile">${escapeHtml(post.content)}</div>
+
+                    <div class="post-actions-mobile">
+                        <div class="action-group">
+                            <button class="action-btn-mobile ${isLiked ? 'liked' : ''}"
+                                    onclick="toggleLike(${post.id})"
+                                    id="like-btn-${post.id}">
+                                <i class="${isLiked ? 'fas' : 'far'} fa-heart"></i>
+                                <span id="like-count-${post.id}">${post.likes_count}</span>
+                            </button>
+                            <button class="action-btn-mobile" onclick="toggleComments(${post.id})">
+                                <i class="far fa-comment"></i>
+                                <span id="comment-count-${post.id}">${post.comments_count}</span>
+                            </button>
+                        </div>
+                        <div class="action-group">
+                            <span class="text-muted" style="font-size: 0.75rem;">
+                                <i class="far fa-eye"></i> ${post.views_count}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="comments-section-mobile" id="comments-${post.id}">
+                        <div id="comments-list-${post.id}"></div>
+                        <div class="comment-input-mobile">
+                            <input type="text"
+                                   class="comment-input-field"
+                                   id="comment-input-${post.id}"
+                                   placeholder="أضف تعليقاً..."
+                                   onkeypress="if(event.key==='Enter') addComment(${post.id})">
+                            <button class="comment-submit-btn" onclick="addComment(${post.id})">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Create post
+        async function createPost() {
+            const content = document.getElementById('post-content').value.trim();
+
+            if (!content) {
+                showToast('يرجى كتابة محتوى المنشور', 'warning');
+                return;
+            }
+
+            if (content.length > 500) {
+                showToast('المنشور طويل جداً (الحد الأقصى 500 حرف)', 'error');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submit-post-btn');
+            const originalHTML = submitBtn.innerHTML;
+
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            submitBtn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('content', content);
+                formData.append('is_anonymous', isAnonymous);
+
+                // Use test endpoint for localhost demo
+                const endpoint = window.location.host === 'localhost:8080'
+                    ? 'http://127.0.0.1:5000/community_bonus/create_post_test'
+                    : '/community_bonus/create_post';
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                let data = null;
+                try {
+                    data = await response.json();
+                } catch (_) {}
+
+                if (response.ok && data && data.success) {
+                    // Clear form
+                    document.getElementById('post-content').value = '';
+                    isAnonymous = false;
+                    document.getElementById('anonymous-toggle').classList.remove('active');
+                    updateCharacterCounter();
+
+                    // Reload posts
+                    loadPosts();
+
+                    showToast('تم نشر المنشور بنجاح!', 'success');
+                } else {
+                    const msg = (data && (data.error || data.message)) || `HTTP ${response.status}`;
+                    showToast(msg || 'حدث خطأ في نشر المنشور', 'error');
+                    return;
+                }
+
+            } catch (error) {
+                console.error('Error creating post:', error);
+                showToast('حدث خطأ في نشر المنشور', 'error');
+            } finally {
+                submitBtn.innerHTML = originalHTML;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Toggle like - لا يسمح إلا بلايك واحد لكل بوست لكل مستخدم (بدون إلغاء لايك)
+        async function toggleLike(postId) {
+            const likeBtn = document.querySelector(`#post-${postId} .action-btn-mobile`);
+
+            // لو المستخدم بالفعل عامل لايك، نتجاهل أي ضغطات إضافية
+            if (likeBtn && likeBtn.classList.contains('liked')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/community_bonus/toggle_like', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ post_id: postId })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update UI - بعد أول لايك يصبح الزر في حالة liked ولا يعود
+                    const btn = likeBtn || document.querySelector(`#post-${postId} .action-btn-mobile`);
+                    if (!btn) return;
+
+                    btn.classList.add('liked');
+                    btn.innerHTML = '<i class="fas fa-heart"></i> <span id="like-count-' + postId + '">' + data.likes_count + '</span>';
+
+                    const likeCount = document.getElementById(`like-count-${postId}`);
+                    if (likeCount) {
+                        likeCount.textContent = data.likes_count;
+                    }
+
+                    // Save to local storage
+                    const likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]');
+                    if (!likedPosts.includes(postId)) {
+                        likedPosts.push(postId);
+                        localStorage.setItem('likedPosts', JSON.stringify(likedPosts));
+                    }
+
+                    // Send notification to post owner
+                    notifyPostOwner(postId, 'like');
+
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+
+            } catch (error) {
+                console.error('Error toggling like:', error);
+                showToast('حدث خطأ في تبديل الإعجاب', 'error');
+            }
+        }
+
+        // Notify post owner (Simulated)
+        function notifyPostOwner(postId, type) {
+            // In a real app, this would be handled by the backend or a socket
+            // For now, we show a toast to confirm the action triggered a notification event
+            const actionText = type === 'like' ? 'إعجابك' : 'تعليقك';
+            console.log(`Notification sent to owner of post ${postId} about ${type}`);
+            
+            // Only show toast if it's not the user's own post (simulated check)
+            // We can't easily know if it's our own post inside this function without looking up the post
+            // But usually the backend handles "don't notify if user is owner"
+            
+            // showToast(`تم إرسال إشعار لصاحب المنشور بـ ${actionText}`, 'success');
+        }
+
+        // Toggle comments
+        function toggleComments(postId) {
+            const commentsSection = document.getElementById(`comments-${postId}`);
+            const isVisible = commentsSection.classList.contains('show');
+
+            if (isVisible) {
+                commentsSection.classList.remove('show');
+            } else {
+                commentsSection.classList.add('show');
+                loadComments(postId);
+            }
+        }
+
+        // Load comments
+        async function loadComments(postId) {
+            try {
+                const response = await fetch(`/community_bonus/get_comments/${postId}`, {
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                renderComments(postId, data.comments || []);
+
+            } catch (error) {
+        console.error('Error loading comments:', error);
+        const commentsList = document.getElementById(`comments-list-${postId}`);
+        if (commentsList) {
+            commentsList.innerHTML = '<p style="text-align: center; color: #6c757d; font-size: 0.8rem;">فشل تحميل التعليقات</p>';
+        }
+        if (typeof showToast === 'function') {
+            showToast('فشل تحميل التعليقات، يرجى المحاولة مرة أخرى', 'error');
+        }
+    }
+        }
+
+        // Render comments
+        function renderComments(postId, comments) {
+            const commentsList = document.getElementById(`comments-list-${postId}`);
+
+            if (!commentsList) return;
+
+            if (comments.length === 0) {
+                commentsList.innerHTML = '<p style="text-align: center; color: #6c757d; font-size: 0.8rem;">لا توجد تعليقات بعد</p>';
+                return;
+            }
+
+            // Get current user ID
+            let currentUserId = parseInt(document.body.getAttribute('data-user-id') || '0');
+            if (isNaN(currentUserId) || currentUserId === 0) {
+                currentUserId = 1; // Test user ID
+            }
+
+            // Check local storage for my comments
+            const myComments = JSON.parse(localStorage.getItem('myComments') || '[]');
+
+            commentsList.innerHTML = comments.map(comment => {
+                // Check if user is owner via ID or local storage
+                const isOwner = (comment.company_id === currentUserId) || 
+                                (comment.can_delete) || 
+                                (myComments.includes(comment.id));
+
+                return `
+                <div class="comment-item-mobile" id="comment-${comment.id}">
+                    <div class="comment-header-mobile">
+                        <span class="comment-author-mobile">${escapeHtml(comment.company_name || 'Unknown')}</span>
+                        <span class="comment-time-mobile">${formatTimeAgo(comment.created_at)}</span>
+                        <div class="comment-actions">
+                            ${comment.can_edit ? `
+                                <button class="comment-edit-btn" onclick="editComment(${comment.id}, ${postId})" title="تعديل التعليق">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            ` : ''}
+                            ${isOwner ? `
+                                <button class="comment-delete-btn" onclick="deleteComment(${comment.id}, ${postId})" title="حذف التعليق">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div class="comment-content-mobile" id="comment-content-${comment.id}">${escapeHtml(comment.content)}</div>
+                </div>
+            `}).join('');
+        }
+
+        // Add comment
+        async function addComment(postId) {
+            const input = document.getElementById(`comment-input-${postId}`);
+            const content = input.value.trim();
+
+            if (!content) {
+                showToast('يرجى كتابة تعليق', 'warning');
+                return;
+            }
+
+            try {
+                const response = await fetch('/community_bonus/add_comment', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        post_id: postId,
+                        content: content
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    input.value = '';
+                    
+                    // Save comment ID if available (assuming data.comment_id or similar)
+                    if (data.comment_id) {
+                        const myComments = JSON.parse(localStorage.getItem('myComments') || '[]');
+                        if (!myComments.includes(data.comment_id)) {
+                            myComments.push(data.comment_id);
+                            localStorage.setItem('myComments', JSON.stringify(myComments));
+                        }
+                    }
+
+                    loadComments(postId);
+
+                    // Update comment count
+                    const commentCount = document.getElementById(`comment-count-${postId}`);
+                    if (commentCount) {
+                        commentCount.textContent = data.comments_count;
+                    }
+
+                    showToast('تم إضافة التعليق بنجاح', 'success');
+                    
+                    // Notify post owner
+                    notifyPostOwner(postId, 'comment');
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+
+            } catch (error) {
+                console.error('Error adding comment:', error);
+                showToast('حدث خطأ في إضافة التعليق', 'error');
+            }
+        }
+
+        // Record view
+        async function recordView(postId) {
+            try {
+                await fetch(`/community_bonus/record_view/${postId}`, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+            } catch (error) {
+                console.error('Error recording view:', error);
+            }
+        }
+
+        // Delete post
+        async function deletePost(postId) {
+            if (!confirm('هل أنت متأكد من حذف هذا المنشور؟')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/community_bonus/delete_post/${postId}`, {
+                    method: 'DELETE',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Remove post from UI
+                    const postElement = document.getElementById(`post-${postId}`);
+                    if (postElement) {
+                        postElement.remove();
+                    }
+
+                    // Remove from posts array
+                    posts = posts.filter(post => post.id !== postId);
+
+                    showToast('تم حذف المنشور بنجاح', 'success');
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+
+            } catch (error) {
+                console.error('Error deleting post:', error);
+                showToast('حدث خطأ في حذف المنشور', 'error');
+            }
+        }
+
+        // Delete comment
+        async function deleteComment(commentId, postId) {
+            if (!confirm('هل أنت متأكد من حذف هذا التعليق؟')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/community_bonus/delete_comment/${commentId}`, {
+                    method: 'DELETE',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Remove comment from UI
+                    const commentElement = document.getElementById(`comment-${commentId}`);
+                    if (commentElement) {
+                        commentElement.remove();
+                    }
+
+                    // Update comment count
+                    const post = posts.find(p => p.id === postId);
+                    if (post) {
+                        post.comments_count = Math.max(0, post.comments_count - 1);
+                        const commentCountElement = document.querySelector(`#post-${postId} .comment-count`);
+                        if (commentCountElement) {
+                            commentCountElement.textContent = post.comments_count;
+                        }
+                    }
+
+                    showToast('تم حذف التعليق بنجاح', 'success');
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+
+            } catch (error) {
+                console.error('Error deleting comment:', error);
+                showToast('حدث خطأ في حذف التعليق', 'error');
+            }
+        }
+
+        // Edit post
+        function editPost(postId) {
+            const post = posts.find(p => p.id === postId);
+            if (!post) return;
+
+            const postContentElement = document.querySelector(`#post-${postId} .post-content-mobile`);
+            if (!postContentElement) return;
+
+            // Create edit form
+            const editForm = document.createElement('div');
+            editForm.className = 'post-edit-form';
+            editForm.innerHTML = `
+                <textarea class="post-edit-textarea" maxlength="500">${escapeHtml(post.content)}</textarea>
+                <div class="post-edit-actions">
+                    <button class="post-edit-save" onclick="savePostEdit(${postId})">
+                        <i class="fas fa-save"></i> حفظ
+                    </button>
+                    <button class="post-edit-cancel" onclick="cancelPostEdit(${postId})">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                </div>
+            `;
+
+            // Store original content
+            postContentElement.setAttribute('data-original-content', post.content);
+
+            // Replace content with edit form
+            postContentElement.style.display = 'none';
+            postContentElement.parentNode.insertBefore(editForm, postContentElement.nextSibling);
+        }
+
+        // Save post edit
+        async function savePostEdit(postId) {
+            const post = posts.find(p => p.id === postId);
+            if (!post) return;
+
+            const editForm = document.querySelector(`#post-${postId} .post-edit-form`);
+            const textarea = editForm.querySelector('.post-edit-textarea');
+            const newContent = textarea.value.trim();
+
+            if (!newContent) {
+                showToast('لا يمكن حفظ منشور فارغ', 'warning');
+                return;
+            }
+
+            if (newContent.length > 500) {
+                showToast('المنشور طويل جداً (الحد الأقصى 500 حرف)', 'error');
+                return;
+            }
+
+            if (newContent === post.content) {
+                cancelPostEdit(postId);
+                return;
+            }
+
+            try {
+                const response = await fetch(`/community_bonus/edit_post/${postId}`, {
+                    method: 'PUT',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ content: newContent })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update post content
+                    post.content = newContent;
+
+                    // Update UI
+                    const postContentElement = document.querySelector(`#post-${postId} .post-content-mobile`);
+                    postContentElement.textContent = newContent;
+
+                    // Remove edit form and show updated content
+                    cancelPostEdit(postId);
+
+                    showToast('تم تعديل المنشور بنجاح', 'success');
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+
+            } catch (error) {
+                console.error('Error editing post:', error);
+                showToast('حدث خطأ في تعديل المنشور', 'error');
+                cancelPostEdit(postId);
+            }
+        }
+
+        // Cancel post edit
+        function cancelPostEdit(postId) {
+            const postContentElement = document.querySelector(`#post-${postId} .post-content-mobile`);
+            const editForm = document.querySelector(`#post-${postId} .post-edit-form`);
+
+            if (editForm) {
+                editForm.remove();
+            }
+
+            if (postContentElement) {
+                postContentElement.style.display = 'block';
+            }
+        }
+
+        // Edit comment
+        function editComment(commentId, postId) {
+            const commentContentElement = document.getElementById(`comment-content-${commentId}`);
+            if (!commentContentElement) return;
+
+            const originalContent = commentContentElement.textContent;
+
+            // Create edit form
+            const editForm = document.createElement('div');
+            editForm.className = 'comment-edit-form';
+            editForm.innerHTML = `
+                <input type="text" class="comment-edit-input" maxlength="200" value="${escapeHtml(originalContent)}">
+                <div class="comment-edit-actions">
+                    <button class="comment-edit-save" onclick="saveCommentEdit(${commentId}, ${postId})">
+                        <i class="fas fa-save"></i>
+            </button>
+                    <button class="comment-edit-cancel" onclick="cancelCommentEdit(${commentId})">
+                        <i class="fas fa-times"></i>
+                </button>
+            </div>
+            `;
+
+            // Store original content
+            commentContentElement.setAttribute('data-original-content', originalContent);
+
+            // Replace content with edit form
+            commentContentElement.style.display = 'none';
+            commentContentElement.parentNode.insertBefore(editForm, commentContentElement.nextSibling);
+
+            // Focus on input
+            editForm.querySelector('.comment-edit-input').focus();
+        }
+
+        // Save comment edit
+        async function saveCommentEdit(commentId, postId) {
+            const editForm = document.querySelector(`#comment-${commentId} .comment-edit-form`);
+            const input = editForm.querySelector('.comment-edit-input');
+            const newContent = input.value.trim();
+
+            if (!newContent) {
+                showToast('لا يمكن حفظ تعليق فارغ', 'warning');
+                return;
+            }
+
+            if (newContent.length > 200) {
+                showToast('التعليق طويل جداً (الحد الأقصى 200 حرف)', 'error');
+                        return;
+                    }
+
+            const originalContent = document.getElementById(`comment-content-${commentId}`).getAttribute('data-original-content');
+            if (newContent === originalContent) {
+                cancelCommentEdit(commentId);
+                return;
+            }
+
+            try {
+                const response = await fetch(`/community_bonus/edit_comment/${commentId}`, {
+                    method: 'PUT',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ content: newContent })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                        if (data.success) {
+                    // Update comment content
+                    const commentContentElement = document.getElementById(`comment-content-${commentId}`);
+                    commentContentElement.textContent = newContent;
+
+                    // Remove edit form and show updated content
+                    cancelCommentEdit(commentId);
+
+                    showToast('تم تعديل التعليق بنجاح', 'success');
+                        } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+
+            } catch (error) {
+                console.error('Error editing comment:', error);
+                showToast('حدث خطأ في تعديل التعليق', 'error');
+                cancelCommentEdit(commentId);
+            }
+        }
+
+        // Cancel comment edit
+        function cancelCommentEdit(commentId) {
+            const commentContentElement = document.getElementById(`comment-content-${commentId}`);
+            const editForm = document.querySelector(`#comment-${commentId} .comment-edit-form`);
+
+            if (editForm) {
+                editForm.remove();
+            }
+
+            if (commentContentElement) {
+                commentContentElement.style.display = 'block';
+            }
+        }
+
+        // Report post
+        function reportPost(postId) {
+            if (confirm('هل أنت متأكد من إبلاغ عن هذا المنشور؟')) {
+                // Implementation for reporting
+                showToast('تم إرسال البلاغ بنجاح', 'success');
+            }
+        }
+
+        // Open messages page
+        function openMessagesPage() {
+            window.location.href = '/company_messages';
+        }
+
+        // Message company - فتح صفحة المراسلات مع الشركة المحددة
+        function messageCompany(companyId) {
+            if (!companyId) {
+                showToast('تعذر تحديد الشركة للمراسلة', 'error');
+                return;
+            }
+            // إعادة توجيه لصفحة المراسلات مع تمرير معرف الشركة
+            window.location.href = `/company_messages?company_id=${companyId}`;
+        }
+
+        // Toggle post menu
+        function togglePostMenu(postId) {
+            const menu = document.getElementById(`menu-${postId}`);
+            const menuBtn = document.getElementById(`menu-btn-${postId}`);
+            const isVisible = menu.classList.contains('show');
+
+            // Close all other menus
+            document.querySelectorAll('.post-menu-dropdown.show').forEach(m => {
+                m.classList.remove('show');
+            });
+
+            // Remove active class from all menu buttons
+            document.querySelectorAll('.post-menu-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            if (!isVisible) {
+                menu.classList.add('show');
+                menuBtn.classList.add('active');
+
+                // Close menu when clicking outside
+                setTimeout(() => {
+                    document.addEventListener('click', function closeMenu(e) {
+                        if (!e.target.closest(`#menu-${postId}`) && !e.target.closest(`#menu-btn-${postId}`)) {
+                            menu.classList.remove('show');
+                            menuBtn.classList.remove('active');
+                            document.removeEventListener('click', closeMenu);
+                        }
+                    });
+                }, 100);
+            }
+        }
+
+        // Utility functions
+        function showLoadingState() {
+            document.getElementById('loading-state').style.display = 'block';
+            document.getElementById('error-state').style.display = 'none';
+            document.getElementById('empty-state').style.display = 'none';
+            document.getElementById('posts-list').innerHTML = '';
+        }
+
+        function hideLoadingState() {
+            document.getElementById('loading-state').style.display = 'none';
+        }
+
+        function showErrorState(message) {
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('error-state').style.display = 'block';
+            document.getElementById('empty-state').style.display = 'none';
+        }
+
+        function hideErrorState() {
+            document.getElementById('error-state').style.display = 'none';
+        }
+
+        function showEmptyState() {
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('error-state').style.display = 'none';
+            document.getElementById('empty-state').style.display = 'block';
+            document.getElementById('posts-list').innerHTML = '';
+        }
+
+        function hideEmptyState() {
+            document.getElementById('empty-state').style.display = 'none';
+        }
+
+        function refreshPosts() {
+            const refreshIcon = document.getElementById('refresh-icon');
+            if (refreshIcon) {
+                refreshIcon.classList.add('fa-spin');
+                setTimeout(() => {
+                    refreshIcon.classList.remove('fa-spin');
+                }, 1000);
+            }
+            loadPosts();
+        }
+
+        function scrollToTop() {
+            const container = document.querySelector('.mobile-container');
+            if (container) {
+                container.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function focusPostForm() {
+            const container = document.querySelector('.mobile-container');
+            const postForm = document.getElementById('post-form');
+            if (container && postForm) {
+                container.scrollTo({ top: 140, behavior: 'smooth' }); // Scroll to post form position
+                document.getElementById('post-content').focus();
+            }
+        }
+
+        function isElementInViewport(el) {
+            if (!el) return false;
+            const rect = el.getBoundingClientRect();
+            return (
+                rect.top >= 0 &&
+                rect.left >= 0 &&
+                rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+                rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+            );
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+
+            if (minutes < 1) return 'الآن';
+            if (minutes < 60) return `قبل ${minutes} دقيقة`;
+            if (hours < 24) return `قبل ${hours} ساعة`;
+            if (days < 7) return `قبل ${days} يوم`;
+
+            return date.toLocaleDateString('ar-EG');
+        }
+
+        function showToast(message, type = 'info') {
+            // Simple toast implementation
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : type === 'warning' ? '#ffc107' : '#17a2b8'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 25px;
+                font-size: 0.9rem;
+                z-index: 10000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                animation: slideDown 0.3s ease-out;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Add CSS animation for toast
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translate(-50%, -20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translate(-50%, 0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Handle visibility change for performance
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && !isLoading) {
+                // Refresh posts when tab becomes visible
+                setTimeout(() => {
+                    loadPosts();
+                }, 1000);
+            }
+        });
+
+        // Handle online/offline
+        window.addEventListener('online', function() {
+            showToast('تم استعادة الاتصال بالإنترنت', 'success');
+            loadPosts();
+        });
+
+        window.addEventListener('offline', function() {
+            showToast('لا يوجد اتصال بالإنترنت', 'warning');
+        });
+    </script>
+</body>
+</html>

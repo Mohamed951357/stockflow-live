@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>جرّب الاشتراك المميز مجاناً!</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --grad-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --grad-accent: linear-gradient(135deg, #22d3ee 0%, #4facfe 100%);
+            --text-dark: #0b1630;
+            --text-muted: #64748b;
+            --shadow-strong: 0 26px 72px rgba(102, 126, 234, 0.35), 0 12px 28px rgba(118, 75, 162, 0.28);
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom);
+        }
+        .card {
+            border-radius: 32px;
+            box-shadow: var(--shadow-strong);
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            max-width: 640px;
+            margin: 0 auto;
+            background: linear-gradient(145deg, rgba(255,255,255,0.98), rgba(248,250,252,0.96));
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            position: relative;
+            overflow: hidden;
+            animation: cardIn .7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            left: 0; right: 0; top: 0;
+            height: 8px;
+            background: linear-gradient(90deg,#667eea,#8b5cf6,#22d3ee,#4facfe,#667eea);
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .content-wrap { padding: 28px; }
+        .star {
+            color: #ffd166;
+            font-size: 1.9rem;
+            margin: 0 4px;
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15));
+        }
+        h2 {
+            font-weight: 800;
+            line-height: 1.3;
+            background: linear-gradient(135deg,#667eea,#8b5cf6,#22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: .6rem;
+        }
+        p.lead {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .badge-days {
+            background: #e2f0fe;
+            color: #0b4a88;
+            padding: .35rem .6rem;
+            border-radius: 12px;
+            font-weight: 800;
+        }
+        .main-btn {
+            padding: .9rem 1.3rem;
+            font-size: 1.05rem;
+            border-radius: 18px;
+            font-weight: 800;
+            transition: all .35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn-premium {
+            background: var(--grad-primary);
+            color: #fff;
+            border: none;
+            width: 100%;
+            box-shadow: 0 16px 34px rgba(102,126,234,.35), 0 8px 18px rgba(118,75,162,.28);
+        }
+        .btn-premium:hover { transform: translateY(-3px) scale(1.02); }
+        .btn-outline {
+            background: #fff;
+            color: #0b1630;
+            border: 2px solid #e2e8f0;
+            font-weight: 800;
+            width: 100%;
+        }
+        .btn-outline:hover { transform: translateY(-2px); }
+        .supporting { font-size: .95rem; color: var(--text-muted); }
+        .container { padding-left: 12px; padding-right: 12px; }
+        .divider {
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg,#667eea,#8b5cf6,#22d3ee);
+            border-radius: 2px;
+            margin: 0.5rem auto 1rem;
+        }
+        .surprise-box {
+            margin-top: 1rem;
+            border-radius: 22px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.96), rgba(248,250,252,0.95));
+            border: 2px solid rgba(102, 126, 234, 0.25);
+            box-shadow: 0 18px 48px rgba(102, 126, 234, 0.22), 0 8px 24px rgba(118, 75, 162, 0.18);
+            padding: 1rem .9rem;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+        .surprise-title {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            font-weight: 800;
+            font-size: 1.05rem;
+            background: linear-gradient(135deg,#667eea,#8b5cf6,#22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: .4rem;
+        }
+        .surprise-hint {
+            color: #475569;
+            font-size: .92rem;
+            opacity: .85;
+            margin-bottom: .6rem;
+        }
+        .reveal-btn {
+            background: var(--grad-accent);
+            border: none;
+            color: #0b1630;
+            border-radius: 14px;
+            padding: .7rem 1.1rem;
+            font-weight: 800;
+            font-size: .95rem;
+            box-shadow: 0 14px 30px rgba(34, 211, 238, 0.32), 0 7px 16px rgba(79, 172, 254, 0.26);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: .6rem;
+            transition: all .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .reveal-btn:hover { transform: translateY(-2px) }
+        .surprise-content { display: none; margin-top: .8rem; animation: fadeIn .5s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: translateY(0) } }
+        .surprise-line {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .5rem .75rem;
+            margin: .25rem 0;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(6,182,212,0.12));
+            color: var(--text-dark);
+            font-weight: 700;
+            font-size: .9rem;
+            border: 1px solid rgba(16,185,129,0.22);
+        }
+        .surprise-line i { color: #10b981 }
+        .footer-note { color: #334155 }
+        .confetti {
+            position: fixed;
+            top: -10px;
+            width: 8px;
+            height: 14px;
+            background: #fff;
+            opacity: .9;
+            transform: rotate(15deg);
+            animation: fall linear forwards;
+            z-index: 9999;
+            border-radius: 3px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: 0.2 } }
+        @media (max-width: 575.98px) {
+            .content-wrap { padding: 20px; }
+            .star { font-size: 1.6rem; }
+            h2 { font-size: 1.35rem; }
+            p.lead { font-size: 1rem; }
+            .main-btn { font-size: 1rem; padding: .8rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12">
+        <div class="card text-center">
+          <div class="content-wrap">
+          <div class="mb-3">
+            <span class="star"><i class="fas fa-star"></i></span>
+            <span class="star"><i class="fas fa-crown"></i></span>
+            <span class="star"><i class="fas fa-star"></i></span>
+          </div>
+          <h2 class="mb-2">✨ تجربة الاشتراك المميز مجاناً!</h2>
+          <div class="divider"></div>
+          <p class="mb-3 lead">
+            استمتع بكل مزايا العملاء المميزين لمدة
+            <span class="badge-days">{{ trial_days }} يوم</span>
+            بلا قيود أو التزامات.
+          </p>
+          <p class="mb-4 supporting">اكتشف أدوات متطورة، تقارير حصرية، دعم أولوية والمزيد...</p>
+          <form method="POST">
+              <button name="trial_answer" value="yes" type="submit" class="btn btn-premium main-btn mb-2">
+                نعم، أريد تجربة المميز <i class="fas fa-arrow-left ms-2"></i>
+              </button>
+              <button name="trial_answer" value="no" type="submit" class="btn btn-outline main-btn">
+                لا، شكراً الآن
+              </button>
+          </form>
+          <div class="surprise-box">
+            <div class="surprise-title"><i class="fas fa-gift"></i> مفاجأة خاصة</div>
+            <div class="surprise-hint">اضغط للكشف عن المفاجأة</div>
+            <button class="reveal-btn" id="revealTrialSurprise"><i class="fas fa-magic"></i> إظهار المفاجأة</button>
+            <div class="surprise-content" id="trialSurpriseContent">
+              <div class="surprise-line"><i class="fas fa-check-circle"></i> أسبوع إضافي مجاناً عند تفعيل التجربة اليوم</div>
+              <div class="surprise-line"><i class="fas fa-check-circle"></i> فتح المزايا الحصرية فور الموافقة</div>
+            </div>
+          </div>
+          <div class="pt-3 mt-4 footer-note">
+            <i class="fas fa-gift me-2"></i>
+            العرض متاح مرة واحدة فقط.
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function(){
+      var revealBtn = document.getElementById('revealTrialSurprise');
+      var surpriseContent = document.getElementById('trialSurpriseContent');
+      var revealed = false;
+      function confetti() {
+        var colors = ['#667eea','#8b5cf6','#22d3ee','#4facfe','#10b981','#06b6d4','#f093fb','#fde68a'];
+        for (var i = 0; i < 48; i++) {
+          var c = document.createElement('span');
+          c.className = 'confetti';
+          c.style.left = (Math.random() * 100) + 'vw';
+          c.style.background = colors[Math.floor(Math.random() * colors.length)];
+          c.style.animationDuration = (0.8 + Math.random() * 1.6) + 's';
+          c.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
+          document.body.appendChild(c);
+          setTimeout(function(el){ if (el && el.parentNode) el.parentNode.removeChild(el); }, 2400, c);
+        }
+      }
+      if (revealBtn) {
+        revealBtn.addEventListener('click', function(){
+          if (!revealed && surpriseContent) {
+            surpriseContent.style.display = 'block';
+            confetti();
+            revealed = true;
+            revealBtn.disabled = true;
+            revealBtn.textContent = 'تم الكشف!';
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المجتمع - بونص فارما</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Cairo', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+        }
+
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin: 0 20px;
+            min-height: calc(100vh - 40px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 2.2rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .header .subtitle {
+            opacity: 0.9;
+            margin-top: 10px;
+            font-size: 1.1rem;
+        }
+
+        .back-btn {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) scale(1.05);
+            color: white;
+        }
+
+        .content-area {
+            padding: 30px;
+        }
+
+        .stats-row {
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.15);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin: 0 auto 15px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e9ecef;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px 25px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #495057;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-body {
+            padding: 25px;
+        }
+
+        .post-composer {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(220, 53, 69, 0.4);
+        }
+
+        .filters-row {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .table {
+            margin: 0;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .badge-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .spinner-border {
+            color: #667eea;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #dee2e6;
+        }
+
+        .pinned-badge {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            color: white;
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 15px;
+            margin-right: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 0 10px;
+                min-height: calc(100vh - 20px);
+                border-radius: 15px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .back-btn {
+                right: 20px;
+                padding: 10px 15px;
+            }
+
+            .stat-card {
+                margin-bottom: 20px;
+            }
+
+            .table-responsive {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header -->
+        <div class="header">
+            <a href="{{ url_for('admin_dashboard') }}" class="back-btn">
+                <i class="fas fa-arrow-right"></i>
+                العودة للوحة الإدارة
+            </a>
+            <h1><i class="fas fa-users me-3"></i>إدارة مجتمع بونص فارما</h1>
+            <p class="subtitle">إدارة شاملة لمنشورات وتعليقات المجتمع</p>
+        </div>
+
+        <div class="content-area">
+            <!-- Statistics Cards -->
+            <div class="row stats-row" id="statsRow">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stat-number text-primary" id="totalPosts">-</div>
+                        <div class="stat-label">إجمالي المنشورات</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="stat-number text-success" id="totalComments">-</div>
+                        <div class="stat-label">إجمالي التعليقات</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="stat-number text-danger" id="totalLikes">-</div>
+                        <div class="stat-label">إجمالي الإعجابات</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="stat-number text-warning" id="activeCompanies">-</div>
+                        <div class="stat-label">الشركات النشطة</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Pinned Post Section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-thumbtack text-warning"></i>
+                        إضافة منشور مثبت
+                    </h3>
+                </div>
+                <div class="section-body">
+                    <form id="pinnedPostForm">
+                        <div class="post-composer">
+                            <div class="mb-3">
+                                <label for="pinnedPostContent" class="form-label fw-bold">محتوى المنشور المثبت</label>
+                                <textarea class="form-control" id="pinnedPostContent" rows="4" placeholder="اكتب محتوى المنشور المثبت هنا..." required></textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="pinnedPostCompany" class="form-label fw-bold">الشركة</label>
+                                    <select class="form-select" id="pinnedPostCompany" required>
+                                        <option value="">اختر الشركة</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="pinnedPostDuration" class="form-label fw-bold">مدة التثبيت</label>
+                                    <select class="form-select" id="pinnedPostDuration">
+                                        <option value="7">أسبوع واحد</option>
+                                        <option value="14">أسبوعين</option>
+                                        <option value="30" selected>شهر واحد</option>
+                                        <option value="0">دائم</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-thumbtack me-2"></i>
+                                إضافة منشور مثبت
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Content Management Section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-list"></i>
+                        إدارة المحتوى
+                    </h3>
+                    <button class="btn btn-primary" onclick="loadContent()">
+                        <i class="fas fa-sync-alt me-2"></i>
+                        تحديث
+                    </button>
+                </div>
+                <div class="section-body">
+                    <!-- Filters -->
+                    <div class="filters-row">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <select class="form-select" id="filterType">
+                                    <option value="all">جميع المحتويات</option>
+                                    <option value="posts">المنشورات فقط</option>
+                                    <option value="comments">التعليقات فقط</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <select class="form-select" id="filterCompany">
+                                    <option value="all">جميع الشركات</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <input type="date" class="form-control" id="filterDate">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <button class="btn btn-primary w-100" onclick="applyFilters()">
+                                    <i class="fas fa-filter me-2"></i>
+                                    تطبيق الفلاتر
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content Table -->
+                    <div class="table-container">
+                        <div class="table-responsive">
+                            <table class="table" id="contentTable">
+                                <thead>
+                                    <tr>
+                                        <th>النوع</th>
+                                        <th>الشركة</th>
+                                        <th>المحتوى</th>
+                                        <th>التاريخ</th>
+                                        <th>الإعجابات/التعليقات</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="contentTableBody">
+                                    <tr>
+                                        <td colspan="6" class="text-center">
+                                            <div class="loading">
+                                                <div class="spinner-border" role="status">
+                                                    <span class="visually-hidden">جاري التحميل...</span>
+                                                </div>
+                                                <p class="mt-2">جاري تحميل البيانات...</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let currentContent = [];
+        let companies = [];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            loadCompanies();
+            loadContent();
+            
+            // Setup pinned post form
+            document.getElementById('pinnedPostForm').addEventListener('submit', handlePinnedPostSubmit);
+        });
+
+        // Load statistics
+        async function loadStats() {
+            try {
+                const response = await fetch('/admin/community_stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('totalPosts').textContent = data.stats.total_posts;
+                    document.getElementById('totalComments').textContent = data.stats.total_comments;
+                    document.getElementById('totalLikes').textContent = data.stats.total_likes;
+                    document.getElementById('activeCompanies').textContent = data.stats.active_companies;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load companies
+        async function loadCompanies() {
+            try {
+                const response = await fetch('/admin/community_companies');
+                const data = await response.json();
+                
+                if (data.success) {
+                    companies = data.companies;
+                    
+                    // Populate company selects
+                    const pinnedSelect = document.getElementById('pinnedPostCompany');
+                    const filterSelect = document.getElementById('filterCompany');
+                    
+                    companies.forEach(company => {
+                        const option1 = new Option(company.company_name, company.id);
+                        const option2 = new Option(company.company_name, company.id);
+                        pinnedSelect.add(option1);
+                        filterSelect.add(option2);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading companies:', error);
+            }
+        }
+
+        // Load content
+        async function loadContent() {
+            try {
+                const response = await fetch('/admin/community_content');
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentContent = data.content;
+                    displayContent(currentContent);
+                } else {
+                    showEmptyState();
+                }
+            } catch (error) {
+                console.error('Error loading content:', error);
+                showEmptyState();
+            }
+        }
+
+        // Display content in table
+        function displayContent(content) {
+            const tbody = document.getElementById('contentTableBody');
+            
+            if (content.length === 0) {
+                showEmptyState();
+                return;
+            }
+            
+            tbody.innerHTML = content.map(item => `
+                <tr>
+                    <td>
+                        ${item.is_pinned ? '<span class="pinned-badge"><i class="fas fa-thumbtack"></i> مثبت</span>' : ''}
+                        <span class="badge ${item.type === 'post' ? 'badge-success' : 'bg-info'}">
+                            <i class="fas fa-${item.type === 'post' ? 'file-alt' : 'comment'}"></i>
+                            ${item.type === 'post' ? 'منشور' : 'تعليق'}
+                        </span>
+                    </td>
+                    <td>${item.company_name}</td>
+                    <td>
+                        <div class="text-truncate" style="max-width: 200px;" title="${item.content}">
+                            ${item.content}
+                        </div>
+                    </td>
+                    <td>${formatDate(item.created_at)}</td>
+                    <td>
+                        ${item.type === 'post' ? 
+                            `<i class="fas fa-heart text-danger"></i> ${item.likes_count} | <i class="fas fa-comment text-info"></i> ${item.comments_count}` :
+                            '-'
+                        }
+                    </td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="deleteContent('${item.type}', ${item.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Show empty state
+        function showEmptyState() {
+            const tbody = document.getElementById('contentTableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h5>لا يوجد محتوى</h5>
+                            <p>لم يتم العثور على أي منشورات أو تعليقات.</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Handle pinned post form submission
+        async function handlePinnedPostSubmit(e) {
+            e.preventDefault();
+            
+            const formData = {
+                content: document.getElementById('pinnedPostContent').value,
+                company_id: document.getElementById('pinnedPostCompany').value,
+                duration_days: document.getElementById('pinnedPostDuration').value
+            };
+            
+            try {
+                const response = await fetch('/admin/create_pinned_post', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('تم إضافة المنشور المثبت بنجاح!');
+                    document.getElementById('pinnedPostForm').reset();
+                    loadContent();
+                    loadStats();
+                } else {
+                    alert('حدث خطأ: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error creating pinned post:', error);
+                alert('حدث خطأ في الاتصال');
+            }
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const type = document.getElementById('filterType').value;
+            const company = document.getElementById('filterCompany').value;
+            const date = document.getElementById('filterDate').value;
+            
+            let filtered = currentContent;
+            
+            if (type !== 'all') {
+                filtered = filtered.filter(item => 
+                    (type === 'posts' && item.type === 'post') ||
+                    (type === 'comments' && item.type === 'comment')
+                );
+            }
+            
+            if (company !== 'all') {
+                filtered = filtered.filter(item => item.company_id == company);
+            }
+            
+            if (date) {
+                filtered = filtered.filter(item => 
+                    item.created_at.startsWith(date)
+                );
+            }
+            
+            displayContent(filtered);
+        }
+
+        // Delete content
+        async function deleteContent(type, id) {
+            if (!confirm('هل أنت متأكد من حذف هذا المحتوى؟')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/admin/delete_${type}/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('تم حذف المحتوى بنجاح!');
+                    loadContent();
+                    loadStats();
+                } else {
+                    alert('حدث خطأ: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error deleting content:', error);
+                alert('حدث خطأ في الاتصال');
+            }
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ar-EG', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    </script>
+</body>
+</html>

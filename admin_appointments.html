@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بونص فارما - إدارة المواعيد - نظام حجز المواعيد</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Cairo', sans-serif; /* تم إضافة خط Cairo هنا */
+        }
+
+        .navbar {
+            background: linear: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-pending { background-color: #fff3cd; }
+        .status-approved { background-color: #d1edff; }
+        .status-rejected { background-color: #f8d7da; }
+
+        .appointment-card {
+            border-left: 4px solid #dc3545;
+            margin-bottom: 1rem;
+        }
+
+        .btn-action {
+            margin: 2px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+                <i class="fas fa-shield-alt me-2"></i>
+                لوحة الإدارة
+            </a>
+
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                    <i class="fas fa-home me-2"></i>
+                    الرئيسية
+                </a>
+                <a class="nav-link" href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    تسجيل الخروج
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>
+                        <i class="fas fa-calendar-check me-2 text-primary"></i>
+                        إدارة المواعيد
+                    </h2>
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-right me-2"></i>
+                        العودة للوحة الإدارة
+                    </a>
+                </div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" style="border-radius: 14px;" role="alert">
+                                <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                {# NEW: Appointment Filtering Section #}
+                <div class="card mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-filter me-2"></i>
+                            فلترة المواعيد
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="GET" action="{{ url_for('admin_appointments') }}">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-4">
+                                    <label for="filter_start_date" class="form-label">
+                                        <i class="fas fa-calendar-alt me-2"></i>
+                                        من تاريخ:
+                                    </label>
+                                    <input type="date" class="form-control" id="filter_start_date" name="filter_start_date" value="{{ request.args.get('filter_start_date', '') }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="filter_end_date" class="form-label">
+                                        <i class="fas fa-calendar-alt me-2"></i>
+                                        إلى تاريخ:
+                                    </label>
+                                    <input type="date" class="form-control" id="filter_end_date" name="filter_end_date" value="{{ request.args.get('filter_end_date', '') }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="filter_status" class="form-label">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        الحالة:
+                                    </label>
+                                    <select class="form-select" id="filter_status" name="filter_status">
+                                        <option value="">كل الحالات</option>
+                                        <option value="pending" {% if request.args.get('filter_status') == 'pending' %}selected{% endif %}>في الانتظار</option>
+                                        <option value="approved" {% if request.args.get('filter_status') == 'approved' %}selected{% endif %}>موافق عليها</option>
+                                        <option value="rejected" {% if request.args.get('filter_status') == 'rejected' %}selected{% endif %}>مرفوضة</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 d-flex justify-content-start flex-wrap gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-filter me-2"></i>
+                                        فلترة
+                                    </button>
+                                    <a href="{{ url_for('admin_appointments') }}" class="btn btn-warning">
+                                        <i class="fas fa-sync-alt me-2"></i>
+                                        إعادة ضبط الفلاتر
+                                    </a>
+                                    <button type="button" class="btn btn-info" onclick="setLast7Days()">
+                                        <i class="fas fa-calendar-week me-2"></i>
+                                        آخر 7 أيام
+                                    </button>
+                                    <button type="button" class="btn btn-info" onclick="setThisMonth()">
+                                        <i class="fas fa-calendar-alt me-2"></i>
+                                        هذا الشهر
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {# END NEW: Appointment Filtering Section #}
+
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card text-center border-warning">
+                            <div class="card-body">
+                                <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                                <h4 class="text-warning">
+                                    {{ appointments|selectattr("status", "equalto", "pending")|list|length }}
+                                </h4>
+                                <p class="text-muted">في الانتظار</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center border-success">
+                            <div class="card-body">
+                                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                                <h4 class="text-success">
+                                    {{ appointments|selectattr("status", "equalto", "approved")|list|length }}
+                                </h4>
+                                <p class="text-muted">موافق عليها</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center border-danger">
+                            <div class="card-body">
+                                <i class="fas fa-times-circle fa-2x text-danger mb-2"></i>
+                                <h4 class="text-danger">
+                                    {{ appointments|selectattr("status", "equalto", "rejected")|list|length }}
+                                </h4>
+                                <p class="text-muted">مرفوضة</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            قائمة المواعيد ({{ appointments|length }} موعد)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if appointments %}
+                            {% for appointment in appointments %}
+                            <div class="card appointment-card status-{{ appointment.status }}">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-3">
+                                            <h6 class="mb-1">
+                                                <i class="fas fa-building me-2"></i>
+                                                {{ appointment.company.company_name }}
+                                            </h6>
+                                            <small class="text-muted">{{ appointment.company.username }}</small>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <strong>التاريخ:</strong><br>
+                                            <i class="fas fa-calendar me-1"></i>
+                                            {{ appointment.appointment_date.strftime('%Y-%m-%d') }}
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <strong>الوقت:</strong><br>
+                                            <i class="fas fa-clock me-1"></i>
+                                            {# CHANGED: from %H:%M to %I:%M %p for 12-hour format #}
+                                            {{ appointment.appointment_time.strftime('%I:%M %p') }}
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <strong>الحالة:</strong><br>
+                                            {% if appointment.status == 'pending' %}
+                                                <span class="badge bg-warning text-dark">
+                                                    <i class="fas fa-clock me-1"></i>انتظار
+                                                </span>
+                                            {% elif appointment.status == 'approved' %}
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check me-1"></i>موافق
+                                                </span>
+                                            {% elif appointment.status == 'rejected' %}
+                                                <span class="badge bg-danger">
+                                                    <i class="fas fa-times me-1"></i>مرفوض
+                                                </span>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="col-md-3 text-end">
+                                            {% if has_permission('manage_appointments') %}
+                                                <button class="btn btn-sm btn-success btn-action"
+                                                        onclick="updateAppointment({{ appointment.id }}, 'approved', '{{ appointment.company.company_name | replace("'", "&#39;") }}')">
+                                                    <i class="fas fa-check"></i> موافقة
+                                                </button>
+                                                <button class="btn btn-sm btn-danger btn-action"
+                                                        onclick="updateAppointment({{ appointment.id }}, 'rejected', '{{ appointment.company.company_name | replace("'", "&#39;") }}')">
+                                                    <i class="fas fa-times"></i> رفض
+                                                </button>
+                                                <button class="btn btn-sm btn-warning btn-action"
+                                                        onclick="editAppointment({{ appointment.id }}, '{{ appointment.appointment_date }}', '{{ appointment.appointment_time.strftime('%H:%M') }}', '{{ appointment.purpose | replace("'", "&#39;") }}', '{{ appointment.notes or '' | replace("'", "&#39;") }}', '{{ appointment.collection_amount or '' }}', '{{ appointment.product_item_name | replace("'", "&#39;") }}')">
+                                                    <i class="fas fa-edit"></i> تعديل
+                                                </button>
+                                            {% else %}
+                                                <button class="btn btn-sm btn-info btn-action"
+                                                        onclick="viewDetails({{ appointment.id }}, '{{ appointment.company.company_name | replace("'", "&#39;") }}', '{{ appointment.purpose | replace("'", "&#39;") }}', '{{ appointment.notes or '' | replace("'", "&#39;") }}', '{{ appointment.admin_response or '' | replace("'", "&#39;") }}', '{{ appointment.collection_amount or '' }}', '{{ appointment.product_item_name | replace("'", "&#39;") }}')">
+                                                    <i class="fas fa-eye"></i> عرض
+                                                </button>
+                                                {% if appointment.status == 'approved' %}
+                                                    <button class="btn btn-sm btn-warning btn-action"
+                                                            onclick="editAppointment({{ appointment.id }}, '{{ appointment.appointment_date }}', '{{ appointment.appointment_time.strftime('%H:%M') }}', '{{ appointment.purpose | replace("'", "&#39;") }}', '{{ appointment.notes or '' | replace("'", "&#39;") }}', '{{ appointment.collection_amount or '' }}', '{{ appointment.product_item_name | replace("'", "&#39;") }}')">
+                                                        <i class="fas fa-edit"></i> تعديل
+                                                    </button>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-2">
+                                        <div class="col-md-12">
+                                            <strong>الغرض:</strong>
+                                            <p class="mb-1">{{ appointment.purpose }}</p>
+                                            <strong>الصنف:</strong>
+                                            <p class="mb-1">{{ appointment.product_item_name }}</p>
+                                            {% if appointment.notes %}
+                                                <strong>ملاحظات الشركة:</strong>
+                                                <p class="mb-1 text-muted">{{ appointment.notes }}</p>
+                                            {% endif %}
+                                            {% if appointment.collection_amount is not none %}
+                                                <strong>مبلغ التحصيل المتوقع:</strong>
+                                                <p class="mb-1 text-success">{{ "%.2f"|format(appointment.collection_amount) }} جنيه</p>
+                                            {% endif %}
+                                            {% if appointment.admin_response %}
+                                                <strong>رد الإدارة:</strong>
+                                                <p class="mb-0 text-primary">{{ appointment.admin_response }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-2">
+                                        <div class="col-md-12">
+                                            <small class="text-muted">
+                                                <i class="fas fa-calendar-plus me-1"></i>
+                                                تم الطلب: {{ appointment.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                                <h5 class="text-muted">لا توجد مواعيد بعد</h5>
+                                <p class="text-muted">سيظهر هنا طلبات المواعيد من الشركات</p>
+                                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary">
+                                    <i class="fas fa-arrow-right me-2"></i>
+                                    العودة للوحة الإدارة
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="updateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">تحديث حالة الموعد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="updateForm" method="POST">
+                    <div class="modal-body">
+                        <input type="hidden" id="appointmentStatus" name="status">
+
+                        <div class="alert alert-info" id="statusAlert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <span id="statusMessage"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="adminResponse" class="form-label">
+                                <i class="fas fa-comment me-2"></i>
+                                رد الإدارة (اختياري)
+                            </label>
+                            <textarea class="form-control" id="adminResponse" name="admin_response" rows="3"
+                                      placeholder="اكتب رد أو ملاحظات للشركة..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>إلغاء
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="confirmBtn">
+                            <i class="fas fa-check me-2"></i>تأكيد
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="detailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-info-circle me-2"></i>
+                        تفاصيل الموعد
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="appointmentDetails">
+                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>إغلاق
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit me-2"></i>
+                        تعديل الموعد
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editForm" method="POST">
+                    <div class="modal-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            يمكنك تعديل تاريخ ووقت الموعد أو إضافة ملاحظات
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editDate" class="form-label">
+                                    <i class="fas fa-calendar me-2"></i>
+                                    التاريخ الجديد
+                                </label>
+                                <input type="date" class="form-control" id="editDate" name="appointment_date" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editTime" class="form-label">
+                                    <i class="fas fa-clock me-2"></i>
+                                    الوقت الجديد
+                                </label>
+                                <input type="time" class="form-control" id="editTime" name="appointment_time" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editProductItemName" class="form-label">
+                                <i class="fas fa-box me-2"></i>
+                                الصنف
+                            </label>
+                            <input type="text" class="form-control" id="editProductItemName" name="product_item_name" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editPurpose" class="form-label">
+                                <i class="fas fa-clipboard me-2"></i>
+                                الغرض من الموعد
+                            </label>
+                            <textarea class="form-control" id="editPurpose" name="purpose" rows="3" required></textarea>
+                        </div>
+
+                        <div class="mb-3" id="editCollectionAmountField">
+                            <label for="editCollectionAmount" class="form-label">
+                                <i class="fas fa-money-bill-wave me-2"></i>
+                                مبلغ التحصيل المتوقع
+                            </label>
+                            <input type="number" step="0.01" class="form-control" id="editCollectionAmount" name="collection_amount" placeholder="أدخل مبلغ التحصيل المتوقع">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editNotes" class="form-label">
+                                <i class="fas fa-sticky-note me-2"></i>
+                                ملاحظات الإدارة (اختياري)
+                            </label>
+                            <textarea class="form-control" id="editNotes" name="admin_notes" rows="2"
+                                  placeholder="أضف ملاحظات حول التعديل..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>إلغاء
+                        </button>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save me-2"></i>حفظ التعديل
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateAppointment(appointmentId, status, companyName) {
+            document.getElementById('appointmentStatus').value = status;
+            document.getElementById('updateForm').action = '/update_appointment/' + appointmentId;
+
+            // تحديث النصوص حسب الحالة
+            const modalTitle = document.getElementById('modalTitle');
+            const statusMessage = document.getElementById('statusMessage');
+            const confirmBtn = document.getElementById('confirmBtn');
+            const statusAlert = document.getElementById('statusAlert');
+
+            if (status === 'approved') {
+                modalTitle.textContent = 'الموافقة على الموعد';
+                statusMessage.textContent = `سيتم الموافقة على موعد شركة: ${companyName}`;
+                confirmBtn.className = 'btn btn-success';
+                confirmBtn.innerHTML = '<i class="fas fa-check me-2"></i>موافقة';
+                statusAlert.className = 'alert alert-success';
+            } else if (status === 'rejected') {
+                modalTitle.textContent = 'رفض الموعد';
+                statusMessage.textContent = `سيتم رفض موعد شركة: ${companyName}`;
+                confirmBtn.className = 'btn btn-danger';
+                confirmBtn.innerHTML = '<i class="fas fa-times me-2"></i>رفض';
+                statusAlert.className = 'alert alert-warning';
+            }
+
+            // مسح النص السابق
+            document.getElementById('adminResponse').value = '';
+
+            const modal = new bootstrap.Modal(document.getElementById('updateModal'));
+            modal.show();
+        }
+
+        function viewDetails(appointmentId, companyName, purpose, companyNotes, adminResponse, collectionAmount, productItemName) {
+            const detailsDiv = document.getElementById('appointmentDetails');
+
+            detailsDiv.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-building me-2"></i>اسم الشركة:</h6>
+                        <p>${companyName}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-hashtag me-2"></i>رقم الموعد:</h6>
+                        <p>#${appointmentId}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6><i class="fas fa-clipboard me-2"></i>الغرض من الموعد:</h6>
+                        <p class="bg-light p-3 rounded">${purpose}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6><i class="fas fa-box me-2"></i>الصنف المطلوب:</h6>
+                        <p class="bg-light p-3 rounded">${productItemName}</p>
+                    </div>
+                </div>
+                ${companyNotes ? `
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6><i class="fas fa-sticky-note me-2"></i>ملاحظات الشركة:</h6>
+                        <p class="bg-light p-3 rounded">${companyNotes}</p>
+                    </div>
+                </div>
+                ` : ''}
+                ${collectionAmount ? `
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6><i class="fas fa-money-bill-wave me-2"></i>مبلغ التحصيل المتوقع:</h6>
+                        <p class="bg-success text-white p-3 rounded">${parseFloat(collectionAmount).toFixed(2)} جنيه</p>
+                    </div>
+                </div>
+                ` : ''}
+                ${adminResponse ? `
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6><i class="fas fa-reply me-2"></i>رد الإدارة:</h6>
+                        <p class="bg-primary text-white p-3 rounded">${adminResponse}</p>
+                    </div>
+                </div>
+                ` : ''}
+            `;
+
+            const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+            modal.show();
+        }
+
+        function editAppointment(appointmentId, currentDate, currentTime, currentPurpose, companyNotes, collectionAmount, productItemName) {
+            document.getElementById('editForm').action = '/edit_appointment/' + appointmentId;
+            document.getElementById('editDate').value = currentDate;
+            document.getElementById('editTime').value = currentTime;
+            document.getElementById('editPurpose').value = currentPurpose;
+            document.getElementById('editNotes').value = companyNotes; // تحميل ملاحظات الشركة الحالية
+            document.getElementById('editProductItemName').value = productItemName; // تحميل اسم الصنف
+
+            // تحميل قيمة مبلغ التحصيل إذا كانت موجودة
+            if (collectionAmount) {
+                document.getElementById('editCollectionAmount').value = parseFloat(collectionAmount);
+                document.getElementById('editCollectionAmountField').style.display = 'block'; // تأكد من إظهار الحقل
+            } else {
+                document.getElementById('editCollectionAmount').value = '';
+                document.getElementById('editCollectionAmountField').style.display = 'none'; // إخفاء الحقل إذا لم يكن هناك مبلغ
+            }
+
+            const modal = new bootstrap.Modal(document.getElementById('editModal'));
+            modal.show();
+        }
+
+        function setLast7Days() {
+            const today = new Date();
+            const last7Days = new Date(today);
+            last7Days.setDate(today.getDate() - 6); // 6 أيام للخلف + اليوم الحالي = 7 أيام
+
+            const formatDate = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
+            document.getElementById('filter_start_date').value = formatDate(last7Days);
+            document.getElementById('filter_end_date').value = formatDate(today);
+            document.querySelector('form[action="{{ url_for('admin_appointments') }}"]').submit(); // إرسال النموذج بعد تعيين التواريخ
+        }
+
+        function setThisMonth() {
+            const today = new Date();
+            const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+            const formatDate = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
+            document.getElementById('filter_start_date').value = formatDate(firstDayOfMonth);
+            document.getElementById('filter_end_date').value = formatDate(lastDayOfMonth);
+            document.querySelector('form[action="{{ url_for('admin_appointments') }}"]').submit(); // إرسال النموذج بعد تعيين التواريخ
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تقرير نشاط الشركات - لوحة الإدارة</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #3b82f6;
+            --light-color: #f8fafc;
+            --dark-color: #1e293b;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-md);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+            font-size: 1.25rem;
+        }
+
+        .navbar .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid #e2e8f0;
+        }
+
+        .page-header h1 {
+            color: var(--dark-color);
+            font-weight: 700;
+            font-size: 2rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .page-header .btn {
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-export {
+            background: var(--gradient-success);
+            color: white;
+        }
+
+        .btn-export:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: white;
+        }
+
+        .btn-back {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: white;
+        }
+
+        /* Statistics Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--gradient-primary);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .stat-card.total::before {
+            background: var(--gradient-primary);
+        }
+
+        .stat-card.active-today::before {
+            background: var(--gradient-success);
+        }
+
+        .stat-card.active-week::before {
+            background: var(--gradient-warning);
+        }
+
+        .stat-card.inactive::before {
+            background: var(--gradient-danger);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .stat-icon.total {
+            background: var(--gradient-primary);
+        }
+
+        .stat-icon.active-today {
+            background: var(--gradient-success);
+        }
+
+        .stat-icon.active-week {
+            background: var(--gradient-warning);
+        }
+
+        .stat-icon.inactive {
+            background: var(--gradient-danger);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+
+        .stat-label {
+            color: var(--secondary-color);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* Search and Controls */
+        .controls-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid #e2e8f0;
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 400px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+        }
+
+        /* Companies Table */
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .table-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .companies-count {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .companies-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .companies-table thead {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        }
+
+        .companies-table th {
+            padding: 1.25rem 1rem;
+            text-align: right;
+            font-weight: 600;
+            color: var(--dark-color);
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 0.95rem;
+        }
+
+        .companies-table tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.3s ease;
+        }
+
+        .companies-table tbody tr:hover {
+            background: #f8fafc;
+            transform: scale(1.01);
+        }
+
+        .companies-table td {
+            padding: 1.25rem 1rem;
+            vertical-align: middle;
+        }
+
+        .company-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .company-name {
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 1rem;
+        }
+
+        .company-username {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .last-login {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .login-time {
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .time-badge {
+            padding: 0.5rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .time-badge.recent {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+        }
+
+        .time-badge.today {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e40af;
+        }
+
+        .time-badge.week {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+        }
+
+        .time-badge.old {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+        }
+
+        .time-badge.never {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: var(--secondary-color);
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-badge.active {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+        }
+
+        .status-badge.inactive {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+        }
+
+        .subscription-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .subscription-badge.premium {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+        }
+
+        .subscription-badge.regular {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: var(--secondary-color);
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem 0.5rem;
+            }
+
+            .page-header {
+                padding: 1.5rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .stat-card {
+                padding: 1.5rem;
+            }
+
+            .controls-section {
+                padding: 1.5rem;
+            }
+
+            .table-container {
+                padding: 1.5rem;
+            }
+
+            .companies-table {
+                font-size: 0.9rem;
+            }
+
+            .companies-table th,
+            .companies-table td {
+                padding: 1rem 0.5rem;
+            }
+
+            .table-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .navbar,
+            .btn,
+            .search-container {
+                display: none !important;
+            }
+
+            body {
+                background: white !important;
+            }
+
+            .main-container {
+                padding: 0;
+            }
+
+            .page-header,
+            .stat-card,
+            .controls-section,
+            .table-container {
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+            }
+        }
+
+        /* Animation for table rows */
+        .companies-table tbody tr {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .companies-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+        .companies-table tbody tr:nth-child(2) { animation-delay: 0.2s; }
+        .companies-table tbody tr:nth-child(3) { animation-delay: 0.3s; }
+        .companies-table tbody tr:nth-child(4) { animation-delay: 0.4s; }
+        .companies-table tbody tr:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+                <i class="fas fa-tachometer-alt me-2"></i>
+                لوحة الإدارة
+            </a>
+            <div class="d-flex">
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-home me-1"></i>
+                    الرئيسية
+                </a>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">
+                    <i class="fas fa-sign-out-alt me-1"></i>
+                    تسجيل الخروج
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <h1>
+                    <i class="fas fa-chart-line me-2"></i>
+                    تقرير نشاط الشركات
+                </h1>
+                <div class="d-flex gap-2">
+                    <button onclick="exportToExcel()" class="btn btn-export">
+                        <i class="fas fa-file-excel me-2"></i>
+                        تصدير Excel
+                    </button>
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-back">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        رجوع
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card total">
+                <div class="stat-icon total">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="stat-number">{{ total_companies }}</div>
+                <div class="stat-label">إجمالي الشركات</div>
+            </div>
+            <div class="stat-card active-today">
+                <div class="stat-icon active-today">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-number">{{ active_today }}</div>
+                <div class="stat-label">نشطة اليوم</div>
+            </div>
+            <div class="stat-card active-week">
+                <div class="stat-icon active-week">
+                    <i class="fas fa-calendar-week"></i>
+                </div>
+                <div class="stat-number">{{ active_this_week }}</div>
+                <div class="stat-label">نشطة هذا الأسبوع</div>
+            </div>
+            <div class="stat-card inactive">
+                <div class="stat-icon inactive">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-number">{{ inactive_count }}</div>
+                <div class="stat-label">غير نشطة</div>
+            </div>
+        </div>
+
+        <!-- Search and Controls -->
+        <div class="controls-section">
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن شركة بالاسم أو اسم المستخدم..." onkeyup="filterTable()">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+        </div>
+
+        <!-- Companies Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">
+                    <i class="fas fa-list me-2"></i>
+                    قائمة الشركات وآخر نشاط
+                </h2>
+                <span class="companies-count">
+                    عدد الشركات: {{ companies|length }}
+                </span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="companies-table" id="companiesTable">
+                    <thead>
+                        <tr>
+                            <th>اسم الشركة</th>
+                            <th>آخر تسجيل دخول</th>
+                            <th>منذ</th>
+                            <th>الحالة</th>
+                            <th>الاشتراك</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for company in companies %}
+                        <tr>
+                            <td>
+                                <div class="company-info">
+                                    <div class="company-name">{{ company.company_name }}</div>
+                                    <div class="company-username">{{ company.username }}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="last-login">
+                                    {% if company.last_login %}
+                                        <div class="login-time">{{ company.last_login_formatted }}</div>
+                                    {% else %}
+                                        <div class="text-muted">لم يسجل دخول</div>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                {% if company.last_login %}
+                                    <span class="time-badge {{ company.activity_class }}">
+                                        {{ company.time_ago }}
+                                    </span>
+                                {% else %}
+                                    <span class="time-badge never">
+                                        <i class="fas fa-times-circle me-1"></i>
+                                        لم يسجل أبداً
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if company.is_active %}
+                                    <span class="status-badge active">
+                                        <i class="fas fa-check-circle me-1"></i>
+                                        نشط
+                                    </span>
+                                {% else %}
+                                    <span class="status-badge inactive">
+                                        <i class="fas fa-times-circle me-1"></i>
+                                        معطل
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if company.is_premium %}
+                                    <span class="subscription-badge premium">
+                                        <i class="fas fa-star me-1"></i>
+                                        بريميوم
+                                    </span>
+                                {% else %}
+                                    <span class="subscription-badge regular">
+                                        <i class="fas fa-user me-1"></i>
+                                        عادي
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        // Search Filter with enhanced functionality
+        function filterTable() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById('companiesTable');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+            let visibleRows = 0;
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const companyName = row.cells[0].textContent.toLowerCase();
+                const username = row.cells[0].querySelector('.company-username').textContent.toLowerCase();
+                
+                if (companyName.includes(filter) || username.includes(filter)) {
+                    row.style.display = '';
+                    visibleRows++;
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+
+            // Update companies count
+            updateCompaniesCount(visibleRows);
+        }
+
+        // Update companies count display
+        function updateCompaniesCount(count) {
+            const countElement = document.querySelector('.companies-count');
+            const totalCompanies = {{ companies|length }};
+            
+            if (count === totalCompanies) {
+                countElement.textContent = `عدد الشركات: ${totalCompanies}`;
+            } else {
+                countElement.textContent = `عدد الشركات: ${count} من ${totalCompanies}`;
+            }
+        }
+
+        // Export to Excel with enhanced formatting
+        function exportToExcel() {
+            const table = document.getElementById('companiesTable');
+            const wb = XLSX.utils.table_to_book(table, {sheet: "تقرير نشاط الشركات"});
+            
+            // Add some formatting
+            const ws = wb.Sheets["تقرير نشاط الشركات"];
+            
+            // Set column widths
+            ws['!cols'] = [
+                {wch: 25}, // Company name
+                {wch: 20}, // Last login
+                {wch: 15}, // Time ago
+                {wch: 12}, // Status
+                {wch: 12}  // Subscription
+            ];
+            
+            const timestamp = new Date().toISOString().slice(0, 10);
+            XLSX.writeFile(wb, `تقرير_نشاط_الشركات_${timestamp}.xlsx`);
+        }
+
+        // Auto-hide alerts with animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateY(-10px)';
+                    setTimeout(() => alert.remove(), 500);
+                }, 5000);
+            });
+
+            // Add loading animation to export button
+            const exportBtn = document.querySelector('.btn-export');
+            exportBtn.addEventListener('click', function() {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<span class="loading me-2"></span>جاري التصدير...';
+                this.disabled = true;
+                
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                }, 2000);
+            });
+
+            // Add enter key support for search
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    filterTable();
+                }
+            });
+
+            // Add clear search functionality
+            searchInput.addEventListener('input', function() {
+                if (this.value === '') {
+                    filterTable();
+                }
+            });
+
+            // Initialize companies count
+            updateCompaniesCount({{ companies|length }});
+        });
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl + F to focus search
+            if (e.ctrlKey && e.key === 'ف') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+            
+            // Ctrl + E to export
+            if (e.ctrlKey && e.key === 'ص') {
+                e.preventDefault();
+                exportToExcel();
+            }
+        });
+
+        // Add smooth scrolling for better UX
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

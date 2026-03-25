@@ -1,0 +1,2195 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بونص فارما - تسجيل الدخول - نظام حجز المواعيد وإدارة الأرصدة المتكامل</title>
+    <meta name="description" content="تسجيل الدخول إلى نظام بونص فارما - إدارة مواعيدك وأرصدة الأصناف بسهولة.">
+    <meta name="google-site-verification" content="WNUlQA_4T0kCTPHQoifi6Y5YkA1dfGbvfE1Jr066v8A" />
+    <link rel="icon" href="{{ url_for('static', filename='logos/favicon.png') }}" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    {% if ramadan_theme_enabled %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ramadan_theme.css') }}">
+    {% endif %}
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .fairy-lights, #fallingStars {
+            pointer-events: none !important;
+        }
+
+        /* Ensure form is clickable */
+        .login-card {
+            position: relative;
+            z-index: 10001;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Cairo', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+            position: relative;
+            overflow-x: hidden;
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Particles Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(2px 2px at 20% 30%, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(2px 2px at 60% 70%, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(3px 3px at 50% 50%, rgba(255, 255, 255, 0.3), transparent),
+                radial-gradient(2px 2px at 80% 10%, rgba(255, 255, 255, 0.5), transparent),
+                radial-gradient(2px 2px at 10% 60%, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(3px 3px at 90% 80%, rgba(255, 255, 255, 0.3), transparent),
+                radial-gradient(2px 2px at 30% 90%, rgba(255, 255, 255, 0.4), transparent);
+            background-size: 200% 200%;
+            animation: particleFloat 30s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Glowing Orbs */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(102, 126, 234, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(118, 75, 162, 0.15) 0%, transparent 50%);
+            animation: orbFloat 25s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes particleFloat {
+
+            0%,
+            100% {
+                background-position: 0% 0%, 100% 100%, 50% 50%, 80% 20%, 20% 80%, 90% 10%, 10% 90%;
+                opacity: 1;
+            }
+
+            50% {
+                background-position: 100% 100%, 0% 0%, 70% 30%, 30% 70%, 60% 40%, 40% 60%, 80% 20%;
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes orbFloat {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg) scale(1);
+                opacity: 0.8;
+            }
+
+            33% {
+                transform: translateY(-20px) rotate(120deg) scale(1.1);
+                opacity: 1;
+            }
+
+            66% {
+                transform: translateY(-35px) rotate(240deg) scale(0.9);
+                opacity: 0.9;
+            }
+        }
+
+        .login-container {
+            max-width: 500px;
+            width: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.98) 100%);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border-radius: 32px;
+            box-shadow:
+                0 40px 80px rgba(0, 0, 0, 0.25),
+                0 20px 40px rgba(102, 126, 234, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.4),
+                inset 0 2px 4px rgba(255, 255, 255, 0.6),
+                0 0 60px rgba(102, 126, 234, 0.1);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            opacity: 0;
+            transform: translateY(30px) scale(0.92) perspective(1000px) rotateX(10deg);
+            animation: slideUpContainer 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation-delay: 0.2s;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .login-container:hover {
+            box-shadow:
+                0 50px 100px rgba(0, 0, 0, 0.3),
+                0 25px 50px rgba(102, 126, 234, 0.25),
+                0 0 0 1px rgba(255, 255, 255, 0.5),
+                inset 0 2px 6px rgba(255, 255, 255, 0.7),
+                0 0 80px rgba(102, 126, 234, 0.2);
+            transform: translateY(-8px) scale(1.01);
+        }
+
+        /* Animated Glow Border */
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(45deg,
+                    #667eea 0%,
+                    #764ba2 25%,
+                    #667eea 50%,
+                    #764ba2 75%,
+                    #667eea 100%);
+            border-radius: 35px;
+            z-index: -1;
+            opacity: 0;
+            animation: borderGlow 4s ease-in-out infinite;
+            background-size: 300% 300%;
+            filter: blur(8px);
+        }
+
+        @keyframes borderGlow {
+
+            0%,
+            100% {
+                opacity: 0;
+                background-position: 0% 50%;
+            }
+
+            50% {
+                opacity: 0.6;
+                background-position: 100% 50%;
+            }
+        }
+
+        @keyframes slideUpContainer {
+            0% {
+                opacity: 0;
+                transform: translateY(50px) scale(0.85) perspective(1000px) rotateX(15deg);
+                filter: blur(15px);
+            }
+
+            60% {
+                opacity: 0.9;
+                transform: translateY(5px) scale(1.01) perspective(1000px) rotateX(2deg);
+                filter: blur(3px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1) perspective(1000px) rotateX(0deg);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes slideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(40px) scale(0.9);
+                filter: blur(10px);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: translateY(10px) scale(0.98);
+                filter: blur(2px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Add animated background pattern to header */
+        .login-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+            animation: headerFloat 20s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        .login-header>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes headerFloat {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(10px, -5px) rotate(1deg);
+            }
+
+            66% {
+                transform: translate(-5px, 10px) rotate(-1deg);
+            }
+        }
+
+        .login-header h4 {
+            line-height: 1.3;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            margin-top: 0;
+        }
+
+        .form-control {
+            border: 2px solid rgba(102, 126, 234, 0.15);
+            border-radius: 16px;
+            padding: 16px 24px;
+            font-size: 1.05rem;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(15px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow:
+                0 6px 20px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            position: relative;
+            font-weight: 500;
+            transform-origin: left center;
+            animation: formControlEnter 0.6s ease-out backwards;
+        }
+
+        @keyframes formControlEnter {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* تأخير ظهور الحقول بشكل متتالي */
+        #username {
+            animation-delay: 0.3s;
+        }
+
+        #password {
+            animation-delay: 0.5s;
+        }
+
+        #remember_me {
+            animation-delay: 0.7s;
+        }
+
+        /* Add subtle inner glow */
+        .form-control::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 16px;
+            padding: 2px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow:
+                0 0 0 6px rgba(102, 126, 234, 0.15),
+                0 12px 35px rgba(102, 126, 234, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.98);
+            transform: translateY(-3px) scale(1.02);
+            outline: none;
+        }
+
+        .form-control:focus::before {
+            opacity: 1;
+        }
+
+        .form-control:hover {
+            border-color: rgba(102, 126, 234, 0.3);
+            transform: translateY(-1px);
+            box-shadow:
+                0 8px 25px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        /* Form Labels Enhancement */
+        .form-label {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1rem;
+            margin-bottom: 0.6rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .form-label i {
+            color: #667eea;
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .form-control:focus+.form-label i,
+        .mb-3:has(.form-control:focus) .form-label i {
+            transform: scale(1.2) rotate(5deg);
+            color: #764ba2;
+        }
+
+        /* Checkbox Enhancement */
+        .form-check-input {
+            width: 22px;
+            height: 22px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+        }
+
+        .form-check-input:hover {
+            border-color: #667eea;
+            transform: scale(1.1);
+        }
+
+        .form-check-label {
+            font-weight: 500;
+            color: #4a5568;
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.3s ease;
+        }
+
+        .form-check-label:hover {
+            color: #667eea;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 20px;
+            padding: 18px 40px;
+            font-weight: 700;
+            font-size: 1.15rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow:
+                0 15px 40px rgba(102, 126, 234, 0.45),
+                0 6px 20px rgba(0, 0, 0, 0.15),
+                inset 0 2px 0 rgba(255, 255, 255, 0.3),
+                0 0 30px rgba(102, 126, 234, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: buttonGlowPulse 2.5s infinite ease-in-out;
+            animation-delay: 0.9s;
+        }
+
+        @keyframes buttonGlowPulse {
+            0% {
+                box-shadow:
+                    0 12px 35px rgba(102, 126, 234, 0.4),
+                    0 4px 15px rgba(0, 0, 0, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                    0 0 0 0 rgba(102, 126, 234, 0.7);
+            }
+
+            70% {
+                box-shadow:
+                    0 12px 35px rgba(102, 126, 234, 0.4),
+                    0 4px 15px rgba(0, 0, 0, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                    0 0 0 15px rgba(102, 126, 234, 0);
+            }
+
+            100% {
+                box-shadow:
+                    0 12px 35px rgba(102, 126, 234, 0.4),
+                    0 4px 15px rgba(0, 0, 0, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                    0 0 0 0 rgba(102, 126, 234, 0);
+            }
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow:
+                0 18px 45px rgba(102, 126, 234, 0.5),
+                0 8px 25px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            background: linear-gradient(135deg, #7c8ef0 0%, #8659b8 100%);
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        /* Alert Enhancement */
+        .alert {
+            border-radius: 16px;
+            border: none;
+            padding: 16px 20px;
+            font-weight: 500;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            animation: alertSlide 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes alertSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.15), rgba(239, 68, 68, 0.1));
+            color: #991b1b;
+            border-left: 4px solid #dc2626;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(74, 222, 128, 0.1));
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(96, 165, 250, 0.1));
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 191, 36, 0.1));
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .logo-image {
+            max-height: 100px;
+            margin-bottom: 25px;
+            border-radius: 16px;
+            position: relative;
+            z-index: 2;
+            filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.1));
+
+            {% if logo_3d_enabled %}
+            animation: logo3DRotate 6s ease-in-out infinite;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            {% else %}
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            {% endif %}
+        }
+
+        {% if logo_3d_enabled %}
+        @keyframes logo3DRotate {
+            0% {
+                transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+            }
+
+            25% {
+                transform: perspective(1000px) rotateY(20deg) rotateX(5deg);
+            }
+
+            50% {
+                transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+            }
+
+            75% {
+                transform: perspective(1000px) rotateY(-20deg) rotateX(-5deg);
+            }
+
+            100% {
+                transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+            }
+        }
+
+        .logo-image:hover {
+            animation: logo3DRotateFast 3s ease-in-out infinite;
+            filter: drop-shadow(0 8px 25px rgba(0, 0, 0, 0.15)) brightness(1.1);
+        }
+
+        @keyframes logo3DRotateFast {
+            0% {
+                transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.1);
+            }
+
+            25% {
+                transform: perspective(1000px) rotateY(30deg) rotateX(10deg) scale(1.1);
+            }
+
+            50% {
+                transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.1);
+            }
+
+            75% {
+                transform: perspective(1000px) rotateY(-30deg) rotateX(-10deg) scale(1.1);
+            }
+
+            100% {
+                transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.1);
+            }
+        }
+
+        {% else %}
+        .logo-image:hover {
+            transform: scale(1.08) rotate(2deg);
+            filter: drop-shadow(0 8px 25px rgba(0, 0, 0, 0.15)) brightness(1.1);
+        }
+        {% endif %}
+
+
+        .forgot-password-link {
+            display: inline-block;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            padding: 5px 10px;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out backwards;
+            animation-delay: 0.9s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .forgot-password-link:hover {
+            color: #764ba2;
+            text-decoration: underline;
+            background-color: rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .forgot-password-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .forgot-password-link:hover::before {
+            left: 100%;
+        }
+
+        .btn-login-type.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        /* Footer Enhancement */
+        footer {
+            margin-top: auto;
+            padding: 20px 0;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 2;
+        }
+
+        footer p {
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+            transition: all 0.3s ease;
+        }
+
+        footer p:hover {
+            color: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
+        }
+
+        .about-btn-top {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+            overflow: hidden;
+            white-space: nowrap;
+            padding: 0;
+        }
+
+        .about-btn-top.expanded {
+            width: 105px;
+            padding-right: 12px;
+        }
+
+        .about-btn-top i {
+            font-size: 0.9rem;
+            min-width: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .about-btn-top span {
+            font-size: 0.85rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            margin-right: 4px;
+        }
+
+        .about-btn-top.expanded span {
+            opacity: 1;
+        }
+
+        .about-btn-top:hover {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+
+
+        @media (max-width: 767.98px) {
+            .about-btn-top {
+                width: 28px;
+                height: 28px;
+                top: 12px;
+                left: 12px;
+            }
+            .about-btn-top.expanded {
+                width: 95px;
+            }
+            .about-btn-top i {
+                min-width: 28px;
+                font-size: 0.8rem;
+            }
+            .about-btn-top span {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Download Button Enhancement */
+        .download-app-section {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(102, 126, 234, 0.1);
+            position: relative;
+        }
+
+        .download-app-section::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        .download-app-section p {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .btn-download-app {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            border-radius: 16px;
+            padding: 14px 30px;
+            font-weight: 700;
+            color: white;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-block;
+            box-shadow:
+                0 10px 25px rgba(16, 185, 129, 0.3),
+                0 4px 12px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-iphone-shortcut {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            border: none;
+            border-radius: 16px;
+            padding: 14px 30px;
+            font-weight: 700;
+            color: white;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-block;
+            box-shadow:
+                0 10px 25px rgba(0, 123, 255, 0.3),
+                0 4px 12px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .btn-download-app::before, .btn-iphone-shortcut::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-download-app:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow:
+                0 15px 35px rgba(16, 185, 129, 0.4),
+                0 6px 15px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            color: white;
+            background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+        }
+
+        .btn-iphone-shortcut:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow:
+                0 15px 35px rgba(0, 123, 255, 0.4),
+                0 6px 15px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            color: white;
+            background: linear-gradient(135deg, #0085ff 0%, #007bff 100%);
+        }
+
+        .btn-download-app:hover::before, .btn-iphone-shortcut:hover::before {
+            left: 100%;
+        }
+
+        .btn-download-app:active, .btn-iphone-shortcut:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .download-buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: nowrap;
+            padding: 0 15px;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 576px) {
+            .btn-download-app, .btn-iphone-shortcut {
+                padding: 12px 15px;
+                font-size: 0.85rem;
+                border-radius: 12px;
+            }
+            .download-buttons-container {
+                gap: 8px;
+                padding: 0 10px;
+            }
+        }
+
+
+
+        /* Toby Popup Enhancement */
+        .toby-popup-container {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.98));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow:
+                0 15px 40px rgba(0, 0, 0, 0.25),
+                0 8px 20px rgba(102, 126, 234, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            padding: 18px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(30px) scale(0.9);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            width: 320px;
+        }
+
+        .toby-popup-container.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .toby-popup-container.icon-only {
+            width: fit-content;
+            padding: 12px;
+            border-radius: 60px;
+            box-shadow:
+                0 8px 25px rgba(0, 0, 0, 0.2),
+                0 4px 12px rgba(102, 126, 234, 0.15);
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .toby-popup-image {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow:
+                0 0 20px rgba(102, 126, 234, 0.6),
+                0 8px 20px rgba(0, 0, 0, 0.15);
+            animation: tobyPulse 2.5s infinite ease-in-out;
+            border: 4px solid #667eea;
+            position: relative;
+        }
+
+        .toby-popup-image::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border-radius: 50%;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            animation: ripple 2s infinite ease-out;
+        }
+
+        .toby-popup-image:hover {
+            transform: scale(1.15) rotate(8deg);
+            box-shadow:
+                0 0 30px rgba(118, 75, 162, 0.8),
+                0 12px 30px rgba(0, 0, 0, 0.2);
+            border-color: #764ba2;
+        }
+
+        @keyframes tobyPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow:
+                    0 0 20px rgba(102, 126, 234, 0.6),
+                    0 8px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            50% {
+                transform: scale(1.08);
+                box-shadow:
+                    0 0 30px rgba(102, 126, 234, 0.8),
+                    0 10px 25px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: scale(1.4);
+                opacity: 0;
+            }
+        }
+
+        .toby-popup-content {
+            flex-grow: 1;
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .toby-popup-content.hidden-content {
+            opacity: 0;
+            transform: translateX(-20px);
+            pointer-events: none;
+        }
+
+        .toby-popup-content p {
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .toby-popup-content .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 14px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow:
+                0 6px 15px rgba(102, 126, 234, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toby-popup-content .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .toby-popup-content .btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow:
+                0 10px 25px rgba(102, 126, 234, 0.4),
+                0 4px 12px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #7c8ef0 0%, #8659b8 100%);
+        }
+
+        .toby-popup-content .btn:hover::before {
+            left: 100%;
+        }
+
+        .toby-popup-close {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .toby-popup-close:hover {
+            color: #333;
+        }
+
+        /* Responsive Design for Mobile */
+        @media (max-width: 767.98px) {
+            .login-container {
+                max-width: 95%;
+                border-radius: 24px;
+                margin: 0 10px;
+            }
+
+            .login-header {
+                padding: 1.5rem 1rem;
+            }
+
+            .login-header h4 {
+                font-size: 1.3rem;
+            }
+
+            .form-control {
+                padding: 14px 20px;
+                font-size: 1rem;
+            }
+
+            .btn-primary {
+                padding: 15px 35px;
+                font-size: 1.05rem;
+            }
+
+            .toby-popup-container {
+                width: calc(100% - 30px);
+                bottom: 15px;
+                right: 15px;
+                left: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+                padding: 15px;
+            }
+
+            .toby-popup-container.icon-only {
+                width: fit-content;
+                height: auto;
+                flex-direction: row;
+            }
+
+            .toby-popup-image {
+                width: 60px;
+                height: 60px;
+            }
+
+            .toby-popup-content {
+                width: 100%;
+                text-align: center;
+                margin-top: 10px;
+            }
+
+            .toby-popup-content.hidden-content {
+                display: none;
+            }
+
+            .toby-popup-content p {
+                font-size: 0.95rem;
+            }
+
+            .toby-popup-content .btn {
+                font-size: 0.85rem;
+                padding: 6px 16px;
+            }
+
+            .download-app-section p {
+                font-size: 1rem;
+            }
+
+            .btn-download-app {
+                padding: 12px 25px;
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Tablet Optimization */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .login-container {
+                max-width: 550px;
+            }
+        }
+
+        /* تعديل حقل كلمة المرور لترك مساحة للأيقونة على اليسار */
+        #password {
+            padding-left: 45px !important;
+            /* مساحة كافية لعدم تداخل النص مع الأيقونة */
+        }
+
+        /* Enhanced Password Toggle Icon */
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            left: 16px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #667eea;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1.1rem;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .toggle-password:hover {
+            color: #764ba2;
+            background: rgba(102, 126, 234, 0.15);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .toggle-password:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        /* Enhanced Promo Screen */
+        .promo-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 1s ease-out, visibility 1s ease-out;
+        }
+
+        .promo-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            animation: orbFloat 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .promo-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .promo-content {
+            text-align: center;
+            animation: promoFadeIn 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .promo-gif {
+            max-width: 85%;
+            max-height: 75vh;
+            border-radius: 24px;
+            box-shadow:
+                0 30px 80px rgba(0, 0, 0, 0.4),
+                0 15px 40px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
+            animation: promoScale 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes promoFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+                filter: blur(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes promoScale {
+            0% {
+                opacity: 0;
+                transform: scale(0.7);
+                box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+            }
+
+            60% {
+                opacity: 0.9;
+                transform: scale(1.03);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+                box-shadow:
+                    0 30px 80px rgba(0, 0, 0, 0.4),
+                    0 15px 40px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        .skip-promo {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.9), rgba(220, 53, 69, 0.8));
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-size: 1rem;
+            box-shadow:
+                0 4px 15px rgba(220, 53, 69, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 100px;
+            justify-content: center;
+        }
+
+        .skip-promo:hover {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 1), rgba(200, 35, 51, 0.95));
+            border-color: rgba(255, 255, 255, 1);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow:
+                0 8px 25px rgba(220, 53, 69, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .skip-promo:active {
+            transform: translateY(0) scale(1);
+            box-shadow:
+                0 2px 10px rgba(220, 53, 69, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .skip-promo i {
+            font-size: 0.9rem;
+        }
+
+        /* تحسينات للموبايل */
+        @media (max-width: 768px) {
+            .skip-promo {
+                top: 15px;
+                right: 15px;
+                padding: 10px 20px;
+                font-size: 0.9rem;
+                min-width: 90px;
+            }
+
+            .skip-promo i {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .skip-promo {
+                top: 10px;
+                right: 10px;
+                padding: 8px 16px;
+                font-size: 0.85rem;
+                min-width: 80px;
+            }
+        }
+
+        /* Chic Countdown Timer */
+        .chic-countdown-wrapper {
+            margin: 25px 0;
+            text-align: center;
+            direction: ltr;
+            /* Ensure numbers order is correct LTR */
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        .chic-countdown {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .time-unit {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+            padding: 15px 10px;
+            min-width: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .time-unit::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), transparent);
+            opacity: 0.3;
+        }
+
+        .time-unit:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .time-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #4a5568;
+            text-shadow: 1px 1px 0px rgba(255, 255, 255, 1);
+            line-height: 1;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin-bottom: 5px;
+        }
+
+        .time-label {
+            font-size: 0.85rem;
+            color: #667eea;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .maintenance-title {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Disabled Button Style - Dark and Pressed */
+        .btn-maintenance-mode {
+            background: linear-gradient(to bottom, #4a5568, #2d3748) !important;
+            border: none !important;
+            color: #a0aec0 !important;
+            cursor: not-allowed !important;
+            box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.4) !important;
+            transform: translateY(2px) !important;
+            opacity: 1 !important;
+            /* Keep full opacity but look dark */
+            filter: grayscale(0.8);
+        }
+
+        .btn-maintenance-mode:hover {
+            transform: translateY(2px) !important;
+            box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .chic-countdown {
+                flex-wrap: nowrap;
+                gap: 5px;
+            }
+
+            .time-unit {
+                min-width: unset;
+                flex: 1;
+                padding: 10px 2px;
+            }
+
+            .time-value {
+                font-size: 1.2rem;
+            }
+
+            .time-label {
+                font-size: 0.65rem;
+            }
+        }
+    </style>
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        body {
+            animation: none !important;
+            background-size: auto !important
+        }
+
+        body::before {
+            display: none !important;
+            animation: none !important
+        }
+
+        .login-header::before {
+            display: none !important;
+            animation: none !important
+        }
+
+        .login-container::before {
+            animation: none !important;
+            filter: none !important
+        }
+
+        .form-control {
+            animation: none !important;
+            backdrop-filter: none !important
+        }
+
+        .btn-primary {
+            animation: none !important
+        }
+
+        .promo-screen {
+            animation: none !important
+        }
+
+        .promo-screen::before {
+            animation: none !important
+        }
+
+        .countdown-icon {
+            animation: none !important
+        }
+
+        .animate__animated {
+            animation: none !important
+        }
+    </style>
+</head>
+<body{% if ramadan_theme_enabled %} class="ramadan-theme" {% endif %}>
+    {% if ramadan_theme_enabled %}
+    <div class="fairy-lights"></div>
+    <div class="falling-stars-container" id="fallingStars"></div>
+    <script>
+        function createStars() {
+            const container = document.getElementById('fallingStars');
+            const starCount = 3; // Reduced to 3 stars as requested
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 2 + 2 + 'px';
+                star.style.width = size;
+                star.style.height = size;
+                star.style.left = Math.random() * 100 + 'vw';
+                // Much slower and elegant animation
+                star.style.animationDuration = Math.random() * 8 + 12 + 's';
+                star.style.animationDelay = Math.random() * 10 + 's';
+                container.appendChild(star);
+            }
+        }
+        createStars();
+    </script>
+    {% endif %}
+    <!-- Promo Screen -->
+    {% if promo_gif_url %}
+    <div class="promo-screen" id="promoScreen">
+        <button class="skip-promo" onclick="skipPromo()">
+            <i class="fas fa-times me-2"></i>تخطي
+        </button>
+        <div class="promo-content">
+            <img src="{{ promo_gif_url }}" alt="Promo" class="promo-gif">
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="login-container" data-aos="fade-up" data-aos-duration="1000">
+        <div class="login-header">
+            <a href="{{ url_for('bonus_pharma') }}" class="about-btn-top" title="من نحن">
+                <i class="fas fa-info"></i>
+                <span class="tooltip-text">من نحن</span>
+            </a>
+
+            <img src="{{ current_logo_path }}" alt="Logo" class="logo-image" id="logoImage"
+                style="max-width: 180px; height: auto; display: block; margin: 0 auto 15px; cursor: pointer;">
+            <h4 class="animate__animated animate__fadeIn animate__delay-1s">
+                {{ system_subtitle | safe }}
+            </h4>
+        </div>
+        <div class="p-4">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show"
+                style="border-radius: 14px; margin-bottom: 1.5rem;" role="alert">
+                <i
+                    class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            {% if maintenance_enabled %}
+            <div class="alert alert-warning text-center mb-4" id="maintenanceAlert" style="border-radius: 14px;">
+                <i class="fas fa-tools me-2"></i>
+                {{ maintenance_message }}
+            </div>
+            {% endif %}
+
+            {% if login_ad_message %}
+            <div class="alert alert-info text-center mb-4" style="border-radius: 14px;">
+                <i class="fas fa-bullhorn me-2"></i>
+                {{ login_ad_message }}
+            </div>
+            {% endif %}
+
+            <!-- Chic Countdown Timer -->
+            {% if maintenance_enabled and maintenance_end_time %}
+            <div class="chic-countdown-wrapper" id="maintenanceCountdown">
+                <div class="maintenance-title text-center">
+                    <i class="fas fa-tools me-2"></i> الموقع في وضع الصيانة
+                </div>
+                <div class="chic-countdown d-flex justify-content-around">
+                    <div class="time-unit text-center">
+                        <span class="time-value d-block" id="days">00</span>
+                        <span class="time-label">أيام</span>
+                    </div>
+                    <div class="time-unit text-center">
+                        <span class="time-value d-block" id="hours">00</span>
+                        <span class="time-label">ساعات</span>
+                    </div>
+                    <div class="time-unit text-center">
+                        <span class="time-value d-block" id="minutes">00</span>
+                        <span class="time-label">دقيقة</span>
+                    </div>
+                    <div class="time-unit text-center">
+                        <span class="time-value d-block" id="seconds">00</span>
+                        <span class="time-label">ثانية</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('handle_login') }}"
+                class="animate__animated animate__fadeIn animate__delay-1s">
+                <div class="mb-3 d-flex justify-content-center">
+                    <div class="btn-group w-100" role="group" aria-label="Login Type">
+                        <input type="hidden" name="login_type" value="company" id="loginTypeCompanyDefault">
+
+                        <input type="radio" class="btn-check" name="login_type_radio" id="loginTypeAdmin" value="admin"
+                            autocomplete="off" style="display: none;">
+                        <label class="btn btn-outline-danger btn-login-type" for="loginTypeAdmin" id="labelAdminLogin"
+                            style="display: none;">
+                            <i class="fas fa-user-shield me-2"></i>إدارة
+                        </label>
+
+                        <input type="radio" class="btn-check" name="login_type_radio" id="loginTypeCompanyTest"
+                            value="company" autocomplete="off" style="display: none;">
+                        <label class="btn btn-outline-warning btn-login-type" for="loginTypeCompanyTest"
+                            id="labelCompanyTestLogin" style="display: none;">
+                            <i class="fas fa-building me-2"></i>اختبار كشركة
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="username" class="form-label d-block mb-2"><i class="fas fa-user me-2"></i>اسم المستخدم</label>
+                    <input type="text" class="form-control w-100" id="username" name="username" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label d-block mb-2"><i class="fas fa-lock me-2"></i>كلمة المرور</label>
+                    <div class="position-relative">
+                        <input type="password" class="form-control w-100" id="password" name="password" required>
+                        <span class="toggle-password" onclick="togglePasswordVisibility('password', this)"
+                              style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #667eea;">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me" value="true">
+                    <label class="form-check-label ms-2" for="remember_me">تذكرني</label>
+                </div>
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-primary btn-lg w-100" id="loginButton">
+                        <i class="fas fa-sign-in-alt me-2"></i>تسجيل الدخول
+                    </button>
+                </div>
+
+                <!-- رابط المساعدة -->
+                <div class="text-center mb-3">
+                    <a href="https://wa.me/201554077727?text=نسيت اسم المستخدم أو كلمة السر"
+                        class="btn btn-outline-success btn-sm w-100" style="border-radius: 12px; font-size: 0.9rem;"
+                        target="_blank">
+                        <i class="fab fa-whatsapp me-2"></i>نسيت اسم المستخدم أو كلمة السر؟
+                    </a>
+                </div>
+
+                <div class="text-center mt-3">
+                    <p class="small">
+                        ليس لديك حساب؟ <a href="{{ url_for('signup_company') }}" class="fw-bold" style="color: #667eea;">سجل الآن</a>
+                    </p>
+                </div>
+            </form>
+
+
+
+            <div class="download-app-section">
+                <p>هل تفضل استخدام التطبيق؟</p>
+                <div class="download-buttons-container">
+                    <a href="https://drive.google.com/file/d/13ajSJedEqlSlEZ5BjdnJzZ5D7RFV7mYn/view?usp=sharing" class="btn btn-download-app">
+                        <i class="fas fa-download me-1"></i> ستوك فلو
+                    </a>
+                    <a href="https://www.icloud.com/shortcuts/a9f10509382d4f8999a459323ccd4856" class="btn btn-iphone-shortcut" target="_blank">
+                        <i class="fab fa-apple me-1"></i> اختصار للأيفون
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="text-center py-3 text-muted">
+        <p class="mb-0">Developer: MO7AMED NAGY</p>
+        <p class="mb-0">+201554077727</p>
+    </footer>
+
+    <div class="whatsapp-popup-container show animate__animated animate__bounceIn animate__delay-2s"
+         id="whatsappPopup">
+         <a href="https://wa.me/201554077727" target="_blank" class="whatsapp-popup-link">
+             <div class="whatsapp-icon-wrapper">
+                 <i class="fab fa-whatsapp"></i>
+             </div>
+         </a>
+     </div>
+
+     <style>
+         .whatsapp-popup-container {
+             position: fixed;
+             bottom: 30px;
+             right: 30px;
+             z-index: 10000;
+         }
+
+         .whatsapp-popup-link {
+             text-decoration: none !important;
+             outline: none !important;
+             -webkit-tap-highlight-color: transparent;
+         }
+
+         .whatsapp-icon-wrapper {
+             width: 65px;
+             height: 65px;
+             background: #25D366;
+             border-radius: 50%;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4);
+             cursor: pointer;
+             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+             position: relative;
+             border: none !important;
+             outline: none !important;
+         }
+
+        .whatsapp-icon-wrapper i {
+             color: white;
+             font-size: 35px;
+         }
+
+         .whatsapp-icon-wrapper:hover {
+             transform: scale(1.1) rotate(10deg);
+             box-shadow: 0 15px 35px rgba(37, 211, 102, 0.5);
+         }
+
+         @media (max-width: 768px) {
+            .whatsapp-icon-wrapper {
+                width: 55px;
+                height: 55px;
+            }
+            .whatsapp-icon-wrapper i {
+                font-size: 30px;
+            }
+            .whatsapp-popup-container {
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // تهيئة مكتبة AOS للتأثيرات الحركية
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: false
+            });
+            // Elements
+            const rememberMeCheckbox = document.getElementById('remember_me');
+            const loginForm = document.querySelector('form[action="{{ url_for("handle_login") }}"]');
+            const changePasswordForm = document.getElementById('changePasswordForm');
+            const loginTypeCompanyDefault = document.getElementById('loginTypeCompanyDefault');
+            const loginTypeAdmin = document.getElementById('loginTypeAdmin');
+            const labelAdminLogin = document.getElementById('labelAdminLogin');
+
+            const logo = document.querySelector('.logo-image');
+            const usernameInput = document.getElementById('username');
+
+            // --- Maintenance Mode Logic ---
+            {% if maintenance_enabled and maintenance_end_time %}
+            // Set the date we're counting down to
+            const countDownDate = new Date("{{ maintenance_end_time }}").getTime();
+
+            const loginButton = document.getElementById('loginButton');
+            const countdownContainer = document.getElementById('maintenanceCountdown');
+            const maintenanceMessage = document.getElementById('maintenanceAlert');
+
+            // Initially disable the button immediately
+            if (loginButton) {
+                loginButton.classList.add('btn-maintenance-mode');
+                loginButton.disabled = true;
+                loginButton.innerHTML = '<i class="fas fa-lock me-2"></i> الصيانة جارية';
+            }
+
+            // Update the count down every 1 second
+            const maintenanceTimer = setInterval(function () {
+
+                // Get today's date and time
+                const now = new Date().getTime();
+
+                // Find the distance between now and the count down date
+                const distance = countDownDate - now;
+
+                // Time calculations for days, hours, minutes and seconds
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                // Output the result in elements
+                const elDays = document.getElementById("days");
+                const elHours = document.getElementById("hours");
+                const elMinutes = document.getElementById("minutes");
+                const elSeconds = document.getElementById("seconds");
+
+                if (elDays) elDays.innerText = days < 10 ? '0' + days : days;
+                if (elHours) elHours.innerText = hours < 10 ? '0' + hours : hours;
+                if (elMinutes) elMinutes.innerText = minutes < 10 ? '0' + minutes : minutes;
+                if (elSeconds) elSeconds.innerText = seconds < 10 ? '0' + seconds : seconds;
+
+                // If the count down is over, write some text
+                if (distance < 0) {
+                    clearInterval(maintenanceTimer);
+                    if (countdownContainer) {
+                        countdownContainer.innerHTML = '<div class="alert alert-success fw-bold"><i class="fas fa-check-circle me-2"></i> تم انتهاء الصيانة، يمكنك تسجيل الدخول الآن</div>';
+                        // Remove countdown wrapper after a delay
+                        setTimeout(() => {
+                            if (countdownContainer) countdownContainer.style.display = 'none';
+                        }, 3000);
+                    }
+                    if (maintenanceMessage) {
+                        maintenanceMessage.style.display = 'none';
+                    }
+                    if (loginButton) {
+                        loginButton.classList.remove('btn-maintenance-mode');
+                        loginButton.disabled = false;
+                        loginButton.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i> تسجيل الدخول';
+                    }
+
+                    // Reload page to refresh server state if needed
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                }
+            }, 1000);
+            {% elif maintenance_enabled %}
+            // Maintenance mode enabled but no end time set
+            const loginButtonNoTime = document.getElementById('loginButton');
+            if (loginButtonNoTime) {
+                loginButtonNoTime.classList.add('btn-maintenance-mode');
+                loginButtonNoTime.disabled = true;
+                loginButtonNoTime.innerHTML = '<i class="fas fa-lock me-2"></i> الصيانة جارية';
+            }
+            {% endif %}
+
+            // Variables for triple click
+            let clickCount = 0;
+            let lastClickTime = 0;
+            const clickThreshold = 3;
+            const timeThreshold = 1000; // Increased to 1 second for easier clicking
+
+            // Check for #admin hash to auto-enable admin mode
+            if (window.location.hash === '#admin') {
+                setTimeout(enableAdminMode, 500);
+            }
+
+            // ... (Keep Remember Me logic) ...
+
+            // Function to enable Admin Mode
+            function enableAdminMode() {
+                // إظهار خيار الإدارة دائماً
+                loginTypeAdmin.style.display = 'inline-block';
+                labelAdminLogin.style.display = 'inline-block';
+
+                // التحقق من وضع الصيانة
+                const isMaintenanceMode = {{ 'true' if maintenance_enabled else 'false' }};
+
+
+        // إظهار خيار اختبار كشركة فقط في وضع الصيانة
+        const loginTypeCompanyTest = document.getElementById('loginTypeCompanyTest');
+        const labelCompanyTestLogin = document.getElementById('labelCompanyTestLogin');
+
+        if (isMaintenanceMode && loginTypeCompanyTest && labelCompanyTestLogin) {
+            // وضع الصيانة مفعل - أظهر خيار "اختبار كشركة"
+            loginTypeCompanyTest.style.display = 'inline-block';
+            labelCompanyTestLogin.style.display = 'inline-block';
+
+            // تفعيل خيار "اختبار كشركة" بشكل افتراضي في الصيانة
+            loginTypeCompanyTest.checked = true;
+            loginTypeCompanyTest.name = 'login_type';
+            labelCompanyTestLogin.classList.add('active');
+            loginTypeAdmin.name = 'login_type_radio';
+        } else {
+            // لا يوجد صيانة - فعّل خيار "إدارة" مباشرة
+            loginTypeAdmin.checked = true;
+            loginTypeAdmin.name = 'login_type';
+            labelAdminLogin.classList.add('active');
+        }
+
+        loginTypeCompanyDefault.name = 'login_type_disabled';
+        clickCount = 0;
+
+        // إخفاء العداد وتفعيل الزر للأدمن
+        const adminCountdownContainer = document.getElementById('maintenanceCountdown');
+        const adminLoginButton = document.getElementById('loginButton');
+
+        // Stop the maintenance timer if it's running
+        if (typeof maintenanceTimer !== 'undefined') {
+            clearInterval(maintenanceTimer);
+        }
+
+        if (adminCountdownContainer) {
+            adminCountdownContainer.style.transition = 'all 0.5s ease';
+            adminCountdownContainer.style.opacity = '0';
+            adminCountdownContainer.style.transform = 'scale(0.9)';
+            setTimeout(function () {
+                adminCountdownContainer.style.display = 'none';
+            }, 500);
+        }
+
+        if (adminLoginButton) {
+            adminLoginButton.disabled = false;
+            adminLoginButton.classList.remove('btn-maintenance-mode');
+            adminLoginButton.classList.add('animate__animated', 'animate__pulse');
+            adminLoginButton.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i> تسجيل الدخول';
+            console.log('🔓 Admin mode activated - login button enabled immediately');
+        }
+
+        // عرض رسالة للأدمن
+        const adminMsg = document.createElement('div');
+        adminMsg.className = 'alert alert-info text-center animate__animated animate__bounceIn';
+
+        if (isMaintenanceMode) {
+            adminMsg.innerHTML = '<i class="fas fa-user-shield me-2"></i>وضع الاختبار - اختر "إدارة" للوحة الأدمن أو "اختبار كشركة" للوحة الشركات';
+        } else {
+            adminMsg.innerHTML = '<i class="fas fa-user-shield me-2"></i>وضع الأدمن - يمكنك تسجيل الدخول مباشرة';
+        }
+
+        const firstForm = document.querySelector('form');
+        if (firstForm) {
+            // إزالة أي رسائل أدمن سابقة
+            const oldMsgs = document.querySelectorAll('.alert-info');
+            oldMsgs.forEach(msg => msg.remove());
+
+            firstForm.insertAdjacentElement('beforebegin', adminMsg);
+        }
+        }
+
+        logo.addEventListener('click', function () {
+            const currentTime = new Date().getTime();
+            console.log('Logo clicked. Count:', clickCount + 1); // Debugging
+
+            if (currentTime - lastClickTime < timeThreshold) {
+                clickCount++;
+                if (clickCount === clickThreshold) {
+                    enableAdminMode();
+                }
+            } else {
+                clickCount = 1;
+            }
+            lastClickTime = currentTime;
+        });
+
+        loginTypeAdmin.addEventListener('change', function () {
+            if (this.checked) {
+                loginTypeCompanyDefault.name = 'login_type_disabled';
+                this.name = 'login_type';
+            } else {
+                loginTypeCompanyDefault.name = 'login_type';
+                this.name = 'login_type_radio';
+            }
+        });
+
+        // Handler لخيار "اختبار كشركة"
+        const loginTypeCompanyTest = document.getElementById('loginTypeCompanyTest');
+        if (loginTypeCompanyTest) {
+            loginTypeCompanyTest.addEventListener('change', function () {
+                if (this.checked) {
+                    loginTypeCompanyDefault.name = 'login_type_disabled';
+                    this.name = 'login_type';
+                } else {
+                    loginTypeCompanyDefault.name = 'login_type';
+                    this.name = 'login_type_radio';
+                }
+            });
+        }
+
+        if (loginTypeAdmin.style.display === 'none' || !loginTypeAdmin.checked) {
+            loginTypeCompanyDefault.name = 'login_type';
+            loginTypeAdmin.name = 'login_type_radio';
+        }
+
+
+
+
+
+        function showTobyPopup() {
+            const tobyPopup = document.getElementById('tobyPopup');
+            if (tobyPopup) {
+                tobyPopup.classList.add('show');
+            }
+        }
+
+        function hideTobyPopup() {
+            const tobyPopup = document.getElementById('tobyPopup');
+            if (tobyPopup) {
+                tobyPopup.style.display = 'none';
+            }
+        }
+
+        function handleTobyClick() {
+            alert('لأ. سجل دخول الأول 😉');
+        }
+
+        // Auto-hide success and info messages after 5 seconds
+        const alerts = document.querySelectorAll('.alert-success, .alert-info');
+        if (alerts.length > 0) {
+            setTimeout(function () {
+                alerts.forEach(function (alert) {
+                    alert.style.transition = 'opacity 0.5s ease';
+                    alert.style.opacity = '0';
+                    setTimeout(function () {
+                        alert.remove();
+                    }, 500);
+                });
+            }, 5000);
+        }
+        });
+
+        // Skip Promo Function (outside DOMContentLoaded so it's globally accessible)
+        function skipPromo() {
+            const promoScreen = document.getElementById('promoScreen');
+            if (promoScreen) {
+                promoScreen.classList.add('hidden');
+            }
+        }
+
+        // Promo Screen Auto-hide after 7 seconds (runs immediately when script loads)
+        window.addEventListener('load', function () {
+            const promoScreen = document.getElementById('promoScreen');
+            if (promoScreen) {
+                setTimeout(function () {
+                    promoScreen.classList.add('hidden');
+                }, 7000);
+            }
+        });
+
+        function togglePasswordVisibility(inputId, iconSpan) {
+            const input = document.getElementById(inputId);
+            const icon = iconSpan.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
+    <script>
+        function ensurePageSpinner() {
+            var spinner = document.getElementById('pageSpinner');
+            if (!spinner) {
+                var style = document.createElement('style');
+                style.textContent = ".spinner-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;justify-content:center;align-items:center}.spinner-overlay.active{display:flex;animation:fadeIn 0.3s ease}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.elegant-spinner{position:relative;width:80px;height:80px}.elegant-spinner::before,.elegant-spinner::after{content:'';position:absolute;border-radius:50%}.elegant-spinner::before{width:80px;height:80px;border:4px solid transparent;border-top-color:#667eea;border-right-color:#764ba2;animation:spinOuter 1.2s linear infinite}.elegant-spinner::after{width:50px;height:50px;top:15px;left:15px;border:4px solid transparent;border-bottom-color:#667eea;border-left-color:#764ba2;animation:spinInner 1.2s linear infinite reverse}@keyframes spinOuter{to{transform:rotate(360deg)}}@keyframes spinInner{to{transform:rotate(360deg)}}";
+                document.head.appendChild(style);
+                spinner = document.createElement('div');
+                spinner.className = 'spinner-overlay';
+                spinner.id = 'pageSpinner';
+                spinner.innerHTML = '<div class="elegant-spinner"><div class="spinner-dot"></div></div>';
+                document.body.appendChild(spinner);
+            }
+            return spinner;
+        }
+
+        window.addEventListener('pageshow', function () {
+            var s = document.getElementById('pageSpinner');
+            if (s) { s.classList.remove('active'); }
+        });
+        window.addEventListener('load', function () {
+            var s = document.getElementById('pageSpinner');
+            if (s) { s.classList.remove('active'); }
+        });
+        window.addEventListener('popstate', function () {
+            var s = document.getElementById('pageSpinner');
+            if (s) { s.classList.remove('active'); }
+        });
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden) {
+                var s = document.getElementById('pageSpinner');
+                if (s) { s.classList.remove('active'); }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // About button slider logic
+            const aboutBtn = document.querySelector('.about-btn-top');
+            if (aboutBtn) {
+                // Expand after a small delay
+                setTimeout(() => {
+                    aboutBtn.classList.add('expanded');
+                    // Collapse after 5 seconds
+                    setTimeout(() => {
+                        aboutBtn.classList.remove('expanded');
+                    }, 5000);
+                }, 800);
+            }
+
+            var form = document.querySelector('form[action*="handle_login"]');
+            var btn = document.getElementById('loginButton');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    if (!form.checkValidity()) {
+                        var s0 = document.getElementById('pageSpinner');
+                        if (s0) { s0.classList.remove('active'); }
+                        form.reportValidity();
+                        e.preventDefault();
+                        return;
+                    }
+                    var s = ensurePageSpinner();
+                    s.classList.add('active');
+                    setTimeout(function () {
+                        var s2 = document.getElementById('pageSpinner');
+                        if (s2) { s2.classList.remove('active'); }
+                    }, 6000);
+                });
+            }
+            if (btn) {
+                btn.addEventListener('click', function (e) {
+                    var formEl = document.querySelector('form[action*="handle_login"]');
+                    if (formEl && !formEl.checkValidity()) {
+                        var s0 = document.getElementById('pageSpinner');
+                        if (s0) { s0.classList.remove('active'); }
+                        formEl.reportValidity();
+                        e.preventDefault();
+                        return;
+                    }
+                    var s = ensurePageSpinner();
+                    s.classList.add('active');
+                });
+            }
+        });
+    </script>
+    </body>
+
+</html>

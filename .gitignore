@@ -1,0 +1,14 @@
+venv/
+*.pyc
+__pycache__/
+instance/
+.env
+db.sqlite3
+site.db
+*.db
+uploads/
+static/logos/*
+static/ad_images/*
+static/apk/*
+.vscode/
+.idea/

@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>الملف الشخصي - بونص فارما</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-primary: #050505;
+            --text-secondary: #65676b;
+            --border-color: #ced0d4;
+            --hover-bg: #f2f2f2;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --navbar-icon-color: #ffffff;
+            --error-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding-top: 80px;
+            /* Increased for new navbar */
+            overflow-x: hidden;
+            background-attachment: fixed;
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Enhanced Unified Navbar (From search_products.html) */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            background-size: 200% 200% !important;
+            animation: navbarGradient 15s ease infinite !important;
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.2),
+                0 5px 20px rgba(102, 126, 234, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1030;
+            backdrop-filter: blur(15px) !important;
+            -webkit-backdrop-filter: blur(15px) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+        }
+
+        @keyframes navbarGradient {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            color: white !important;
+        }
+
+        .navbar-logo {
+            height: 40px;
+            width: auto;
+            margin-left: 10px;
+        }
+
+        .navbar-nav-notification-wrapper {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            margin-right: 15px;
+            flex-grow: 0;
+            justify-content: flex-end;
+            flex-shrink: 0;
+            gap: 5px !important;
+        }
+
+        .navbar-nav-notification-wrapper .nav-link {
+            padding: 0.4rem !important;
+            position: relative;
+            color: #000000 !important;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .navbar-nav-notification-wrapper .nav-link:hover {
+            color: #ffffff !important;
+            transform: translateY(-2px);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            padding: 5px 8px;
+            border-radius: 50%;
+            background-color: var(--error-color);
+            color: white;
+            font-size: 0.75em;
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+            line-height: 1;
+        }
+
+        /* Mobile Navbar Adjustments */
+        @media (max-width: 991.98px) {
+            .navbar-nav-notification-wrapper {
+                order: -1;
+                margin-left: auto;
+                margin-right: 10px;
+                gap: 3px !important;
+                max-width: 140px;
+                justify-content: space-between;
+                flex-grow: 1;
+            }
+
+            .navbar-collapse {
+                background: rgba(255, 255, 255, 0.95);
+                position: absolute;
+                top: 70px;
+                left: 0;
+                right: 0;
+                padding: 16px;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+                border-top: 1px solid rgba(0, 0, 0, 0.05);
+            }
+
+            .navbar-nav .nav-link {
+                color: #333 !important;
+                padding: 10px;
+                border-radius: 8px;
+            }
+
+            .navbar-nav .nav-link:hover {
+                background: rgba(0, 0, 0, 0.05);
+                color: #667eea !important;
+            }
+        }
+
+        /* Profile Header Area (No Cover) */
+        .profile-header-container {
+            background-color: transparent;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+            margin-top: 20px;
+            /* Space from navbar */
+        }
+
+        .profile-header-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            max-width: 940px;
+            margin: 0 auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .profile-header-content {
+                flex-direction: row;
+                text-align: right;
+                align-items: center;
+                padding: 40px;
+                gap: 30px;
+            }
+        }
+
+        .profile-avatar-container {
+            position: relative;
+            /* No negative margin needed */
+            display: flex;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        @media (min-width: 768px) {
+            .profile-avatar-container {
+                margin-bottom: 0;
+            }
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid #ffffff;
+            background-color: #ffffff;
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-info {
+            flex-grow: 1;
+        }
+
+        .profile-name {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #333;
+        }
+
+        .profile-bio {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+        }
+
+        .verified-badge {
+            color: #1877f2;
+            margin-right: 4px;
+        }
+
+        /* Content Grid */
+        .content-container {
+            max-width: 940px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 992px) {
+            .content-grid {
+                grid-template-columns: 2fr 3fr;
+                /* Left sidebar (info), Right feed (edit) */
+            }
+        }
+
+        /* Cards */
+        .fb-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .card-header-fb {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .card-title-fb {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+
+        /* Info Items */
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            color: #444;
+            font-size: 1rem;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .info-item:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .info-item i {
+            width: 24px;
+            color: #667eea;
+            margin-left: 10px;
+            text-align: center;
+        }
+
+        /* Form Styles */
+        .form-control {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            background-color: #fff;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-primary-fb {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary-fb:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Avatar Selection Grid */
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .avatar-option {
+            cursor: pointer;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 3px solid transparent;
+            position: relative;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .avatar-option img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .avatar-option.selected {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .avatar-option.selected::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: #667eea;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        /* Premium Badge */
+        .premium-badge {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #333;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-header { display:flex; justify-content:space-between; align-items:center; gap:1rem; margin: 1rem 0; }
+        .page-title { margin:0; font-size:1.35rem; display:inline-flex; align-items:center; gap:0.5rem; }
+        .back-btn { display:inline-flex; align-items:center; gap:0.4rem; background:#6b7280; color:#fff; border-radius:999px; padding:0.45rem 1rem; font-weight:700; font-size:0.9rem; text-decoration:none; box-shadow:0 6px 18px rgba(0,0,0,0.12); }
+        .back-btn:hover{opacity:0.95}
+        .back-btn:active{transform:scale(0.98)}
+        @media (max-width: 991.98px){ .page-title{ font-size:1.2rem } }
+        @media (max-width: 767.98px){ .page-title{ font-size:1.05rem } }
+        </style>
+    <link rel="manifest" href="/manifest.json">
+<style>body{animation:none!important}</style>
+</head>
+
+<body>
+
+    <!-- Navbar (Matching Search Page) -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('company_dashboard') }}">
+                {% if current_logo_path %}
+                <img src="{{ current_logo_path }}" alt="Logo" class="navbar-logo">
+                {% else %}
+                <img src="{{ url_for('static', filename='images/default_logo.png') }}" alt="Default Logo"
+                    class="navbar-logo">
+                {% endif %}
+                <span class="full-text ms-2">{{ system_subtitle }}</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavCompany"
+                aria-controls="navbarNavCompany" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="navbar-nav-notification-wrapper">
+                <a class="nav-link" href="{{ url_for('company_profile') }}" title="ملفي الشخصي">
+                    <i class="fas fa-user-circle fa-lg"></i>
+                </a>
+                <a class="nav-link" href="{{ url_for('company_messages') }}" title="المراسلات">
+                    <i class="fas fa-comments fa-lg"></i>
+                    <span class="notification-badge" id="community-count" style="display: none;">0</span>
+                </a>
+                <a class="nav-link" href="{{ url_for('instructions') }}" title="تعليمات وإرشادات">
+                    <i class="fas fa-question-circle fa-lg"></i>
+                </a>
+                <a class="nav-link position-relative" href="{{ url_for('notifications') }}" title="الإشعارات">
+                    <i class="fas fa-bell fa-lg"></i>
+                    <span class="notification-badge" id="notification-count" style="display: none;">0</span>
+                </a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="navbarNavCompany">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('company_dashboard') }}">الرئيسية</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('my_products') }}">أصنافي</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('search_products') }}">البحث</a></li>
+                    <li class="nav-item"><a class="nav-link text-danger" href="{{ url_for('logout') }}">تسجيل الخروج</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header Top Bar -->
+    <div class="page-header">
+        <h2 class="page-title"><i class="fas fa-user me-2"></i> الملف الشخصي</h2>
+        <a href="{{ url_for('company_dashboard') }}" class="back-btn" id="profileBackBtn">العودة للوحة الرئيسية <i class="fas fa-arrow-right ms-2"></i></a>
+    </div>
+
+    <!-- Profile Header (No Cover) -->
+    <div class="profile-header-container">
+        <div class="profile-header-content">
+            <div class="profile-avatar-container">
+                <div class="profile-avatar" id="mainProfileAvatar">
+                    {% set avatar_key = company.avatar if company.avatar else 'male-1' %}
+                    {% set avatar_parts = avatar_key.split('-') %}
+                    {% set avatar_type = 'html' if avatar_parts[0] == 'html' else 'jpg' %}
+                    {% if avatar_type == 'html' %}
+                    {% if avatar_key == 'html-1' %}
+                    <div style="width: 120px; height: 120px; background: linear-gradient(45deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; border: 4px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">HTML 1</div>
+                    {% elif avatar_key == 'html-2' %}
+                    <div style="width: 120px; height: 120px; background: linear-gradient(135deg, #f093fb, #f5576c); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; border: 4px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">HTML 2</div>
+                    {% elif avatar_key == 'html-3' %}
+                    <div style="width: 120px; height: 120px; background: linear-gradient(45deg, #4facfe, #00f2fe); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; border: 4px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">HTML 3</div>
+                    {% elif avatar_key == 'html-4' %}
+                    <div style="width: 120px; height: 120px; background: linear-gradient(135deg, #fa709a, #fee140); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; border: 4px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">HTML 4</div>
+                    {% elif avatar_key == 'html-5' %}
+                    <div style="width: 120px; height: 120px; background: linear-gradient(45deg, #30cfd0, #330867); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; border: 4px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">HTML 5</div>
+                    {% else %}
+                    <div style="width: 120px; height: 120px; background: linear-gradient(135deg, #a8edea, #fed6e3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #333; font-weight: bold; font-size: 14px; border: 4px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">HTML 6</div>
+                    {% endif %}
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/avatars/' + avatar_key + '.jpg') }}" alt="Profile Picture" id="mainProfileImage" onerror="this.src='{{ url_for('static', filename='images/avatars/male-1.jpg') }}'">
+                    {% endif %}
+                </div>
+            </div>
+            <div class="profile-info">
+                <h1 class="profile-name">
+                    {{ company.company_name }}
+                    {% if company.is_premium or company.company_name == 'STOCK FLOW' %}
+                    <i class="fas fa-check-circle verified-badge" title="تم التحقق"></i>
+                    {% endif %}
+                </h1>
+                <div class="profile-bio">
+                    {{ company.email }}
+                </div>
+                {% if company.is_premium %}
+                <div class="premium-badge">
+                    <i class="fas fa-crown"></i> عضوية مميزة
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-container">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show mb-3" style="border-radius: 14px;"
+            role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="content-grid">
+            <!-- Left Column: Intro / Info -->
+            <div class="left-column">
+                <div class="fb-card">
+                    <div class="card-header-fb">
+                        <h2 class="card-title-fb">نبذة عن الشركة</h2>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-phone"></i>
+                        <span>{{ company.phone }}</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>{{ company.email }}</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>انضم في {{ company.created_at.strftime('%Y-%m-%d') if company.created_at else 'غير محدد'
+                            }}</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-user-tag"></i>
+                        <span>{{ company.username }}</span>
+                    </div>
+                </div>
+
+                <!-- Premium Status Card -->
+                <div class="fb-card">
+                    <div class="card-header-fb">
+                        <h2 class="card-title-fb">حالة الاشتراك</h2>
+                    </div>
+                    {% if company.is_premium %}
+                    <div class="text-center text-success mb-2">
+                        <i class="fas fa-check-circle fa-3x mb-2"></i>
+                        <h4>اشتراكك نشط</h4>
+                    </div>
+                    <p class="text-muted text-center small">ينتهي في: {{ company.premium_end_date.strftime('%Y-%m-%d')
+                        if company.premium_end_date else 'غير محدد' }}</p>
+                    {% else %}
+                    <div class="text-center text-secondary mb-2">
+                        <i class="fas fa-lock fa-3x mb-2"></i>
+                        <h4>عضوية مجانية</h4>
+                    </div>
+                    <a href="{{ url_for('subscribe_plus') }}" class="btn btn-outline-primary w-100 mt-2" id="upgradeAccountBtn">ترقية الحساب</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Right Column: Edit Form (Feed Style) -->
+            <div class="right-column">
+                <div class="fb-card">
+                    <div class="card-header-fb">
+                        <h2 class="card-title-fb">تعديل البيانات</h2>
+                    </div>
+
+            <form method="POST" action="{{ url_for('company_profile_post') }}" class="modern-form">
+                
+                        <!-- Hidden Avatar Input -->
+                        <input type="hidden" name="avatar" id="selected-avatar"
+                            value="{{ company.avatar if company.avatar else 'male-1' }}">
+
+                        <div class="mb-3">
+                            <label class="form-label text-secondary fw-bold small">اسم الشركة</label>
+                            <input type="text" class="form-control" name="company_name"
+                                value="{{ company.company_name }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-secondary fw-bold small">رقم الهاتف</label>
+                            <input type="tel" class="form-control" name="phone" value="{{ company.phone }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-secondary fw-bold small">البريد الإلكتروني</label>
+                            <input type="email" class="form-control" name="email" value="{{ company.email }}">
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="mb-3">
+                            <label class="form-label text-secondary fw-bold small mb-2">اختر شخصية (أفاتار)</label>
+                            <div class="avatar-grid">
+                                {% for i in range(1, 2) %}
+                                <div class="avatar-option" data-value="male-{{ i }}"
+                                    onclick="selectAvatar('male-{{ i }}')">
+                                    <img src="{{ url_for('static', filename='images/avatars/male-' + i|string + '.jpg') }}"
+                                        alt="Male {{ i }}">
+                                </div>
+                                {% endfor %}
+                                {% for i in range(1, 2) %}
+                                <div class="avatar-option" data-value="female-{{ i }}"
+                                    onclick="selectAvatar('female-{{ i }}')">
+                                    <img src="{{ url_for('static', filename='images/avatars/female-' + i|string + '.jpg') }}"
+                                        alt="Female {{ i }}">
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3" style="display: none;">
+                            <label class="form-label text-secondary fw-bold small mb-2">ارفع صورة وسيتم تحويلها لأفاتار HTML خفيف تلقائيًا</label>
+                            <input type="file" class="form-control" id="avatarUpload" accept="image/*" style="display: none;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-secondary fw-bold small mb-2">تفضيلات المراسلات</label>
+                            <div class="d-flex justify-content-between align-items-center p-3" style="background: rgba(0,0,0,0.03); border-radius: 12px;">
+                                <div>
+                                    <strong>استقبال رسائل من الشركات الأخرى</strong>
+                                    <div class="text-muted small">عند إيقاف هذا الخيار، لا يمكن للشركات الأخرى إرسال رسائل لك (ما عدا إدارة النظام).</div>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="allow_company_messages" name="allow_company_messages" {% if company.receive_messages_enabled %}checked{% endif %}>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary-fb py-2 fs-5">
+                                <i class="fas fa-save me-2"></i> حفظ التعديلات
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function renderHtmlAvatar(container, key) {
+            let html = '';
+            if (key === 'html-1') html = '<div style="width: 120px; height: 120px; background: linear-gradient(45deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; border: 4px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">HTML 1</div>';
+            else if (key === 'html-2') html = '<div style="width: 120px; height: 120px; background: linear-gradient(135deg, #f093fb, #f5576c); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; border: 4px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">HTML 2</div>';
+            else if (key === 'html-3') html = '<div style="width: 120px; height: 120px; background: linear-gradient(45deg, #4facfe, #00f2fe); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; border: 4px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">HTML 3</div>';
+            else if (key === 'html-4') html = '<div style="width: 120px; height: 120px; background: linear-gradient(135deg, #fa709a, #fee140); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; border: 4px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">HTML 4</div>';
+            else if (key === 'html-5') html = '<div style="width: 120px; height: 120px; background: linear-gradient(45deg, #30cfd0, #330867); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; border: 4px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">HTML 5</div>';
+            else html = '<div style="width: 120px; height: 120px; background: linear-gradient(135deg, #a8edea, #fed6e3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #333; font-weight: bold; font-size: 14px; border: 4px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">HTML 6</div>';
+            container.innerHTML = html;
+        }
+        function selectAvatar(avatarKey) {
+            document.getElementById('selected-avatar').value = avatarKey;
+            document.querySelectorAll('.avatar-option').forEach(el => {
+                el.classList.remove('selected');
+                if (el.dataset.value === avatarKey) { el.classList.add('selected'); }
+            });
+            const container = document.getElementById('mainProfileAvatar');
+            if (!container) return;
+            if (avatarKey.startsWith('html-')) {
+                renderHtmlAvatar(container, avatarKey);
+            } else {
+                container.innerHTML = '<img id="mainProfileImage" alt="Profile Picture">';
+                const mainImg = document.getElementById('mainProfileImage');
+                mainImg.src = `/static/images/avatars/${avatarKey}.jpg`;
+                mainImg.onerror = function(){ this.src = '/static/images/avatars/male-1.jpg'; };
+            }
+        }
+        function fileToHtmlAvatar(file, cb) {
+            const reader = new FileReader();
+            reader.onload = function(e){
+                const img = new Image();
+                img.onload = function(){
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = 32; canvas.height = 32;
+                    ctx.drawImage(img, 0, 0, 32, 32);
+                    let r=0,g=0,b=0,n=0;
+                    const data = ctx.getImageData(0,0,32,32).data;
+                    for (let i=0;i<data.length;i+=4){ r+=data[i]; g+=data[i+1]; b+=data[i+2]; n++; }
+                    r/=n; g/=n; b/=n;
+                    const max = Math.max(r,g,b), min = Math.min(r,g,b);
+                    let h=0,s=0,l=(max+min)/510;
+                    const d = max-min;
+                    s = l>0.5 ? d/(510-max-min) : d/(max+min);
+                    if (d===0) h=0; else {
+                        switch(max){
+                            case r: h = ((g-b)/d + (g<b?6:0)); break;
+                            case g: h = ((b-r)/d + 2); break;
+                            case b: h = ((r-g)/d + 4); break;
+                        }
+                        h*=60;
+                    }
+                    let key = 'html-1';
+                    if (s < 0.25) key = 'html-6';
+                    else if ((h >= 0 && h < 25) || (h >= 330 && h <= 360)) key = 'html-2';
+                    else if (h >= 25 && h < 70) key = 'html-4';
+                    else if (h >= 70 && h < 160) key = 'html-5';
+                    else if (h >= 160 && h < 220) key = 'html-3';
+                    else key = 'html-1';
+                    cb(key);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        document.getElementById('avatarUpload')?.addEventListener('change', function(){
+            const f = this.files && this.files[0];
+            if (!f) return;
+            fileToHtmlAvatar(f, function(key){ selectAvatar(key); });
+        });
+
+        // Initialize selection on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentAvatar = document.getElementById('selected-avatar').value || 'male-1';
+            selectAvatar(currentAvatar);
+        });
+    </script>
+</body>
+</html>
+<script>
+    function ensurePageSpinner() {
+        var spinner = document.getElementById('pageSpinner');
+        if (!spinner) {
+            var style = document.createElement('style');
+            style.textContent = ".spinner-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;justify-content:center;align-items:center}.spinner-overlay.active{display:flex;animation:fadeIn 0.3s ease}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.elegant-spinner{position:relative;width:80px;height:80px}.elegant-spinner::before,.elegant-spinner::after{content:'';position:absolute;border-radius:50%}.elegant-spinner::before{width:80px;height:80px;border:4px solid transparent;border-top-color:#667eea;border-right-color:#764ba2;animation:spinOuter 1.2s linear infinite}.elegant-spinner::after{width:50px;height:50px;top:15px;left:15px;border:4px solid transparent;border-bottom-color:#667eea;border-left-color:#764ba2;animation:spinInner 1.2s linear infinite reverse}@keyframes spinOuter{to{transform:rotate(360deg)}}@keyframes spinInner{to{transform:rotate(360deg)}}";
+            document.head.appendChild(style);
+            spinner = document.createElement('div');
+            spinner.className = 'spinner-overlay';
+            spinner.id = 'pageSpinner';
+            spinner.innerHTML = '<div class=\"elegant-spinner\"><div class=\"spinner-dot\"></div></div>';
+            document.body.appendChild(spinner);
+        }
+        return spinner;
+    }
+    window.addEventListener('pageshow', function(){
+        var s = document.getElementById('pageSpinner');
+        if (s) { s.classList.remove('active'); }
+    });
+    window.addEventListener('popstate', function(){
+        var s = document.getElementById('pageSpinner');
+        if (s) { s.classList.remove('active'); }
+    });
+    document.addEventListener('visibilitychange', function(){
+        if (!document.hidden) {
+            var s = document.getElementById('pageSpinner');
+            if (s) { s.classList.remove('active'); }
+        }
+    });
+    document.addEventListener('DOMContentLoaded', function(){
+        var btn = document.getElementById('upgradeAccountBtn');
+        if (btn) {
+            btn.addEventListener('click', function(){
+                var s = ensurePageSpinner();
+                s.classList.add('active');
+            });
+        }
+        var backBtn = document.getElementById('profileBackBtn');
+        if (backBtn) {
+            backBtn.addEventListener('click', function(e){
+                e.preventDefault();
+                var s = ensurePageSpinner();
+                s.classList.add('active');
+                var href = this.getAttribute('href');
+                setTimeout(function(){ window.location.href = href; }, 150);
+            }, { passive: false });
+        }
+    });
+</script>

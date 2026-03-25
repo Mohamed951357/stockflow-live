@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بونص فارما - إدارة المديرين - نظام حجز المواعيد</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .role-super { border-left: 4px solid #dc3545; }
+        .role-manager { border-left: 4px solid #fd7e14; }
+        .role-editor { border-left: 4px solid #28a745; }
+        .role-viewer { border-left: 4px solid #6c757d; }
+
+        .admin-card {
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .admin-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .permission-badge {
+            font-size: 0.75rem;
+            margin: 2px;
+        }
+
+        .btn-group-actions {
+            display: flex;
+            flex-wrap: wrap; /* للسماح للأزرار بالنزول لسطر جديد على الشاشات الصغيرة */
+            justify-content: flex-end;
+            gap: 5px; /* مسافة بين الأزرار */
+        }
+        .btn-group-actions .btn {
+            flex-grow: 1; /* للسماح للأزرار بالتمدد في المساحة المتاحة */
+            min-width: 80px; /* لضمان حجم معقول للأزرار */
+        }
+
+        /* Responsive adjustments for small screens */
+        @media (max-width: 767.98px) {
+            .admin-card .col-md-3,
+            .admin-card .col-md-2,
+            .admin-card .col-md-1 {
+                margin-bottom: 10px; /* مسافة بين الأعمدة في الشاشات الصغيرة */
+            }
+            .admin-card .col-md-2:last-child {
+                margin-bottom: 0;
+            }
+            .admin-card .text-end {
+                text-align: start !important; /* محاذاة الأزرار لليسار في الشاشات الصغيرة */
+            }
+            .btn-group-actions {
+                justify-content: flex-start; /* محاذاة الأزرار لليسار */
+            }
+            .btn-group-actions .btn {
+                width: 100%; /* جعل الأزرار تأخذ عرض 100% */
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+                <i class="fas fa-shield-alt me-2"></i>
+                لوحة الإدارة
+            </a>
+
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                    <i class="fas fa-home me-2"></i>
+                    الرئيسية
+                </a>
+                <a class="nav-link" href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    تسجيل الخروج
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>
+                        <i class="fas fa-users-cog me-2 text-primary"></i>
+                        إدارة المديرين
+                    </h2>
+                    <div>
+                        <a href="{{ url_for('add_admin') }}" class="btn btn-success">
+                            <i class="fas fa-plus me-2"></i>إضافة مدير جديد
+                        </a>
+                        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-right me-2"></i>العودة للوحة الإدارة
+                        </a>
+                    </div>
+                </div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" style="border-radius: 14px;" role="alert">
+                                <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    أنواع المديرين والصلاحيات
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    {% for role_key, role_info in admin_roles.items() %}
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card role-{{ role_key }}">
+                                            <div class="card-body text-center">
+                                                <h6 class="card-title">{{ role_info.name }}</h6>
+                                                <div class="mt-2">
+                                                    {% if 'all' in role_info.permissions %}
+                                                        <span class="badge bg-danger permission-badge">جميع الصلاحيات</span>
+                                                    {% else %}
+                                                        {% for permission in role_info.permissions %}
+                                                            <span class="badge bg-primary permission-badge">
+                                                                {{ ALL_PERMISSIONS[permission] if permission in ALL_PERMISSIONS else permission }}
+                                                            </span>
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            قائمة المديرين ({{ admins|length }} مدير)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if admins %}
+                            {% for admin in admins %}
+                            <div class="card admin-card role-{{ admin.role }}">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-3">
+                                                    {% if admin.role == 'super' %}
+                                                        <i class="fas fa-crown fa-2x text-danger"></i>
+                                                    {% elif admin.role == 'manager' %}
+                                                        <i class="fas fa-user-tie fa-2x text-warning"></i>
+                                                    {% elif admin.role == 'editor' %}
+                                                        <i class="fas fa-user-edit fa-2x text-success"></i>
+                                                    {% else %}
+                                                        <i class="fas fa-user fa-2x text-secondary"></i>
+                                                    {% endif %}
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-1">{{ admin.full_name or admin.username }}</h6>
+                                                    <small class="text-muted">@{{ admin.username }}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <strong>الدور:</strong><br>
+                                            <span class="badge bg-{{ 'danger' if admin.role == 'super' else 'warning' if admin.role == 'manager' else 'success' if admin.role == 'editor' else 'secondary' }}">
+                                                {{ admin_roles[admin.role].name }}
+                                            </span>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <strong>البريد:</strong><br>
+                                            <small>{{ admin.email or 'غير محدد' }}</small>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <strong>آخر دخول:</strong><br>
+                                            <small>
+                                                {% if admin.last_login %}
+                                                    {{ admin.last_login.strftime('%Y-%m-%d %H:%M') }}
+                                                {% else %}
+                                                    لم يسجل دخول بعد
+                                                {% endif %}
+                                            </small>
+                                        </div>
+
+                                        <div class="col-md-1">
+                                            <strong>الحالة:</strong><br>
+                                            {% if admin.is_active %}
+                                                <span class="badge bg-success">نشط</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">معطل</span>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="col-md-2 text-end">
+                                            <div class="btn-group-actions">
+                                                {% if admin.id != current_user_id %} {# لا يمكن تعديل أو حذف حسابك الخاص #}
+                                                    <a href="{{ url_for('edit_admin', admin_id=admin.id) }}"
+                                                       class="btn btn-sm btn-warning" title="تعديل">
+                                                        <i class="fas fa-edit"></i> <span class="d-none d-lg-inline">تعديل</span>
+                                                    </a>
+                                                    {% if current_user.role == 'super' or admin.role not in ['super', 'manager'] %}
+                                                        <a href="{{ url_for('toggle_admin', admin_id=admin.id) }}"
+                                                           class="btn btn-sm btn-{{ 'danger' if admin.is_active else 'success' }}"
+                                                           title="{{ 'إلغاء تفعيل' if admin.is_active else 'تفعيل' }}">
+                                                            <i class="fas fa-{{ 'pause' if admin.is_active else 'play' }}"></i> <span class="d-none d-lg-inline">{{ 'تعطيل' if admin.is_active else 'تفعيل' }}</span>
+                                                        </a>
+                                                        <button type="button" class="btn btn-sm btn-danger"
+                                                                onclick="confirmDelete({{ admin.id }}, '{{ admin.full_name or admin.username | escape }}')"
+                                                                title="حذف">
+                                                            <i class="fas fa-trash-alt"></i> <span class="d-none d-lg-inline">حذف</span>
+                                                        </button>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="badge bg-info p-2">حسابك</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-2">
+                                        <div class="col-md-12">
+                                            <small class="text-muted">
+                                                <i class="fas fa-calendar-plus me-1"></i>
+                                                تم الإنشاء: {{ admin.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                                {% if admin.created_by %}
+                                                    بواسطة مدير آخر
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-users-slash fa-4x text-muted mb-3"></i>
+                                <h5 class="text-muted">لا يوجد مديرون بعد</h5>
+                                <p class="text-muted">ابدأ بإضافة مديرين جدد للنظام</p>
+                                <a href="{{ url_for('add_admin') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>
+                                    إضافة مدير جديد
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteConfirmModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        تأكيد حذف المدير
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>هل أنت متأكد أنك تريد حذف المدير <strong id="adminNameDeleteModal"></strong>؟</p>
+                    <p class="text-danger">**تحذير**: هذا الإجراء لا يمكن التراجع عنه وسيحذف جميع بيانات المدير المرتبطة (المواعيد التي تعامل معها، الإشعارات التي أرسلها، ملفات الأصناف التي رفعها).</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>إلغاء
+                    </button>
+                    <form id="deleteAdminForm" method="POST">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash-alt me-2"></i>تأكيد الحذف
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function confirmDelete(adminId, adminName) {
+            document.getElementById('deleteAdminForm').action = '/delete_admin/' + adminId;
+            document.getElementById('adminNameDeleteModal').textContent = adminName;
+            var deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            deleteConfirmModal.show();
+        }
+    </script>
+</body>
+</html>

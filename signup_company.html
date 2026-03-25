@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بونص فارما - تسجيل حساب جديد - نظام حجز المواعيد</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Cairo', sans-serif;
+            min-height: 100vh;
+            min-height: 100svh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+            position: relative;
+            overflow-x: hidden;
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
+        }
+
+        @supports (height: 100dvh) {
+            body {
+                min-height: 100dvh;
+            }
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Particles Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20% 30%, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(2px 2px at 60% 70%, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(3px 3px at 50% 50%, rgba(255, 255, 255, 0.3), transparent),
+                radial-gradient(2px 2px at 80% 10%, rgba(255, 255, 255, 0.5), transparent),
+                radial-gradient(2px 2px at 10% 60%, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(3px 3px at 90% 80%, rgba(255, 255, 255, 0.3), transparent),
+                radial-gradient(2px 2px at 30% 90%, rgba(255, 255, 255, 0.4), transparent);
+            background-size: 200% 200%;
+            animation: particleFloat 30s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* Glowing Orbs */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(102, 126, 234, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(118, 75, 162, 0.15) 0%, transparent 50%);
+            animation: orbFloat 25s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        @keyframes particleFloat {
+            0%, 100% { 
+                background-position: 0% 0%, 100% 100%, 50% 50%, 80% 20%, 20% 80%, 90% 10%, 10% 90%;
+                opacity: 1;
+            }
+            50% { 
+                background-position: 100% 100%, 0% 0%, 70% 30%, 30% 70%, 60% 40%, 40% 60%, 80% 20%;
+                opacity: 0.8;
+            }
+        }
+        
+        @keyframes orbFloat {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg) scale(1); 
+                opacity: 0.8;
+            }
+            33% { 
+                transform: translateY(-20px) rotate(120deg) scale(1.1); 
+                opacity: 1;
+            }
+            66% { 
+                transform: translateY(-35px) rotate(240deg) scale(0.9); 
+                opacity: 0.9;
+            }
+        }
+        .signup-container {
+            max-width: 650px;
+            width: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.98) 100%);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border-radius: 32px;
+            box-shadow: 
+                0 40px 80px rgba(0, 0, 0, 0.25),
+                0 20px 40px rgba(102, 126, 234, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.4),
+                inset 0 2px 4px rgba(255, 255, 255, 0.6),
+                0 0 60px rgba(102, 126, 234, 0.1);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            opacity: 0;
+            transform: translateY(30px) scale(0.92) perspective(1000px) rotateX(10deg);
+            animation: slideUpContainer 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation-delay: 0.2s;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .signup-container:hover {
+            box-shadow: 
+                0 50px 100px rgba(0, 0, 0, 0.3),
+                0 25px 50px rgba(102, 126, 234, 0.25),
+                0 0 0 1px rgba(255, 255, 255, 0.5),
+                inset 0 2px 6px rgba(255, 255, 255, 0.7),
+                0 0 80px rgba(102, 126, 234, 0.2);
+            transform: translateY(-8px) scale(1.01);
+        }
+        
+        /* Animated Glow Border */
+        .signup-container::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(45deg, 
+                #667eea 0%, 
+                #764ba2 25%, 
+                #667eea 50%, 
+                #764ba2 75%, 
+                #667eea 100%);
+            border-radius: 35px;
+            z-index: -1;
+            opacity: 0;
+            animation: borderGlow 4s ease-in-out infinite;
+            background-size: 300% 300%;
+            filter: blur(8px);
+        }
+        
+        @keyframes borderGlow {
+            0%, 100% { 
+                opacity: 0; 
+                background-position: 0% 50%;
+            }
+            50% { 
+                opacity: 0.6;
+                background-position: 100% 50%;
+            }
+        }
+        
+        @keyframes slideUpContainer {
+            0% {
+                opacity: 0;
+                transform: translateY(50px) scale(0.85) perspective(1000px) rotateX(15deg);
+                filter: blur(15px);
+            }
+            60% {
+                opacity: 0.9;
+                transform: translateY(5px) scale(1.01) perspective(1000px) rotateX(2deg);
+                filter: blur(3px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1) perspective(1000px) rotateX(0deg);
+                filter: blur(0);
+            }
+        }
+        .signup-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .signup-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+            animation: headerFloat 20s ease-in-out infinite;
+            z-index: 0;
+        }
+        
+        .signup-header > * {
+            position: relative;
+            z-index: 1;
+        }
+        
+        @keyframes headerFloat {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(10px, -5px) rotate(1deg); }
+            66% { transform: translate(-5px, 10px) rotate(-1deg); }
+        }
+        
+        .signup-header h4 {
+            line-height: 1.3;
+            margin-bottom: 0.5rem;
+        }
+        
+        .signup-header p {
+            margin-top: 0;
+        }
+        
+        .logo-image {
+            max-height: 100px;
+            margin-bottom: 25px;
+            border-radius: 16px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 2;
+            filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.1));
+            animation: logoEntrance 1.2s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        }
+        
+        @keyframes logoEntrance {
+            0% {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.8);
+                filter: blur(10px);
+            }
+            70% {
+                opacity: 1;
+                transform: translateY(10px) scale(1.1);
+                filter: blur(0);
+            }
+            100% {
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .logo-image:hover {
+            transform: scale(1.08) rotate(2deg);
+            filter: drop-shadow(0 8px 25px rgba(0, 0, 0, 0.15)) brightness(1.1);
+        }
+        
+        .form-control {
+            border: 2px solid rgba(102, 126, 234, 0.15);
+            border-radius: 16px;
+            padding: 16px 24px;
+            font-size: 1.05rem;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(15px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 6px 20px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            position: relative;
+            font-weight: 500;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 
+                0 0 0 6px rgba(102, 126, 234, 0.15),
+                0 12px 35px rgba(102, 126, 234, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.98);
+            transform: translateY(-3px) scale(1.02);
+            outline: none;
+        }
+        
+        .form-control:hover {
+            border-color: rgba(102, 126, 234, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 
+                0 8px 25px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1rem;
+            margin-bottom: 0.6rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .form-label i {
+            color: #667eea;
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .form-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 20px;
+            padding: 18px 40px;
+            font-weight: 700;
+            font-size: 1.15rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 15px 40px rgba(102, 126, 234, 0.45),
+                0 6px 20px rgba(0, 0, 0, 0.15),
+                inset 0 2px 0 rgba(255, 255, 255, 0.3),
+                0 0 30px rgba(102, 126, 234, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 
+                0 18px 45px rgba(102, 126, 234, 0.5),
+                0 8px 25px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            background: linear-gradient(135deg, #7c8ef0 0%, #8659b8 100%);
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+        
+        /* Alert Enhancement */
+        .alert {
+            border-radius: 16px;
+            border: none;
+            padding: 16px 20px;
+            font-weight: 500;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            animation: alertSlide 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+        
+        @keyframes alertSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .alert-danger {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.15), rgba(239, 68, 68, 0.1));
+            color: #991b1b;
+            border-left: 4px solid #dc2626;
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(74, 222, 128, 0.1));
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        
+        .alert-info {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(96, 165, 250, 0.1));
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+
+        /* Toby Popup Enhancement */
+        .toby-popup-container {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.98));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 
+                0 15px 40px rgba(0, 0, 0, 0.25),
+                0 8px 20px rgba(102, 126, 234, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            padding: 18px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(30px) scale(0.9);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            width: 320px;
+        }
+
+        .toby-popup-container.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .toby-popup-container.icon-only {
+            width: fit-content;
+            padding: 12px;
+            border-radius: 60px;
+            box-shadow: 
+                0 8px 25px rgba(0, 0, 0, 0.2),
+                0 4px 12px rgba(102, 126, 234, 0.15);
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .toby-popup-image {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 0 20px rgba(102, 126, 234, 0.6),
+                0 8px 20px rgba(0, 0, 0, 0.15);
+            animation: tobyPulse 2.5s infinite ease-in-out;
+            border: 4px solid #667eea;
+            position: relative;
+        }
+        
+        .toby-popup-image::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border-radius: 50%;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            animation: ripple 2s infinite ease-out;
+        }
+
+        .toby-popup-image:hover {
+            transform: scale(1.15) rotate(8deg);
+            box-shadow: 
+                0 0 30px rgba(118, 75, 162, 0.8),
+                0 12px 30px rgba(0, 0, 0, 0.2);
+            border-color: #764ba2;
+        }
+
+        @keyframes tobyPulse {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 
+                    0 0 20px rgba(102, 126, 234, 0.6),
+                    0 8px 20px rgba(0, 0, 0, 0.15);
+            }
+            50% { 
+                transform: scale(1.08); 
+                box-shadow: 
+                    0 0 30px rgba(102, 126, 234, 0.8),
+                    0 10px 25px rgba(0, 0, 0, 0.2);
+            }
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+            100% {
+                transform: scale(1.4);
+                opacity: 0;
+            }
+        }
+
+        .toby-popup-content {
+            flex-grow: 1;
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .toby-popup-content.hidden-content {
+            opacity: 0;
+            transform: translateX(-20px);
+            pointer-events: none;
+        }
+
+        .toby-popup-content p {
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .toby-popup-content .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 14px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 6px 15px rgba(102, 126, 234, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .toby-popup-content .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .toby-popup-content .btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 
+                0 10px 25px rgba(102, 126, 234, 0.4),
+                0 4px 12px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #7c8ef0 0%, #8659b8 100%);
+        }
+        
+        .toby-popup-content .btn:hover::before {
+            left: 100%;
+        }
+
+        .toby-popup-close {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .toby-popup-close:hover {
+            color: #333;
+        }
+
+        /* Responsive Design for Mobile */
+        @media (max-width: 767.98px) {
+            body {
+                align-items: stretch;
+                justify-content: flex-start;
+                padding: 16px 12px;
+                animation: none;
+                background-size: auto;
+            }
+
+            body::before,
+            body::after {
+                display: none;
+                animation: none;
+            }
+
+            .signup-header::before,
+            .signup-container::before {
+                animation: none;
+                filter: none;
+            }
+
+            .signup-container {
+                max-width: 95%;
+                border-radius: 24px;
+                margin: 0 10px;
+            }
+            
+            .signup-header {
+                padding: 1.5rem 1rem;
+            }
+            
+            .signup-header h4 {
+                font-size: 1.3rem;
+            }
+            
+            .form-control {
+                padding: 14px 20px;
+                font-size: 1rem;
+            }
+
+            .form-control:focus,
+            .form-control:hover {
+                transform: none;
+            }
+            
+            .btn-primary {
+                padding: 15px 35px;
+                font-size: 1.05rem;
+            }
+            
+            .toby-popup-container {
+                width: calc(100% - 30px);
+                bottom: 15px;
+                right: 15px;
+                left: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+                padding: 15px;
+            }
+            
+            .toby-popup-container.icon-only {
+                width: fit-content;
+                height: auto;
+                flex-direction: row;
+            }
+            
+            .toby-popup-image {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .toby-popup-content {
+                width: 100%;
+                text-align: center;
+                margin-top: 10px;
+            }
+            
+            .toby-popup-content.hidden-content {
+                display: none;
+            }
+            
+            .toby-popup-content p {
+                font-size: 0.95rem;
+            }
+            
+            .toby-popup-content .btn {
+                font-size: 0.85rem;
+                padding: 6px 16px;
+            }
+        }
+        
+        /* Tablet Optimization */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .signup-container {
+                max-width: 600px;
+            }
+        }
+
+        @media (hover: none) {
+            .signup-container:hover {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-header">
+            <img src="{{ current_logo_path }}" alt="Logo" class="logo-image">
+            <h4>تسجيل حساب مندوب جديد</h4>
+            <p class="mb-0">يرجى ملء البيانات التالية لإنشاء حسابك</p>
+        </div>
+        <div class="p-4">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
+                            <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="username" class="form-label"><i class="fas fa-user me-2"></i>اسم المستخدم *</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                    <div class="form-text">سيستخدم لتسجيل الدخول</div>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label"><i class="fas fa-lock me-2"></i>كلمة المرور *</label>
+                    <input type="password" class="form-control" id="password" name="password" required minlength="6">
+                    <div class="form-text">يجب أن تكون 6 أحرف أو أكثر</div>
+                </div>
+                <div class="mb-3">
+                    <label for="confirm_password" class="form-label"><i class="fas fa-lock me-2"></i>تأكيد كلمة المرور *</label>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                </div>
+                <div class="mb-3">
+                    <label for="company_name" class="form-label"><i class="fas fa-building me-2"></i>اسم الشركة *</label>
+                    <input type="text" class="form-control" id="company_name" name="company_name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label"><i class="fas fa-envelope me-2"></i>البريد الإلكتروني (اختياري)</label>
+                    <input type="email" class="form-control" id="email" name="email">
+                <div class="mb-3">
+                    <label for="phone" class="form-label"><i class="fas fa-phone me-2"></i>رقم الهاتف *</label>
+                    <input type="tel" class="form-control" id="phone" name="phone" required pattern="01[0-9]{9}" minlength="11" maxlength="11" title="يجب أن يكون رقم الهاتف 11 رقم ويبدأ ب 01" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                    <div class="form-text">يجب أن يتكون من 11 رقم ويبدأ بـ 01</div>
+                </div>
+                <div class="mb-4">
+                    <label for="invite_code" class="form-label"><i class="fas fa-ticket-alt me-2"></i>كود الدعوة *</label>
+                    <input type="text" class="form-control" id="invite_code" name="invite_code" required>
+                    <div class="form-text text-danger">مطلوب للتسجيل. يرجى الحصول عليه من الإدارة.</div>
+                </div>
+
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>تسجيل حساب جديد
+                    </button>
+                </div>
+                <div class="text-center">
+                    <p>
+                        لديك حساب بالفعل؟ <a href="{{ url_for('login') }}">تسجيل الدخول</a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {# NEW: Floating WhatsApp Button #}
+    <div class="whatsapp-fixed-wrapper">
+        <a href="https://wa.me/201554077727" class="whatsapp-float" target="_blank">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+    </div>
+    <style>
+        .whatsapp-fixed-wrapper {
+            position: fixed !important;
+            bottom: 20px !important;
+            left: 20px !important;
+            z-index: 9999 !important;
+            /* Force hardware acceleration to prevent repainting issues */
+            transform: translate3d(0, 0, 0);
+            -webkit-transform: translate3d(0, 0, 0);
+            pointer-events: none; /* Let clicks pass through the wrapper if it's large, though it shouldn't be */
+            width: auto;
+            height: auto;
+        }
+        
+        .whatsapp-float {
+            pointer-events: auto; /* Re-enable clicks */
+            background-color: #25d366;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 30px;
+            box-shadow: 2px 2px 3px #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            animation: pulse-green 2s infinite;
+            text-decoration: none;
+        }
+        .whatsapp-float:hover {
+            background-color: #128c7e;
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(37, 211, 102, 0.8);
+        }
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+        }
+        /* Mobile adjustment */
+        @media (max-width: 768px) {
+            .whatsapp-fixed-wrapper {
+                bottom: 15px !important;
+                left: 15px !important;
+            }
+            .whatsapp-float {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+            }
+        }
+    </style>
+    {# END NEW #}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+<!-- Toby JS Removed -->
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // تهيئة مكتبة AOS للتأثيرات الحركية
+            const isMobile = window.matchMedia('(max-width: 767.98px)').matches;
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: true,
+                disable: isMobile
+            });
+            // Original logic for admin login type toggle (kept as is)
+            const loginForm = document.querySelector('form[action="{{ url_for("login") }}"]');
+            const changePasswordForm = document.getElementById('changePasswordForm');
+            const loginTypeCompanyDefault = document.getElementById('loginTypeCompanyDefault');
+            const loginTypeAdmin = document.getElementById('loginTypeAdmin');
+            const labelAdminLogin = document.getElementById('labelAdminLogin');
+            const userTypeChangePassword = document.getElementById('userTypeChangePassword');
+            const changePasswordLink = document.getElementById('changePasswordLink');
+            const cancelChangePasswordBtn = document.getElementById('cancelChangePassword');
+
+            const logo = document.querySelector('.logo-image');
+            let clickCount = 0;
+            let lastClickTime = 0;
+            const clickThreshold = 3;
+            const timeThreshold = 500;
+
+            if (logo) { // Check if logo exists (it might not on signup page)
+                logo.addEventListener('click', function() {
+                    const currentTime = new Date().getTime();
+                    if (currentTime - lastClickTime < timeThreshold) {
+                        clickCount++;
+                        if (clickCount === clickThreshold) {
+                            if (loginTypeAdmin) loginTypeAdmin.style.display = 'inline-block';
+                            if (labelAdminLogin) labelAdminLogin.style.display = 'inline-block';
+                            if (loginTypeAdmin) loginTypeAdmin.checked = true;
+                            if (loginTypeCompanyDefault) loginTypeCompanyDefault.name = 'login_type_disabled';
+                            if (loginTypeAdmin) loginTypeAdmin.name = 'login_type';
+                            if (labelAdminLogin) labelAdminLogin.classList.add('active');
+                            clickCount = 0;
+                        }
+                    } else {
+                        clickCount = 1;
+                    }
+                    lastClickTime = currentTime;
+                });
+            }
+
+            if (userTypeChangePassword) userTypeChangePassword.value = 'company';
+
+            if (loginTypeAdmin) {
+                loginTypeAdmin.addEventListener('change', function() {
+                    if (this.checked) {
+                        if (userTypeChangePassword) userTypeChangePassword.value = 'admin';
+                        if (loginTypeCompanyDefault) loginTypeCompanyDefault.name = 'login_type_disabled';
+                        this.name = 'login_type';
+                    } else {
+                        if (userTypeChangePassword) userTypeChangePassword.value = 'company';
+                        if (loginTypeCompanyDefault) loginTypeCompanyDefault.name = 'login_type';
+                        this.name = 'login_type_radio';
+                    }
+                });
+            }
+
+            // This part is specific to login page where admin type toggle exists
+            if (loginTypeAdmin && (loginTypeAdmin.style.display === 'none' || !loginTypeAdmin.checked)) {
+                 if (loginTypeCompanyDefault) loginTypeCompanyDefault.name = 'login_type';
+                 if (loginTypeAdmin) loginTypeAdmin.name = 'login_type_radio';
+            }
+
+            if (changePasswordLink) {
+                changePasswordLink.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    if (loginForm) loginForm.style.display = 'none';
+                    if (changePasswordForm) changePasswordForm.style.display = 'block';
+                    const changeUsernameInput = document.getElementById('change_username');
+                    const usernameInput = document.getElementById('username');
+                    if (changeUsernameInput && usernameInput) changeUsernameInput.value = usernameInput.value;
+
+                    if (loginTypeAdmin && loginTypeAdmin.style.display !== 'none' && loginTypeAdmin.checked) {
+                        if (userTypeChangePassword) userTypeChangePassword.value = 'admin';
+                    } else {
+                        if (userTypeChangePassword) userTypeChangePassword.value = 'company';
+                    }
+                });
+            }
+
+            if (cancelChangePasswordBtn) {
+                cancelChangePasswordBtn.addEventListener('click', function() {
+                    if (changePasswordForm) changePasswordForm.style.display = 'none';
+                    if (loginForm) loginForm.style.display = 'block';
+                });
+            }
+
+            const params = new URLSearchParams(window.location.search);
+            const inviteCodeFromUrl = params.get('invite_code');
+            if (inviteCodeFromUrl) {
+                const inviteInput = document.getElementById('invite_code');
+                if (inviteInput) {
+                    inviteInput.value = inviteCodeFromUrl;
+                }
+            }
+
+        });
+    </script>
+</body>
+</html>

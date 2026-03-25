@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الاشتراك في STOCKFLOW PLUS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f8f9fa;
+            padding-top: 56px;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            color: #fff;
+        }
+
+        .navbar-logo {
+            height: 35px;
+            width: auto;
+            margin-left: 10px;
+        }
+
+        .hero-section {
+            min-height: calc(100vh - 56px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .hero-card {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+            max-width: 900px;
+            width: 100%;
+            padding: 2.5rem 2rem;
+        }
+
+        .badge-plus {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #333;
+            border-radius: 999px;
+            padding: 0.35rem 0.9rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+        }
+
+        .hero-title {
+            font-weight: 800;
+            font-size: 1.9rem;
+            margin-top: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-subtitle {
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+        }
+
+        .features-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .features-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: .75rem;
+            margin-bottom: .75rem;
+            color: #495057;
+        }
+
+        .features-list li i {
+            color: #28a745;
+            margin-top: 4px;
+        }
+
+        .price-box {
+            border-radius: 16px;
+            background: #f1f3ff;
+            padding: 1.25rem 1.5rem;
+            text-align: center;
+        }
+
+        .price-main {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #4c6fff;
+        }
+
+        .price-main small {
+            font-size: .9rem;
+            color: #6c757d;
+        }
+
+        .subscribe-btn {
+            background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+            border: none;
+            border-radius: 999px;
+            padding: 0.8rem 2.2rem;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            gap: .6rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+        }
+
+        .subscribe-btn:hover {
+            opacity: .95;
+        }
+
+        @media (max-width: 767.98px) {
+            .hero-card {
+                padding: 1.75rem 1.25rem;
+            }
+
+            .hero-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('company_dashboard') }}">
+                {% if current_logo_path %}
+                    <img src="{{ current_logo_path }}" alt="Logo" class="navbar-logo">
+                {% else %}
+                    <img src="{{ url_for('static', filename='images/default_logo.png') }}" alt="Logo" class="navbar-logo">
+                {% endif %}
+                <span class="full-text">{{ system_subtitle }}</span>
+                <span class="short-text d-none"></span>
+            </a>
+        </div>
+    </nav>
+
+    <section class="hero-section">
+        <div class="hero-card">
+            <div class="row g-4 align-items-center">
+                <div class="col-md-7">
+                    <span class="badge-plus">
+                        <i class="fas fa-gem"></i>
+                        STOCKFLOW PLUS
+                    </span>
+                    <h1 class="hero-title"> مع STOCKFLOW PLUS</h1>
+                    <p class="hero-subtitle">
+                        باقة مميزة تساعدك في إدارة الأصناف والمراسلات بشكل أسهل وأسرع.
+                    </p>
+                    <ul class="features-list">
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>عدد لامحدود من البحثات .</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>مزايا إضافية في التقارير والمتابعة.</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>تحديثات جديدة بشكل مستمر للمشتركين في الباقة.</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-5">
+                    <div class="price-box mb-3">
+                        <div class="price-main">
+                            50 جنيه
+                            <small>/ 3 شهور فقط</small>
+                        </div>
+                        <div class="text-muted mt-2">
+                            تدفع مرة واحدة فقط، وبدون أي التزامات إضافية.
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <a href="{{ url_for('subscribe_payment') }}" class="subscribe-btn">
+                            <i class="fas fa-credit-card"></i>
+                            اشترك الآن
+                        </a>
+                        <div class="text-muted small mt-2">
+                            سيتم تحويلك لصفحة تفاصيل طرق الدفع.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

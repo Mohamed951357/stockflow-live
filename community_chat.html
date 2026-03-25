@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>دعم بونص فارما - الشات الذكي</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <link href="https://use.fontawesome.com/releases/v6.4.2/css/all.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* تعريف الأيقونات الأساسية */
+    @font-face {
+      font-family: 'FontAwesomeFallback';
+      src: url('data:font/woff2;charset=utf-8;base64,d09GMgABAAAAAAOQAAsAAAAAB8AAAANDAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHEIGVgCDHAqDHIJwATYCJAMQCwoABCAFhGcHShtpBsgOJQnBwAAAAABEPHy/H+2+mfn7RzKJRjPEk0QzTyKZhEgkiAlihQ7pJv5P82cTaMnmHp5aaFYqLFwVhSoLVeHKwpWVKgvVXQjVXb5ZfJl8mXz5+3JdPkJDCA2hEFogNEIjNEMrhIYb/nNs6gUyz29nuYw1bfTe6AUYBxTY3tgmK5AC8Q3jLi7jMgTwkE9dZGh0cgFLYUwKEFfXVpZgGXJYGnqhFdQlK3PiGRRt06vqEfDU/758Q7FYgkJlYEw6vTK8gMFP8acVsv/POQwBop/OALaODHVBJi5KDe8jG+rrkoeaJ1VMC1D8/88JVmyJ/vEKBMZYtBvALGTCT6vQQcFPK6SgUDw1i2dAA3jIxjPgGSLRJqWUlZXllSSXlxeV5OSUFOcWFQcCgZKcnNKiIv+ytDQpKQmnt0VFJcXF5YFAeUlJRWFhZUlJVWFhTUVFbVFRXWVlQ1VVY3V1U01Nc21tS11da319W0NDe2Njx9TUdFPTTHPzbEvL3KS5+dbW+fb2hY6Oxc7Ope7u5Z6elT7/6kDf2mD/+tDAxvDg5sjQ1ujw9tjIztjozqTJPdOm9c6Y0TdrVv/s2QNz5gzOnTu0YMHwwoUjixaNLl48tnTp+LJlE8uXH1yx4tCqVYdXrz6ydu3RdeumNmyY3rhxZtOm2c2b57ZsObF168lt207t2HF6167Tu3ef2bPn7N69Ew8eTD58OPXo0fTjxzNPnsw+fTr37Nn8ixcLL18uvnq19Pr18ps3K2/frr57t/b+/fqHDxsfP25++rT1+fP2ly87X7/ufvu2d/r0vvfvD3z4cPDjx0OfPh3+/PnIly9Hv3499u3b8e/fT/z4cfLnz1O/fp3+/fvMv39nU1LO/f9/7u/fc0lJ5xMTLyQkXIyPv5SWdiktDQDZbpPD6ckrJwB/ky/At9iX+QvyGfBt8hkA+Bb7Mv8Pvs0/zf8hl3+L/1n+X/yfFVCrwqkdqwqwXwXLlmIYs7KxBsBD8P/F1mnNXze0Avy3poGHnHKMvZpS6Cf1BgEvKdDQEgUZL9lkZtdBxUcDtLw0gYdqrNd9hJGIjLoANZ4ACOEcgEIQr0AmXBjM7PegEs8XtIQrBA9D0W/0ERlhm6XcQBtqgP6HrKs6lCzK4A3qz2hzcYXKF3KkLmCZdcOKeMIe2WOuYY/MkTlVh5RQDRzgGZrNFjjAHpRK1aHVuqpjva5qSQvVAW2gDED/Q6yW0kGSW9Tg84/ROieuoA8uJR1SC7Cy1A2W9EpkH7DHPGzXwDpiHGIOKh1EEUoDHMAzaGxsAQ6VPVBSUuWgtVSqGvtSXVVxfUX5BjzMeYwUOYrIUUbFW5u3NC5tPfF+bWnTpgA=') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+    
+    /* تعريف الأيقونات الأساسية كاحتياطي */
+    .icon-fallback {
+      font-family: 'FontAwesomeFallback';
+      display: inline-block;
+      font-style: normal;
+      font-variant: normal;
+      text-rendering: auto;
+      line-height: 1;
+    }
+    
+    /* تعريف الأيقونات الأساسية المستخدمة في الصفحة */
+    .icon-paper-plane:before { content: "\f1d8"; }
+    .icon-smile:before { content: "\f118"; }
+    .icon-paperclip:before { content: "\f0c6"; }
+    .icon-image:before { content: "\f03e"; }
+    .icon-microphone:before { content: "\f130"; }
+    .icon-times:before { content: "\f00d"; }
+
+    /* Navbar styles from company_messages.html */
+    .navbar {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 1030;
+    }
+    
+    .navbar-brand {
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+
+    .navbar-logo {
+        height: 35px;
+        width: auto;
+        margin-left: 10px;
+    }
+
+    .navbar-brand .full-text {
+        display: inline;
+    }
+    
+    @media (max-width: 767.98px) {
+        .navbar-brand .full-text {
+            display: none;
+        }
+        .navbar-brand .short-text {
+            display: none;
+        }
+    }
+    
+    @media (min-width: 768px) {
+        .navbar-brand .short-text {
+            display: none;
+        }
+        .navbar-brand .full-text {
+            display: inline;
+        }
+    }
+
+    .navbar-nav-notification-wrapper {
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+        margin-right: 15px;
+        flex-grow: 1;
+        justify-content: space-around;
+        max-width: 200px;
+        flex-shrink: 0;
+        gap: 10px;
+    }
+    
+    .navbar-nav-notification-wrapper .nav-link {
+        padding: 0.5rem;
+        position: relative;
+        color: #000000;
+        transition: color 0.3s ease, transform 0.3s ease;
+        background: none;
+        border: none;
+        cursor: pointer;
+        line-height: 1;
+    }
+    
+    .navbar-nav-notification-wrapper .nav-link:hover {
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+    
+    .navbar-nav-notification-wrapper .nav-link .fa-lg {
+        font-size: 1.25em;
+    }
+
+    @media (max-width: 991.98px) {
+        .navbar-nav-notification-wrapper {
+            order: -1;
+            margin-left: auto;
+            margin-right: 10px;
+            flex-grow: 0;
+            max-width: 150px;
+            justify-content: space-between;
+        }
+        .navbar-nav-notification-wrapper .nav-link {
+            padding: 0.5rem;
+        }
+        .navbar-nav-user-info {
+            display: none;
+        }
+        .navbar-collapse .navbar-nav {
+            width: 100%;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .navbar-collapse .nav-item {
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .navbar-collapse .nav-item:last-child {
+            border-bottom: none;
+        }
+        .navbar-collapse .nav-link {
+            padding: 12px 15px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease;
+        }
+        .navbar-collapse .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+        .navbar-collapse .navbar-text {
+            display: block;
+            padding: 12px 15px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    }
+
+    @media (min-width: 992px) {
+        .navbar-nav-notification-wrapper {
+            margin-left: 15px;
+            margin-right: 0;
+        }
+        .navbar-nav-notification-wrapper .nav-link {
+            padding: 0.5rem 0.75rem;
+        }
+        .navbar-nav-user-info {
+            display: flex;
+        }
+    }
+  </style>
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); /* Rich purple to vibrant blue */
+      --secondary-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); /* Cyan to bright blue */
+      --bot-message-bg: #f8f9ff; /* Softer blue for bot messages */
+      --user-message-bg: linear-gradient(135deg, #6a11cb 0%, #8e44ad 100%); /* Rich purple gradient */
+      --input-bg: #f8faff; /* Softer input background */
+      --text-color: #2d3748;
+      --light-text-color: #f7fafc;
+      --accent-color: #00f2fe; /* Brighter cyan for actions */
+      --shadow-light: rgba(106, 17, 203, 0.08);
+      --shadow-medium: rgba(106, 17, 203, 0.15);
+      --highlight-color: #4facfe;
+      --success-color: #0bab7c;
+      --error-color: #e74c3c;
+      --border-radius: 25px;
+      --transition-speed: 0.3s;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: var(--primary-gradient); /* Apply gradient to body */
+      color: var(--text-color);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding-top: 76px; /* Space for navbar */
+    }
+    
+    .chat-container {
+      width: 100%;
+      max-width: 500px;
+      height: calc(100vh - 76px); /* Adjust for navbar */
+      background-color: white;
+      border-radius: var(--border-radius);
+      box-shadow: 0 20px 50px var(--shadow-medium);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: scale(0.98);
+      transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    @media (min-width: 576px) {
+        .chat-container {
+            max-width: 420px; /* Optimal width for desktop chat */
+            height: 85vh;
+            max-height: 700px;
+        }
+        .chat-container:hover {
+            transform: scale(1); /* Pop out a bit on hover */
+        }
+    }
+
+    .chat-header {
+      background: var(--primary-gradient); /* Header with primary gradient */
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .chat-header h2 {
+      font-weight: 700;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .chat-header .toby-header-image {
+        height: 45px;
+        width: 45px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(255, 255, 255, 0.7);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        transition: all var(--transition-speed) ease;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-4px); }
+        100% { transform: translateY(0); }
+    }
+
+    .chat-header .toby-header-image:hover {
+        transform: scale(1.1) rotate(5deg);
+        border-color: var(--accent-color);
+    }
+
+    .chat-header .back-button {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        font-size: 1rem;
+        cursor: pointer;
+        padding: 8px 15px;
+        border-radius: var(--border-radius);
+        transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        position: relative;
+        overflow: hidden;
+    }
+    .chat-header .back-button:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .chat-header .back-button .fa-arrow-right {
+        transition: transform var(--transition-speed) ease;
+    }
+    
+    .chat-header .back-button:hover .fa-arrow-right {
+        transform: translateX(-3px);
+    }
+
+
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background-color: #f0f4f8;
+      background-image: radial-gradient(circle at 10% 20%, rgba(106, 17, 203, 0.02) 0%, rgba(37, 117, 252, 0.02) 90%);
+      scroll-behavior: smooth;
+
+      /* Scrollbar Styling */
+      scrollbar-width: thin;
+      scrollbar-color: var(--highlight-color) transparent;
+    }
+
+    .chat-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: linear-gradient(to bottom, #6a11cb, #2575fc);
+      border-radius: 10px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(to bottom, #8e44ad, #4facfe);
+    }
+    
+    .message {
+      margin-bottom: 20px;
+      max-width: 85%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+      animation: messageAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes messageAppear {
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
+    .user-message {
+      align-self: flex-end;
+      background: var(--user-message-bg);
+      color: var(--light-text-color);
+      border-radius: 22px 5px 22px 22px; /* Flipped border radius */
+      text-align: right;
+    }
+    
+    .bot-message {
+      align-self: flex-start;
+      background: linear-gradient(135deg, #ffffff, var(--bot-message-bg));
+      color: var(--text-color);
+      border-radius: 5px 22px 22px 22px; /* Flipped border radius */
+    }
+
+    .message-content {
+        padding: 12px 18px;
+        box-shadow: 0 8px 20px var(--shadow-light);
+        transition: all var(--transition-speed) ease;
+        border: 1px solid rgba(106, 17, 203, 0.1);
+    }
+
+    .user-message .message-content {
+      box-shadow: 0 8px 20px rgba(106, 17, 203, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .message-time {
+      font-size: 0.75rem;
+      color: rgba(0, 0, 0, 0.4);
+      margin-top: 8px;
+      padding: 0 10px;
+      text-align: left;
+    }
+    
+    .user-message .message-time {
+      color: rgba(255, 255, 255, 0.7);
+      text-align: right;
+    }
+    
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+      justify-content: flex-start;
+      padding: 0 10px;
+      margin-bottom: 15px;
+    }
+    
+    .quick-action {
+      background: var(--secondary-gradient);
+      color: var(--light-text-color);
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 15px rgba(0, 242, 254, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .quick-action:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 8px 25px rgba(0, 242, 254, 0.3);
+    }
+
+    .quick-action:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 4px 15px rgba(0, 242, 254, 0.2);
+    }
+
+    /* Smart Assistant Styles */
+    .suggestions-container {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .suggestion-button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+      font-family: 'Tajawal', sans-serif;
+    }
+    
+    .suggestion-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+    
+    .suggestion-button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    /* Smart Response Styles */
+    .smart-response {
+      background: linear-gradient(135deg, #f8f9ff 0%, #e8f2ff 100%);
+      border: 1px solid #e1e8ff;
+      border-radius: 15px;
+      padding: 15px;
+      margin: 8px 0;
+      position: relative;
+    }
+    
+    .smart-response::before {
+      content: '🤖';
+      position: absolute;
+      top: -8px;
+      right: 15px;
+      background: white;
+      padding: 4px 8px;
+      border-radius: 50%;
+      font-size: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .smart-response .response-title {
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    
+    .smart-response .response-content {
+      color: #2d3748;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    
+    .smart-response .response-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .smart-action {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .smart-action:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+    }
+
+    /* Context Indicator */
+    .context-indicator {
+      background: rgba(102, 126, 234, 0.1);
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin: 8px 0;
+      font-size: 12px;
+      color: #667eea;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .context-indicator::before {
+      content: '💡';
+      font-size: 14px;
+    }
+
+    /* Enhanced Typing Indicator */
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: rgba(102, 126, 234, 0.05);
+      border-radius: 15px;
+      margin: 8px 0;
+      max-width: 80px;
+    }
+    
+    .typing-dots {
+      display: flex;
+      gap: 4px;
+    }
+    
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: #667eea;
+      border-radius: 50%;
+      animation: typing-bounce 1.4s infinite ease-in-out;
+    }
+    
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    
+    @keyframes typing-bounce {
+      0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+      }
+      40% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    
+    .chat-input-container {
+      padding: 15px 20px;
+      background-color: #ffffff;
+      border-top: 1px solid rgba(106, 17, 203, 0.1);
+      box-shadow: 0 -5px 20px rgba(106, 17, 203, 0.05);
+      display: flex;
+      align-items: center;
+      gap: 10px; /* Space between input and button */
+    }
+    
+    .chat-input {
+      flex: 1;
+      border: 1px solid #e0e6f0;
+      border-radius: 30px;
+      padding: 14px 20px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+    }
+
+    .chat-input::placeholder {
+        color: #a0aec0;
+    }
+    
+    .chat-input:focus {
+      border-color: var(--highlight-color);
+      box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.2);
+      background-color: white;
+    }
+    
+    .send-button {
+      background: var(--primary-gradient);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(106, 17, 203, 0.3);
+      flex-shrink: 0;
+    }
+
+    .send-button i {
+      font-size: 1.3rem;
+      transition: transform var(--transition-speed) ease;
+    }
+
+    .send-button:hover {
+      transform: translateY(-2px) scale(1.1);
+      box-shadow: 0 8px 25px rgba(106, 17, 203, 0.4);
+    }
+
+    .send-button:active {
+      transform: translateY(1px) scale(0.95);
+      box-shadow: 0 2px 10px rgba(106, 17, 203, 0.3);
+    }
+    
+    .typing-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px; /* space for text and dots */
+      padding: 12px 20px;
+      background: #e9eef5;
+      border-radius: 5px 20px 20px 20px;
+      margin: 0 0 20px 0; /* aligned with bot messages */
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .typing-indicator .dots {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .typing-indicator span {
+      width: 8px;
+      height: 8px;
+      background: var(--highlight-color);
+      border-radius: 50%;
+      display: inline-block;
+      animation: bounce 1.4s infinite ease-in-out both;
+    }
+    
+    .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0s; }
+    
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1.0); }
+    }
+    
+    .link-card {
+      background-color: rgba(106, 17, 203, 0.05);
+      border-radius: 15px;
+      padding: 15px;
+      margin-top: 12px;
+      border-left: 4px solid var(--highlight-color);
+      transition: all var(--transition-speed) ease;
+    }
+    
+    .link-card:hover {
+        background-color: rgba(106, 17, 203, 0.08);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px var(--shadow-light);
+    }
+
+    .link-card h4 {
+      color: #6a11cb;
+      margin-bottom: 5px;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .link-card p {
+      color: #555;
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+    }
+    
+    .link-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--secondary-gradient);
+      color: white;
+      text-decoration: none;
+      padding: 8px 18px;
+      border-radius: 25px;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 8px rgba(0, 114, 255, 0.2);
+    }
+    
+    .link-button:hover {
+      background: var(--primary-gradient);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(106, 17, 203, 0.3);
+    }
+    
+    @media (max-width: 576px) {
+      body {
+          padding: 0;
+      }
+      .chat-container {
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+        max-width: 100%;
+        box-shadow: none;
+        transform: scale(1);
+      }
+      .chat-header {
+          padding: 15px 18px;
+          border-radius: 0;
+      }
+      .chat-header h2 {
+          font-size: 1.3rem;
+      }
+      .chat-messages {
+          padding: 15px;
+      }
+      .message {
+          max-width: 90%;
+      }
+      .message-content {
+          padding: 12px 15px;
+      }
+      .quick-action {
+          padding: 10px 15px;
+          font-size: 0.85rem;
+      }
+      .chat-input-container {
+          padding: 10px 15px;
+      }
+      .chat-input {
+          padding: 12px 18px;
+          font-size: 1rem;
+      }
+      .send-button {
+          width: 48px;
+          height: 48px;
+      }
+      .send-button i {
+          font-size: 1.2rem;
+      }
+    }
+    /* Styles for the premium message box (copied from other HTML files) */
+    .premium-message-box {
+        background-color: #fff3cd; /* لون تحذيري */
+        border: 1px solid #ffc107;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        margin-top: 2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        position: absolute; /* Position it absolutely within the chat container */
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%; /* Adjust width as needed */
+        z-index: 1000; /* Ensure it's on top */
+        display: none; /* Hidden by default, shown by JS */
+    }
+    .premium-message-box h5 {
+        color: #ffc107;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    .premium-message-box p {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+    }
+    .premium-message-box .btn {
+        background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 10px 25px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    .premium-message-box .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+    }
+  </style>
+</head>
+<body style="padding-top: 76px;">
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('company_dashboard') }}">
+            {% if current_logo_path %}
+                <img src="{{ current_logo_path }}" alt="Logo" class="navbar-logo">
+            {% endif %}
+            <span class="full-text">{{ system_subtitle }}</span>
+            <span class="short-text"></span>
+        </a>
+
+        <div class="navbar-nav-notification-wrapper d-flex">
+            <a class="nav-link" href="{{ url_for('company_profile') }}" title="ملفي الشخصي">
+                <i class="fas fa-user-circle fa-lg"></i>
+            </a>
+            <a class="nav-link" href="{{ url_for('community_chat') }}">
+                <i class="fas fa-comments fa-lg"></i>
+            </a>
+            <a class="nav-link" href="{{ url_for('instructions') }}" title="تعليمات وإرشادات">
+                <i class="fas fa-question-circle fa-lg"></i>
+            </a>
+            <a class="nav-link position-relative" href="{{ url_for('notifications') }}">
+                <i class="fas fa-bell fa-lg"></i>
+            </a>
+        </div>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavCompany" aria-controls="navbarNavCompany" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNavCompany">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item d-lg-none">
+                    <span class="navbar-text">
+                        <i class="fas fa-building me-2"></i>
+                        {{ current_user.company_name if current_user.company_name else 'شركة' }}
+                    </span>
+                </li>
+                <li class="nav-item d-none d-lg-flex align-items-center me-3">
+                    <span class="navbar-text">
+                        <i class="fas fa-building me-2"></i>
+                        {{ current_user.company_name if current_user.company_name else 'شركة' }}
+                    </span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('company_dashboard') }}">
+                        <i class="fas fa-home me-2"></i>
+                        الرئيسية
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('company_messages') }}">
+                        <i class="fas fa-envelope me-2"></i>
+                        المراسلات
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('my_products') }}">
+                        <i class="fas fa-boxes me-2"></i>
+                        أصنافي
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('search_products') }}">
+                        <i class="fas fa-search me-2"></i>
+                        البحث عن المنتجات
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('book_appointment') }}">
+                        <i class="fas fa-calendar-plus me-2"></i>
+                        حجز موعد
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('appointments') }}">
+                        <i class="fas fa-calendar-check me-2"></i>
+                        مواعيدي
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{{ url_for('community_chat') }}">
+                        <i class="fas fa-comments me-2"></i>
+                        مجتمع بونص
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('reports') }}">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        التقارير
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">
+                        <i class="fas fa-sign-out-alt me-2"></i>
+                        تسجيل الخروج
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+  </nav>
+
+  <div class="chat-container">
+    <div class="chat-header">
+      <button class="back-button" onclick="window.location.href = '{{ url_for('company_dashboard') }}'">
+          <i class="fas fa-arrow-right"></i>
+      </button>
+      <h2>توبي <img src="{{ url_for('static', filename='images/toby_robot_cartoon.png') }}" alt="Toby" class="toby-header-image"></h2>
+      <a href="#" class="logo" style="visibility: hidden;">بونص فارما</a> </div>
+
+    <div class="chat-messages" id="chatMessages">
+      </div>
+
+    <div class="premium-message-box" id="premiumMessageBox">
+        <i class="fas fa-star fa-3x text-warning mb-3"></i>
+        <h5>هذه الميزة متاحة فقط للمشتركين في STOCKFLOW PLUS!</h5>
+        <p id="premiumMessageText">للأسف، لا يمكنك استخدام ميزة الدردشة الذكية لأن هذه الميزة تتطلب اشتراكًا مميزًا.</p>
+        <button type="button" class="btn" onclick="window.location.href = '{{ url_for('subscribe_payment') }}'">
+            <i class="fas fa-crown me-2"></i> اشترك الآن في STOCKFLOW PLUS!
+        </button>
+    </div>
+
+    <div class="chat-input-container" id="chatInputContainer">
+      <input type="text" class="chat-input" id="messageInput" placeholder="اكتب رسالتك هنا..." autocomplete="off">
+      <button class="send-button" id="sendButton">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // عناصر DOM
+    const chatMessages = document.getElementById('chatMessages');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+    const premiumMessageBox = document.getElementById('premiumMessageBox');
+    const chatInputContainer = document.getElementById('chatInputContainer');
+    const premiumMessageTextElement = document.getElementById('premiumMessageText');
+
+    // ** تم حذف منطق الردود الثابتة لأنه سيتم استبداله بالذكاء الاصطناعي **
+
+    // إظهار مؤشر الكتابة
+    function showTypingIndicator() {
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'typing-indicator';
+      typingDiv.innerHTML = 'توبي يكتب... <div class="dots"><span></span><span></span><span></span></div>';
+      typingDiv.id = 'typingIndicator';
+      chatMessages.appendChild(typingDiv);
+      scrollToBottom();
+    }
+
+    // إخفاء مؤشر الكتابة
+    function hideTypingIndicator() {
+      const typingIndicator = document.getElementById('typingIndicator');
+      if (typingIndicator) {
+        typingIndicator.remove();
+      }
+    }
+
+    // إضافة رسالة إلى الشات
+    function addMessage(text, isUser, link = null, quickActions = null) {
+        const messageWrapper = document.createElement('div');
+        messageWrapper.className = isUser ? 'message user-message' : 'message bot-message';
+        
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        let messageContentHTML = `<div class="message-content"><div>${text}</div>`;
+        
+        if (link) {
+            messageContentHTML += `
+            <div class="link-card">
+                <h4><i class="${link.icon || 'fas fa-link'}"></i>${link.title}</h4>
+                <p>${link.description}</p>
+                <a href="${link.url}" target="_blank" class="link-button"><i class="fas fa-external-link-alt"></i>اذهب إلى الصفحة</a>
+            </div>`;
+        }
+        
+        messageContentHTML += '</div>'; // close message-content
+        
+        const timeHTML = `<div class="message-time">${time}</div>`;
+
+        // The order is different for user and bot messages for visual alignment
+        if (isUser) {
+            messageWrapper.innerHTML = messageContentHTML + timeHTML;
+        } else {
+            messageWrapper.innerHTML = messageContentHTML + timeHTML;
+        }
+
+        chatMessages.appendChild(messageWrapper);
+        
+        if (quickActions) {
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'quick-actions';
+            
+            quickActions.forEach(action => {
+            const actionButton = document.createElement('button');
+            actionButton.className = 'quick-action';
+            actionButton.textContent = action;
+            actionButton.onclick = () => {
+                messageInput.value = action;
+                sendSmartMessage();
+            };
+            actionsDiv.appendChild(actionButton);
+            });
+            
+            chatMessages.appendChild(actionsDiv);
+        }
+        
+        scrollToBottom();
+    }
+
+    // التمرير لآخر رسالة
+    function scrollToBottom() {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // ** NEW: Send message to the new API endpoint for AI processing **
+    async function sendSmartMessage() {
+        const text = messageInput.value.trim();
+        if (!text) return;
+
+        addMessage(text, true);
+        messageInput.value = '';
+
+        showTypingIndicator();
+
+        try {
+            const response = await fetch('/api/chat_smart_response', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: text })
+            });
+
+            const data = await response.json();
+            hideTypingIndicator();
+
+            if (response.ok) {
+                addMessage(data.message, false);
+            } else if (response.status === 403) {
+                 premiumMessageBox.style.display = 'block';
+                 chatInputContainer.style.display = 'none';
+                 premiumMessageTextElement.textContent = data.message;
+            } else {
+                addMessage(data.message || 'عذراً، حدث خطأ في التواصل مع الخادم.', false);
+            }
+
+        } catch (error) {
+            hideTypingIndicator();
+            console.error('Error sending message to server:', error);
+            addMessage('عذراً، حدث خطأ في التواصل مع الخادم.', false);
+        }
+    }
+
+    // أحداث الأزرار
+    sendButton.addEventListener('click', sendSmartMessage);
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendSmartMessage();
+      }
+    });
+
+    // تحميل الرسالة الترحيبية عند بدء الشات
+    window.addEventListener('DOMContentLoaded', () => {
+      const isPremium = {{ is_premium | tojson }};
+      const premiumFeaturesEnabled = {{ premium_features_enabled | tojson }};
+      const premiumMessage = {{ premium_message | tojson }};
+
+      if (premiumFeaturesEnabled && !isPremium) {
+          premiumMessageBox.style.display = 'block';
+          chatInputContainer.style.display = 'none';
+          premiumMessageTextElement.textContent = premiumMessage;
+      } else {
+          setTimeout(() => {
+            showTypingIndicator();
+            setTimeout(() => {
+                hideTypingIndicator();
+                addMessage("أهلاً بك، أنا توبي مساعدك الذكي. كيف يمكنني خدمتك اليوم؟ 😊", false, null, ["البحث عن رصيد صنف", "حجز موعد", "تقارير الأصناف", "تعليمات استخدام النظام"]);
+            }, 1000);
+          }, 500);
+      }
+    });
+  </script>
+  
+  <script>
+    // التحقق من تحميل Font Awesome وتفعيل الأيقونات الاحتياطية إذا لم يتم تحميله
+    (function() {
+      function checkFontAwesome() {
+        // التحقق مما إذا كانت مكتبة Font Awesome محملة بشكل صحيح
+        var isFontAwesomeLoaded = (function() {
+          // إنشاء عنصر اختبار
+          var span = document.createElement('span');
+          span.className = 'fas fa-paper-plane';
+          span.style.visibility = 'hidden';
+          document.body.appendChild(span);
+          
+          // التحقق من العرض والارتفاع للعنصر
+          var result = window.getComputedStyle(span).fontFamily.includes('Font Awesome') || 
+                       (span.offsetWidth > 0 && span.offsetHeight > 0);
+          
+          // إزالة عنصر الاختبار
+          document.body.removeChild(span);
+          return result;
+        })();
+        
+        // إذا لم يتم تحميل Font Awesome، استخدم الأيقونات الاحتياطية
+        if (!isFontAwesomeLoaded) {
+          console.log('Font Awesome غير محمل، استخدام الأيقونات الاحتياطية');
+          
+          // إضافة الفئة icon-fallback لجميع عناصر Font Awesome
+          var faElements = document.querySelectorAll('.fas, .far, .fab, .fa');
+          faElements.forEach(function(el) {
+            // استخراج اسم الأيقونة من الفئات
+            var classes = Array.from(el.classList);
+            var iconClass = classes.find(function(cls) {
+              return cls.startsWith('fa-');
+            });
+            
+            if (iconClass) {
+              // إضافة فئة الأيقونة الاحتياطية المقابلة
+              el.classList.add('icon-fallback');
+              el.classList.add('icon-' + iconClass.substring(3)); // إزالة 'fa-' من البداية
+            }
+          });
+        }
+      }
+      
+      // تنفيذ الفحص بعد تحميل الصفحة
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', checkFontAwesome);
+      } else {
+        checkFontAwesome();
+      }
+    })();
+  </script>
+</body>
+</html>

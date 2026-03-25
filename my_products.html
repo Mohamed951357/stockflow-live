@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بونص فارما - أصنافي - {{ system_subtitle }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* NEW: Root CSS variables for consistent theming */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Matching dashboard primary gradient */
+            --secondary-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); /* Cyan to bright blue */
+            --text-color-dark: #2d3748;
+            --text-color-light: #f7fafc;
+            --accent-color: #00f2fe; /* Brighter cyan for actions */
+            --shadow-light: rgba(0, 0, 0, 0.08);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+            --highlight-color: #4facfe; /* Used for some borders/highlights */
+            --success-color: #0bab7c; /* A vibrant green */
+            --error-color: #dc3545; /* Red for notifications, matches original file's #dc3545 */
+            --border-radius-lg: 15px;
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Cairo', sans-serif;
+            min-height: 100vh;
+            padding-top: 70px;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(2px 2px at 20% 30%, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(2px 2px at 60% 70%, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(3px 3px at 50% 50%, rgba(255, 255, 255, 0.3), transparent),
+                radial-gradient(2px 2px at 80% 10%, rgba(255, 255, 255, 0.5), transparent),
+                radial-gradient(2px 2px at 10% 60%, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(3px 3px at 90% 80%, rgba(255, 255, 255, 0.3), transparent),
+                radial-gradient(2px 2px at 30% 90%, rgba(255, 255, 255, 0.4), transparent);
+            background-size: 200% 200%;
+            animation: particleFloat 30s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(102, 126, 234, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(118, 75, 162, 0.15) 0%, transparent 50%);
+            animation: orbFloat 25s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes particleFloat {
+            0%, 100% {
+                background-position: 0% 0%, 100% 100%, 50% 50%, 80% 20%, 20% 80%, 90% 10%, 10% 90%;
+                opacity: 1;
+            }
+            50% {
+                background-position: 100% 100%, 0% 0%, 70% 30%, 30% 70%, 60% 40%, 40% 60%, 80% 20%;
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes orbFloat {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg) scale(1);
+                opacity: 0.8;
+            }
+            33% {
+                transform: translateY(-20px) rotate(120deg) scale(1.1);
+                opacity: 1;
+            }
+            66% {
+                transform: translateY(-35px) rotate(240deg) scale(0.9);
+                opacity: 0.9;
+            }
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+            background: rgba(248, 249, 250, 0.78);
+            min-height: calc(100vh - 70px);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 32px 32px 0 0;
+            margin-top: 20px;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .my-products-container {
+            padding-top: 1rem;
+            padding-bottom: 2rem;
+        }
+
+        /* Navbar styles copied from search_products.html for consistent look */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            background-size: 200% 200% !important;
+            animation: navbarGradient 15s ease infinite !important;
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.2),
+                0 5px 20px rgba(102, 126, 234, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1030;
+            backdrop-filter: blur(15px) !important;
+            -webkit-backdrop-filter: blur(15px) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+        }
+
+        /* Notification badge specific styles for clarity */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            padding: 5px 8px;
+            border-radius: 50%;
+            background-color: var(--error-color);
+            color: white;
+            font-size: 0.75em;
+            font-weight: bold;
+            z-index: 10;
+            min-width: 20px;
+            text-align: center;
+            line-height: 1;
+        }
+
+        /* Navbar Brand (Logo + Text) */
+        .navbar-brand {
+            font-weight: 600;
+            color: #000000 !important;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand span {
+            color: #000000 !important;
+        }
+
+        .navbar-logo {
+            height: 40px;
+            width: auto;
+            margin-left: 10px;
+        }
+
+        .navbar .nav-link {
+            color: #000000 !important;
+        }
+
+        .navbar .nav-link:hover {
+            color: #ffffff !important;
+        }
+
+        .navbar-text {
+            color: rgba(0, 0, 0, 0.8) !important;
+        }
+
+        @keyframes navbarGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Navbar Notification/Action Icons Wrapper */
+        .navbar-nav-notification-wrapper {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            margin-right: 15px;
+            flex-grow: 0;
+            justify-content: flex-end;
+            flex-shrink: 0;
+            gap: 5px !important;
+        }
+
+        .navbar-nav-notification-wrapper .nav-link {
+            padding: 0.4rem !important;
+            position: relative;
+            color: #000000;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .navbar-nav-notification-wrapper .nav-link:hover {
+            color: #ffffff; /* لجعل اللون أبيض عند التحويم */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+
+        .navbar-nav-notification-wrapper .nav-link .fa-lg {
+            font-size: 1.25em; /* Standard large icon size */
+        }
+
+        /* Mobile specific adjustments for navbar icons */
+        @media (max-width: 991.98px) {
+            .navbar-nav-notification-wrapper {
+                order: -1; /* Place before brand on mobile */
+                margin-left: auto; /* Push to the right next to toggler */
+                margin-right: 10px; /* Space from toggler */
+                gap: 3px !important;
+                max-width: 140px; /* Smaller max-width for mobile icons */
+                justify-content: space-between; /* Align to the right on mobile */
+                flex-grow: 1; /* Allow to grow to fill space somewhat */
+            }
+            .navbar-nav-notification-wrapper .nav-link {
+                padding: 0.35rem !important;
+            }
+            .navbar-nav-notification-wrapper .notification-badge {
+                top: 0px;
+                right: 0px;
+                font-size: 0.65em;
+                padding: 3px 6px;
+            }
+            /* Hide company info in collapsed menu */
+            .navbar-nav-user-info {
+                display: none;
+            }
+            /* Collapsed menu styles */
+            .navbar-collapse .navbar-nav {
+                width: 100%;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+            .navbar-collapse .nav-item {
+                text-align: center;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .navbar-collapse .nav-item:last-child {
+                border-bottom: none;
+            }
+            .navbar-collapse .nav-link {
+                padding: 12px 15px;
+                color: rgba(255, 255, 255, 0.9);
+                font-size: 1.1rem;
+                transition: background-color 0.3s ease;
+            }
+            .navbar-collapse .nav-link:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                border-radius: 5px;
+            }
+            /* Style for company name in mobile collapsed menu */
+            .navbar-collapse .navbar-text {
+                display: block;
+                padding: 12px 15px;
+                color: rgba(255, 255, 255, 0.7);
+                font-weight: 600;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        /* Desktop specific adjustments */
+        @media (min-width: 992px) {
+            .navbar-nav-notification-wrapper {
+                margin-left: 15px;
+                margin-right: 0;
+                gap: 5px !important;
+            }
+            .navbar-nav-notification-wrapper .nav-link {
+                padding: 0.4rem 0.5rem !important;
+            }
+            .navbar-nav-notification-wrapper .notification-badge {
+                top: -5px;
+                right: -5px;
+                font-size: 0.75em;
+                padding: 5px 8px;
+            }
+            .navbar-nav-user-info {
+                display: flex;
+            }
+        }
+
+        .product-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            padding: 2rem;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+        
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+        
+        .product-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-color-dark);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+        
+        .product-icon {
+            background: var(--primary-gradient);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+        
+        .product-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-item {
+            background: rgba(102, 126, 234, 0.05);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        
+        .info-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-color-dark);
+        }
+        
+        .product-notes {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .product-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        .btn-modern {
+            border: none;
+            border-radius: 12px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-edit {
+            background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%);
+            color: white;
+        }
+        
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(23, 162, 184, 0.3);
+            color: white;
+        }
+        
+        .btn-delete {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            margin-top: 2rem;
+        }
+        
+        .empty-icon {
+            background: var(--primary-gradient);
+            color: white;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            font-size: 2rem;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .product-card {
+                padding: 1.5rem;
+                margin-bottom: 1rem;
+            }
+            
+            .product-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .product-actions {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .product-info {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+            
+            .info-item {
+                padding: 0.75rem;
+            }
+            
+            .product-title {
+                font-size: 1.1rem;
+                text-align: center;
+            }
+            
+            .product-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            .product-card {
+                padding: 1rem;
+            }
+            
+            .btn-modern {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.85rem;
+            }
+        }
+        
+        .premium-message-box {
+            background-color: #fff3cd; /* لون تحذيري */
+            border: 1px solid #ffc107;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        .premium-message-box h5 {
+            color: #ffc107;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .premium-message-box p {
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+        }
+        .premium-message-box .btn {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 10px 25px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .premium-message-box .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+        }
+
+        .my-products-header {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .my-products-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-color-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .my-products-icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .my-products-subtitle {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .my-products-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .my-products-count-badge {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            background: rgba(102, 126, 234, 0.08);
+            border: 1px solid rgba(102, 126, 234, 0.25);
+            margin-left: 0.5rem;
+        }
+
+        .my-products-count-badge .count-number {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .my-products-count-badge .count-label {
+            font-size: 0.75rem;
+            color: #4a5568;
+        }
+
+        .add-products-btn {
+            border-radius: 999px;
+            padding: 0.65rem 1.5rem;
+            font-weight: 600;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: #6b7280;
+            color: #fff;
+            border-radius: 999px;
+            padding: 0.45rem 1rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+        }
+        .back-btn:hover { opacity: 0.95; }
+        .back-btn:active { transform: scale(0.98); }
+
+        .my-products-top-bar { display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem; margin: 0; flex-wrap: nowrap; }
+        .back-column { display:flex; flex-direction:column; align-items:flex-end; gap:0.4rem; flex: 0 0 auto; }
+        .my-products-title { display:flex; align-items:center; gap:0.5rem; margin:0; white-space: nowrap; flex: 1 1 auto; }
+        .my-products-title span { font-size: 1.05rem; font-weight: 700; }
+        @media (max-width: 991.98px){ .my-products-title span{ font-size:1rem } }
+        @media (max-width: 767.98px){
+            .my-products-title{ gap:0.4rem; }
+            .my-products-title span{ font-size:1rem }
+            .my-products-icon-circle{ width:40px; height:40px; }
+            .back-btn{ font-size:0.85rem; padding:0.4rem 0.9rem; }
+            .my-products-top-bar{ max-width: 480px; margin: 0 auto; }
+        }
+
+        .favorites-toolbar {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .favorites-search-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .favorites-search-input {
+            border-radius: 999px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 3rem 0.75rem 1rem;
+            font-size: 0.95rem;
+            box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .favorites-search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.15rem rgba(102, 126, 234, 0.25);
+        }
+
+        .clear-favorites-search {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .favorites-search-input:not(:placeholder-shown) ~ .clear-favorites-search {
+            display: flex;
+        }
+
+        .clear-favorites-search:hover {
+            background: #667eea;
+            color: #ffffff;
+        }
+
+        .favorites-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .favorites-filter-chip {
+            border-radius: 999px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            background: rgba(255, 255, 255, 0.85);
+            padding: 0.4rem 0.9rem;
+            font-size: 0.85rem;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .favorites-filter-chip.active {
+            background: var(--primary-gradient);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .favorites-filter-chip:hover {
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .my-products-header {
+                align-items: flex-start;
+            }
+
+            .my-products-header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .favorites-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('company_dashboard') }}">
+                <img src="{{ current_logo_path }}" alt="Logo" class="navbar-logo">
+                <span class="full-text">{{ system_subtitle }}</span>
+                <span class="short-text d-none"></span>{# MODIFIED: Removed "النظام" to make it empty and d-none #}
+            </a>
+
+            {# NEW: Navbar icons container for Profile, Community, Instructions, Notifications #}
+            <div class="navbar-nav-notification-wrapper">
+                <a class="nav-link" href="{{ url_for('company_profile') }}" title="ملفي الشخصي">
+                    <i class="fas fa-user-circle fa-lg"></i>
+                </a>
+                <a class="nav-link" href="{{ url_for('company_messages') }}" title="المراسلات">
+                    <i class="fas fa-comments fa-lg"></i>
+                    <span class="notification-badge" id="community-count" style="display: none;">0</span>
+                </a>
+                <a class="nav-link" href="{{ url_for('instructions') }}" title="تعليمات وإرشادات">
+                    <i class="fas fa-question-circle fa-lg"></i>
+                </a>
+                <a class="nav-link position-relative" href="{{ url_for('notifications') }}" title="الإشعارات">
+                    <i class="fas fa-bell fa-lg"></i>
+                    <span class="notification-badge" id="notification-count" style="display: none;">0</span>
+                </a>
+            </div>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavCompany" aria-controls="navbarNavCompany" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNavCompany">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    {# User Info on Mobile Menu - Hidden on desktop #}
+                    <li class="nav-item d-lg-none">
+                        <span class="navbar-text">
+                            <i class="fas fa-building me-2"></i>
+                            {{ current_user.company_name }}
+                        </span>
+                    </li>
+                    {# User Info on Desktop Navbar - Hidden on mobile #}
+                    <li class="nav-item d-none d-lg-flex align-items-center me-3">
+                        <span class="navbar-text">
+                            <i class="fas fa-building me-2"></i>
+                            {{ current_user.company_name }}
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('company_dashboard') }}">
+                            <i class="fas fa-home me-2"></i>
+                            الرئيسية
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('my_products') }}">
+                            <i class="fas fa-boxes me-2"></i>
+                            أصنافي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('search_products') }}">
+                            <i class="fas fa-search me-2"></i>
+                            البحث في الأصناف
+                        </a>
+                    </li>
+                    <li class="nav-item"> {# NEW: Link for Stock Reports #}
+                        <a class="nav-link" href="{{ url_for('company_stock_reports') }}">
+                            <i class="fas fa-chart-line me-2"></i>
+                            تقارير الأرصدة
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('appointments') }}">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            مواعيدي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            تسجيل الخروج
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container my-products-container">
+            {% set favorites_count = favorite_products|length %}
+
+            <div class="my-products-header mb-4">
+                <div class="my-products-top-bar">
+                    <div class="my-products-title">
+                        <div class="my-products-icon-circle">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <span>أصنافي</span>
+                    </div>
+                    <div class="back-column">
+                        <a href="{{ url_for('company_dashboard') }}" class="back-btn" id="mpBackBtn">العودة للوحة الرئيسية <i class="fas fa-arrow-right ms-2"></i></a>
+                        <div class="my-products-count-badge">
+                            <span class="count-number">{{ favorites_count }}</span>
+                            <span class="count-label">صنف مفضل</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="my-products-subtitle">
+                    إدارة سريعة وواضحة لقائمة الأصناف المفضلة لشركتك.
+                </p>
+                <div class="my-products-header-actions">
+                    <a href="{{ url_for('search_products') }}" class="btn btn-primary add-products-btn">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        إضافة أصناف جديدة
+                    </a>
+                </div>
+            </div>
+
+            {# NEW: Add an ID to the container of flash messages for JavaScript targeting #}
+            <div id="flash-messages-container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% for category, message in messages %}
+                        {% if message %} {# Basic check for message existence #}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" style="border-radius: 14px;" role="alert">
+                                <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endwith %}
+            </div>
+
+            {# NEW: Check for premium features access #}
+            {% if not company.is_premium and premium_features_enabled %}
+                <div class="premium-message-box">
+                    <i class="fas fa-star fa-3x text-warning mb-3"></i>
+                    <h5>هذه الميزة متاحة فقط للمشتركين في STOCKFLOW PLUS!</h5>
+                    <p>للأسف، لا يمكنك عرض أو إدارة أصنافك المفضلة لأن هذه الميزة تتطلب اشتراكًا مميزًا.</p>
+                    <p>{{ premium_message }}</p>
+                    <button type="button" class="btn" onclick="window.location.href = '{{ url_for('subscribe_payment') }}'">
+                        <i class="fas fa-crown me-2"></i> اشترك الآن في STOCKFLOW PLUS!
+                    </button>
+                </div>
+            {% else %}
+                {# Original content for my products #}
+                {% if favorite_products %}
+                    <div class="favorites-toolbar mb-4">
+                        <div class="favorites-search-wrapper">
+                            <input type="text" id="favoritesSearchInput" class="form-control favorites-search-input" placeholder="ابحث داخل أصنافي..." autocomplete="off">
+                            <button type="button" id="clearFavoritesSearch" class="clear-favorites-search">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="favorites-filters">
+                            <button type="button" class="favorites-filter-chip active" data-filter="all">
+                                <i class="fas fa-layer-group"></i>
+                                <span>الكل</span>
+                            </button>
+                            <button type="button" class="favorites-filter-chip" data-filter="available">
+                                <i class="fas fa-check-circle"></i>
+                                <span>متوفر</span>
+                            </button>
+                            <button type="button" class="favorites-filter-chip" data-filter="no-price">
+                                <i class="fas fa-question-circle"></i>
+                                <span>بدون سعر</span>
+                            </button>
+                            <button type="button" class="favorites-filter-chip" data-filter="has-notes">
+                                <i class="fas fa-sticky-note"></i>
+                                <span>به ملاحظات</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row" id="favoriteProductsGrid">
+                        {% for product in favorite_products %}
+                        <div class="col-lg-6 col-xl-4 favorite-product-item">
+                            <div class="product-card"
+                                 data-product-name="{{ product.product_name|lower|e }}"
+                                 data-has-notes="{{ '1' if product.notes else '0' }}"
+                                 data-has-price="{{ '1' if product.price else '0' }}"
+                                 data-is-available="{{ '1' if product.quantity and product.quantity != '0' else '0' }}">
+                                <div class="product-header">
+                                    <div class="product-title">
+                                        <div class="product-icon">
+                                            <i class="fas fa-box-open"></i>
+                                        </div>
+                                        {{ product.product_name }}
+                                    </div>
+                                    <div class="product-actions">
+                                        <button class="btn btn-modern btn-edit btn-sm" onclick="editProduct({{ product.id }})">
+                                            <i class="fas fa-edit"></i>
+                                            <span class="d-none d-md-inline">تعديل</span>
+                                        </button>
+                                        <button class="btn btn-modern btn-delete btn-sm" onclick='deleteProduct({{ product.id }}, {{ product.product_name|tojson }})'>
+                                            <i class="fas fa-trash-alt"></i>
+                                            <span class="d-none d-md-inline">حذف</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="product-info">
+                                    <div class="info-item">
+                                        <div class="info-label">
+                                            <i class="fas fa-cubes"></i>
+                                            الكمية
+                                        </div>
+                                        <div class="info-value">{{ product.quantity if product.quantity != '0' else 'غير متوفر' }}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-label">
+                                            <i class="fas fa-tag"></i>
+                                            السعر
+                                        </div>
+                                        <div class="info-value">{{ product.price if product.price else 'غير محدد' }}</div>
+                                    </div>
+                                </div>
+
+                                {% if product.notes %}
+                                <div class="product-notes">
+                                    <div class="info-label">
+                                        <i class="fas fa-sticky-note"></i>
+                                        ملاحظات
+                                    </div>
+                                    <div class="text-muted">{{ product.notes }}</div>
+                                </div>
+                                {% endif %}
+
+                                <div class="product-meta">
+                                    <div>
+                                        <i class="fas fa-clock me-1"></i>
+                                        أضيف: {{ product.added_at.strftime('%d/%m/%Y') }}
+                                    </div>
+                                    {% if product.last_modified and product.last_modified != product.added_at %}
+                                    <div>
+                                        <i class="fas fa-sync-alt me-1"></i>
+                                        عُدل: {{ product.last_modified.strftime('%d/%m/%Y') }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <h4 class="text-muted mb-3">لا توجد أصناف مفضلة لديك بعد</h4>
+                        <p class="text-muted mb-4">ابدأ ببناء مجموعتك من الأصناف المفضلة من خلال البحث وإضافة المنتجات التي تهمك</p>
+                        <a href="{{ url_for('search_products') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-search me-2"></i>
+                            استكشف الأصناف
+                        </a>
+                    </div>
+                {% endif %}
+            {% endif %} {# END NEW: Check for premium features access #}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function editProduct(id) {
+            // يمكن إضافة modal للتعديل لاحقاً
+            alert('ميزة التعديل ستكون متاحة قريباً');
+        }
+
+        function deleteProduct(id, name) {
+            if (confirm('هل أنت متأكد من حذف الصنف "' + name + '" من أصنافك؟')) {
+                fetch('/delete_my_product/' + id, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert('حدث خطأ: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting product:', error);
+                    alert('حدث خطأ أثناء حذف الصنف.');
+                });
+            }
+        }
+
+        // Renamed and updated to fetch all counts, matching other pages
+        function updateCounts() {
+            fetch('/api/unread_counts')
+                .then(response => response.json())
+                .then(data => {
+                    const notificationBadge = document.getElementById('notification-count');
+                    if (notificationBadge) {
+                        if (data.unread_notifications_count > 0) {
+                            notificationBadge.textContent = data.unread_notifications_count;
+                            notificationBadge.style.display = 'block';
+                        } else {
+                            notificationBadge.style.display = 'none';
+                        }
+                    }
+
+                    const communityBadge = document.getElementById('community-count');
+                    if (communityBadge) {
+                        if (data.unread_community_messages_count > 0) {
+                            communityBadge.textContent = data.unread_community_messages_count;
+                            communityBadge.style.display = 'block';
+                        } else {
+                            communityBadge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching unread counts:', error));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCounts(); // Initial call to update counts
+            setInterval(updateCounts, 30000); // Update every 30 seconds
+
+            // JavaScript to hide empty flash messages container
+            const flashMessagesContainer = document.getElementById('flash-messages-container');
+            if (flashMessagesContainer) {
+                flashMessagesContainer.childNodes.forEach(node => {
+                    if (node.nodeType === Node.TEXT_NODE && node.nodeValue.trim() === '') {
+                        node.remove();
+                    }
+                });
+
+                if (flashMessagesContainer.children.length === 0) {
+                    flashMessagesContainer.style.display = 'none';
+                }
+            }
+
+            // Client-side filtering for favorites
+            const searchInput = document.getElementById('favoritesSearchInput');
+            const clearSearchBtn = document.getElementById('clearFavoritesSearch');
+            const filterChips = document.querySelectorAll('.favorites-filter-chip');
+            const productItems = document.querySelectorAll('.favorite-product-item');
+
+            function applyFilters() {
+                const query = (searchInput ? searchInput.value.toLowerCase().trim() : '');
+                const activeChip = document.querySelector('.favorites-filter-chip.active');
+                const filter = activeChip ? activeChip.getAttribute('data-filter') : 'all';
+
+                productItems.forEach(item => {
+                    const card = item.querySelector('.product-card');
+                    if (!card) return;
+
+                    const name = (card.getAttribute('data-product-name') || '').toLowerCase();
+                    const hasNotes = card.getAttribute('data-has-notes') === '1';
+                    const hasPrice = card.getAttribute('data-has-price') === '1';
+                    const isAvailable = card.getAttribute('data-is-available') === '1';
+
+                    let visible = true;
+
+                    if (query && !name.includes(query)) {
+                        visible = false;
+                    }
+
+                    if (filter === 'available' && !isAvailable) {
+                        visible = false;
+                    } else if (filter === 'no-price' && hasPrice) {
+                        visible = false;
+                    } else if (filter === 'has-notes' && !hasNotes) {
+                        visible = false;
+                    }
+
+                    item.style.display = visible ? '' : 'none';
+                });
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener('input', () => {
+                    applyFilters();
+                });
+            }
+
+            if (clearSearchBtn && searchInput) {
+                clearSearchBtn.addEventListener('click', () => {
+                    searchInput.value = '';
+                    applyFilters();
+                });
+            }
+
+            filterChips.forEach(chip => {
+                chip.addEventListener('click', () => {
+                    filterChips.forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    applyFilters();
+                });
+            });
+        });
+
+        // Removed all device detection and Android/iPhone specific navbar positioning logic
+    </script>
+    <script>
+        function ensurePageSpinner() {
+            var spinner = document.getElementById('pageSpinner');
+            if (!spinner) {
+                var style = document.createElement('style');
+                style.textContent = ".spinner-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;justify-content:center;align-items:center}.spinner-overlay.active{display:flex;animation:fadeIn 0.3s ease}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.elegant-spinner{position:relative;width:80px;height:80px}.elegant-spinner::before,.elegant-spinner::after{content:'';position:absolute;border-radius:50%}.elegant-spinner::before{width:80px;height:80px;border:4px solid transparent;border-top-color:#667eea;border-right-color:#764ba2;animation:spinOuter 1.2s linear infinite}.elegant-spinner::after{width:50px;height:50px;top:15px;left:15px;border:4px solid transparent;border-bottom-color:#667eea;border-left-color:#764ba2;animation:spinInner 1.2s linear infinite reverse}@keyframes spinOuter{to{transform:rotate(360deg)}}@keyframes spinInner{to{transform:rotate(360deg)}}";
+                document.head.appendChild(style);
+                spinner = document.createElement('div');
+                spinner.className = 'spinner-overlay';
+                spinner.id = 'pageSpinner';
+                spinner.innerHTML = '<div class="elegant-spinner"><div class="spinner-dot"></div></div>';
+                document.body.appendChild(spinner);
+            }
+            return spinner;
+        }
+        window.addEventListener('pageshow', function(){
+            var s = document.getElementById('pageSpinner');
+            if (s) { s.classList.remove('active'); }
+        });
+        window.addEventListener('popstate', function(){
+            var s = document.getElementById('pageSpinner');
+            if (s) { s.classList.remove('active'); }
+        });
+        document.addEventListener('visibilitychange', function(){
+            if (!document.hidden) {
+                var s = document.getElementById('pageSpinner');
+                if (s) { s.classList.remove('active'); }
+            }
+        });
+        document.addEventListener('DOMContentLoaded', function(){
+            var homeLink = document.querySelector('a.nav-link[href*="company_dashboard"]');
+            if (homeLink) {
+                homeLink.addEventListener('click', function(e){
+                    e.preventDefault();
+                    var s = ensurePageSpinner();
+                    s.classList.add('active');
+                    var href = this.getAttribute('href');
+                    setTimeout(function(){ window.location.href = href; }, 150);
+                }, { passive: false });
+            }
+            var backBtn = document.getElementById('mpBackBtn');
+            if (backBtn) {
+                backBtn.addEventListener('click', function(e){
+                    e.preventDefault();
+                    var s = ensurePageSpinner();
+                    s.classList.add('active');
+                    var href = this.getAttribute('href');
+                    setTimeout(function(){ window.location.href = href; }, 150);
+                }, { passive: false });
+            }
+        });
+    </script>
+</body>
+</html>

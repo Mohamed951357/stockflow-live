@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تقرير قراءة الرسالة - مراسلات الشركات</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Cairo', sans-serif;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: none;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #17a2b8 0%, #0d6efd 100%);
+            color: white;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+        }
+        .table thead th {
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h4 mb-0">
+            <i class="fas fa-envelope-open-text me-2 text-info"></i>
+            تقرير قراءة الرسالة
+        </h2>
+        <a href="{{ url_for('admin_private_messages') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right me-2"></i>
+            العودة لمراسلات الشركات
+        </a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <div>
+                    <div class="fw-semibold mb-1">الموضوع: {{ base_message.subject or 'بدون عنوان' }}</div>
+                    <div class="small">نص الرسالة: {{ base_message.message }}</div>
+                </div>
+                <div class="mt-2 mt-md-0 text-md-end small">
+                    <div>المرسل: {% if base_message.sender %}{{ base_message.sender.company_name }}{% else %}غير متاح{% endif %}</div>
+                    <div>إجمالي الشركات المستهدفة: {{ total_count }}</div>
+                    <div>عدد الشركات التي قرأت الرسالة: {{ read_count }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if rows %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>الشركة</th>
+                            <th>الحالة</th>
+                            <th>وقت القراءة</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in rows %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ row.receiver_id }} - {{ row.receiver_name }}</td>
+                                <td>
+                                    {% if row.is_read %}
+                                        <span class="badge bg-success"><i class="fas fa-check-double me-1"></i> مقروءة</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i> غير مقروءة</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ row.read_at or '-' }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted mb-0">لا توجد بيانات لهذه الرسالة.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

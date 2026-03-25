@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>لوحة شات الإدارة - بونص فارما</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --secondary-color: #1d4ed8;
+      --light-color: #f8fafc;
+      --dark-color: #1e293b;
+      --success-color: #059669;
+      --info-color: #0284c7;
+      --warning-color: #dc2626;
+      --chat-bg: #f1f5f9;
+      --message-sent-bg: #2563eb;
+      --message-received-bg: #ffffff;
+      --message-sent-text: #ffffff;
+      --message-received-text: #1e293b;
+      --border-color: #e2e8f0;
+      --hover-bg: #f8fafc;
+      --active-bg: #e0f2fe;
+      --typing-indicator: #2563eb;
+    }
+    
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: var(--chat-bg);
+      color: var(--dark-color);
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+    
+    .chat-layout {
+      display: flex;
+      height: 100vh;
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+      background: white;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .companies-sidebar {
+      width: 380px;
+      border-right: 1px solid var(--border-color);
+      background: white;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .companies-sidebar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 2px;
+      height: 100%;
+      background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+      opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+      .companies-sidebar {
+        position: absolute;
+        right: 0;
+        height: 100%;
+        transform: translateX(100%);
+        z-index: 1000;
+        width: 100%;
+        max-width: 380px;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .companies-sidebar.active {
+        transform: translateX(0);
+        animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      .companies-sidebar::after {
+        width: 3px;
+        right: auto;
+        left: 0;
+      }
+    }
+    
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: white;
+      position: relative;
+      animation: slideIn 0.5s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .chat-header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 10;
+    }
+
+    .chat-header .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 5px;
+    }
+
+    @media (max-width: 768px) {
+      .chat-header .menu-toggle {
+        display: block;
+      }
+    }
+    
+    .chat-header h5 {
+      margin: 0;
+      font-weight: 700;
+    }
+    
+    /* NEW: Toby image in header */
+    .chat-header .toby-header-image {
+        height: 45px; /* Size of Toby's image */
+        width: 45px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-left: 10px; /* Space from text */
+        border: 2px solid rgba(255, 255, 255, 0.7); /* Subtle white border */
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* NEW: Back button style */
+    .chat-header .back-button {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 8px;
+        transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .chat-header .back-button:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(-3px); /* Slight movement to the right for RTL */
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      background: var(--chat-bg);
+      scroll-behavior: smooth;
+      position: relative;
+    }
+
+    .scroll-to-bottom {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+
+    .scroll-to-bottom:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      background: var(--secondary-color);
+    }
+
+    .scroll-to-bottom.visible {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .chat-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 3px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: var(--primary-color);
+      border-radius: 3px;
+      transition: background 0.3s ease;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+      background: var(--secondary-color);
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+      background: var(--light-color);
+      border-radius: 10px;
+      margin: 5px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: var(--primary-color);
+      border-radius: 10px;
+      border: 3px solid var(--light-color);
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+      background: var(--secondary-color);
+    }
+
+    .new-messages-indicator {
+      position: fixed;
+      bottom: 100px;
+      right: 50%;
+      transform: translateX(50%);
+      background: var(--primary-color);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      z-index: 100;
+      transition: all 0.3s ease;
+    }
+
+    .new-messages-indicator:hover {
+      background: var(--secondary-color);
+      transform: translateX(50%) translateY(-3px);
+    }
+
+    .new-messages-indicator.visible {
+      display: flex;
+      animation: bounceIn 0.5s ease;
+    }
+
+    @keyframes bounceIn {
+      0% {
+        opacity: 0;
+        transform: translateX(50%) translateY(20px);
+      }
+      50% {
+        transform: translateX(50%) translateY(-5px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(50%) translateY(0);
+      }
+    }
+    
+    .message {
+      display: flex;
+      margin-bottom: 15px;
+      max-width: 80%;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: messageAppear 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      position: relative;
+    }
+
+    .message::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--border-color), transparent);
+      opacity: 0.5;
+    }
+
+    @keyframes messageAppear {
+      0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      50% {
+        opacity: 0.5;
+        transform: translateY(10px) scale(0.98);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
+    .message.sent {
+      margin-left: auto;
+      flex-direction: row-reverse;
+    }
+    
+    .message.received {
+      margin-right: auto;
+    }
+    
+    .message-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 10px;
+    }
+    
+    .message-content {
+      max-width: calc(100% - 60px);
+    }
+    
+    .message-bubble {
+      padding: 12px 15px;
+      border-radius: 18px;
+      position: relative;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      max-width: 80%;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      transition: all 0.3s ease;
+      opacity: 1;
+      transform: translateY(0);
+      animation: messageAppear 0.3s ease;
+    }
+
+    .message-bubble:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .message.sent .message-bubble:hover {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    }
+
+    .message.received .message-bubble:hover {
+      background: linear-gradient(135deg, #ffffff, var(--light-color));
+    }
+    
+    .message.sent .message-bubble {
+      background: linear-gradient(135deg, var(--message-sent-bg), var(--secondary-color));
+      color: var(--message-sent-text);
+      border-bottom-right-radius: 4px;
+      margin-left: auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .message.sent .message-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: -8px;
+      width: 16px;
+      height: 16px;
+      background: var(--message-sent-bg);
+      clip-path: polygon(0 0, 0% 100%, 100% 100%);
+    }
+    
+    .message.received .message-bubble {
+      background: linear-gradient(135deg, var(--message-received-bg), var(--light-color));
+      color: var(--message-received-text);
+      border-bottom-left-radius: 4px;
+      margin-right: auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .message.received .message-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: -8px;
+      width: 16px;
+      height: 16px;
+      background: var(--message-received-bg);
+      clip-path: polygon(100% 0, 0 100%, 100% 100%);
+    }
+    
+    .message-info {
+      display: flex;
+      align-items: center;
+      margin-top: 5px;
+      font-size: 0.8rem;
+      color: var(--dark-color);
+      opacity: 0.7;
+      transition: all 0.3s ease;
+      gap: 4px;
+    }
+
+    .message:hover .message-info {
+      opacity: 1;
+    }
+    
+    .message-time {
+      margin: 0 5px;
+    }
+    
+    .attachment-container {
+      margin-top: 10px;
+      border-radius: 10px;
+      overflow: hidden;
+      max-width: 300px;
+      background: var(--light-color);
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+    
+    .attachment-container img {
+      max-width: 100%;
+      height: auto;
+      cursor: pointer;
+      transition: transform 0.3s;
+      display: block;
+    }
+    
+    .attachment-container img:hover {
+      transform: scale(1.05);
+    }
+
+    .attachment-preview {
+      position: relative;
+      display: inline-block;
+    }
+
+    .attachment-preview .download-btn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .attachment-preview:hover .download-btn {
+      opacity: 1;
+    }
+
+    .file-attachment {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      gap: 10px;
+      background: var(--light-color);
+      border-radius: 8px;
+      margin-top: 5px;
+    }
+
+    .file-attachment i {
+      font-size: 1.5rem;
+      color: var(--primary-color);
+    }
+
+    .file-info {
+      flex: 1;
+    }
+
+    .file-name {
+      font-size: 0.9rem;
+      color: var(--dark-color);
+      margin-bottom: 2px;
+    }
+
+    .file-size {
+      font-size: 0.8rem;
+      color: #666;
+    }
+    
+    .chat-input-container {
+      padding: 15px 20px;
+      background: white;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      position: relative;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+
+    .typing-indicator {
+      position: absolute;
+      top: -30px;
+      right: 20px;
+      background: var(--light-color);
+      padding: 5px 15px;
+      border-radius: 15px;
+      font-size: 0.9rem;
+      color: var(--dark-color);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+    }
+
+    .typing-indicator.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .chat-input {
+      flex: 1;
+      border-radius: 25px;
+      padding: 12px 20px;
+      border: 2px solid var(--border-color);
+      outline: none;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+      background: var(--light-color);
+      resize: none;
+      max-height: 120px;
+      min-height: 45px;
+      line-height: 1.5;
+    }
+
+    .chat-input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    .chat-input:focus {
+      border-color: var(--primary-color);
+    }
+    
+    .send-btn {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border: none;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      margin-right: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(37, 99, 235, 0.2);
+    }
+
+    .send-btn i {
+      font-size: 1.2rem;
+      transition: transform 0.2s ease;
+    }
+
+    .send-btn:hover {
+      background: var(--secondary-color);
+      transform: scale(1.05);
+    }
+
+    .send-btn:hover i {
+      transform: translateX(-3px);
+    }
+    
+    .send-btn:hover {
+      background: var(--secondary-color);
+    }
+    
+    .message-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .file-input-label,
+    .emoji-btn {
+      background: var(--light-color);
+      color: var(--dark-color);
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid var(--border-color);
+    }
+    
+    .file-input-label:hover,
+    .emoji-btn:hover {
+      background: var(--hover-bg);
+      border-color: var(--primary-color);
+      transform: scale(1.05);
+    }
+
+    .emoji-picker {
+      position: absolute;
+      bottom: 80px;
+      right: 20px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+      padding: 15px;
+      display: none;
+      z-index: 1000;
+      width: 300px;
+      height: 300px;
+      overflow-y: auto;
+    }
+
+    .emoji-picker.active {
+      display: block;
+    }
+
+    .emoji-category {
+      margin-bottom: 15px;
+    }
+
+    .emoji-category-title {
+      font-size: 0.9rem;
+      color: var(--dark-color);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 5px;
+    }
+
+    .emoji-item {
+      font-size: 1.5rem;
+      padding: 5px;
+      cursor: pointer;
+      text-align: center;
+      border-radius: 5px;
+      transition: background 0.2s ease;
+    }
+
+    .emoji-item:hover {
+      background: var(--hover-bg);
+    }
+    
+    .company-card {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      border-bottom: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .company-card::before {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--primary-color);
+      transform: scaleY(0);
+      transition: transform 0.3s ease;
+    }
+
+    .company-card:hover::before,
+    .company-card.active::before {
+      transform: scaleY(1);
+    }
+    
+    .company-card:hover {
+      background: var(--hover-bg);
+      transform: translateX(-5px);
+    }
+    
+    .company-card.active {
+      background: var(--active-bg);
+    }
+
+    .company-card.unread {
+      background: rgba(37, 99, 235, 0.05);
+    }
+
+    .company-card.unread .company-name {
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+    
+    .company-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-left: 15px;
+    }
+    
+    .company-info {
+      flex: 1;
+    }
+    
+    .company-name {
+      font-weight: 600;
+      margin-bottom: 3px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .company-name::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      right: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary-color);
+      transition: width 0.3s ease;
+    }
+
+    .company-card:hover .company-name::after {
+      width: 100%;
+    }
+    
+    .company-last-message {
+      font-size: 0.85rem;
+      color: #6c757d;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .company-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    
+    .company-time {
+      font-size: 0.75rem;
+      color: #6c757d;
+      margin-bottom: 5px;
+    }
+    
+    .unread-badge {
+      background: var(--warning-color);
+      color: white;
+      border-radius: 12px;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      transform: scale(0);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .unread-badge.visible {
+      transform: scale(1);
+    }
+    
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #6c757d;
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      color: #adb5bd;
+    }
+    
+    /* Scrollbar styling */
+    .companies-sidebar::-webkit-scrollbar,
+    .chat-messages::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .companies-sidebar::-webkit-scrollbar-track,
+    .chat-messages::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    .companies-sidebar::-webkit-scrollbar-thumb,
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 10px;
+    }
+    
+    .companies-sidebar::-webkit-scrollbar-thumb:hover,
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+      background: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <div id="emojiPicker" class="emoji-picker">
+    <div class="emoji-category">
+      <div class="emoji-category-title">الوجوه التعبيرية</div>
+      <div class="emoji-grid" id="smileysEmojis"></div>
+    </div>
+    <div class="emoji-category">
+      <div class="emoji-category-title">الإشارات</div>
+      <div class="emoji-grid" id="gesturesEmojis"></div>
+    </div>
+    <div class="emoji-category">
+      <div class="emoji-category-title">القلوب والرموز</div>
+      <div class="emoji-grid" id="symbolsEmojis"></div>
+    </div>
+  </div>
+
+  <div class="chat-layout">
+    <div class="companies-sidebar">
+      <div class="p-3 border-bottom">
+        <h5 class="mb-0"><i class="fas fa-building me-2"></i> الشركات</h5>
+      </div>
+      
+      <div id="companiesList">
+        </div>
+      
+      <div id="emptyCompanies" class="empty-state">
+        <i class="fas fa-comment-slash"></i>
+        <h5>لا توجد محادثات حالية</h5>
+        <p class="text-muted">اختر شركة من القائمة لبدء المحادثة</p>
+      </div>
+    </div>
+    
+    <div class="chat-container" id="chatContainer" style="display: none;">
+      <div class="chat-header">
+        <h5 id="currentChatTitle">
+          <img src="{{ url_for('static', filename='images/toby_robot_cartoon.png') }}" alt="Toby" class="toby-header-image">
+          الشات مع <span id="companyNameHeader">الإدارة</span>
+        </h5>
+        {# NEW: Back button #}
+        <button class="back-button" onclick="window.location.href = '{{ url_for('admin_dashboard') }}'">
+            <i class="fas fa-arrow-right"></i> الرئيسية
+        </button>
+      </div>
+      
+      <div id="chatMessages" class="chat-messages">
+        </div>
+        <div id="newMessagesIndicator" class="new-messages-indicator" onclick="scrollToBottom(true)">
+          <i class="fas fa-arrow-down"></i>
+          <span class="count">0</span> رسائل جديدة
+        </div>
+        <button id="scrollToBottomBtn" class="scroll-to-bottom" onclick="scrollToBottom(true)" title="التمرير للأسفل">
+          <i class="fas fa-chevron-down"></i>
+        </button>
+      
+      <div class="chat-input-container">
+        <div class="typing-indicator" id="typingIndicator">
+          <span class="typing-text">جاري الكتابة</span>
+          <div class="typing-dots">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+        
+        <div class="message-actions">
+          <label for="fileInput" class="file-input-label" title="إرفاق ملف">
+            <i class="fas fa-paperclip"></i>
+          </label>
+          <input type="file" id="fileInput" accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display: none;">
+          
+          <button class="emoji-btn" id="emojiButton" title="إضافة رمز تعبيري">
+            <i class="far fa-smile"></i>
+          </button>
+        </div>
+        
+        <textarea id="messageInput" class="chat-input" placeholder="اكتب رسالتك هنا..." rows="1" autocomplete="off"></textarea>
+        
+        <button id="sendButton" class="send-btn" title="إرسال">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+    
+    <div id="emptyChat" class="empty-state">
+      <i class="fas fa-comments"></i>
+      <h5>اختر محادثة</h5>
+      <p class="text-muted">اختر شركة من القائمة الجانبية لبدء المحادثة</p>
+    </div>
+  </div>
+
+  <script>
+    let selectedCompanyId = null;
+    let lastMessageId = 0;
+    let socket;
+    
+    // تهيئة اتصال WebSocket
+    function initWebSocket() {
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+      const wsUrl = wsProtocol + window.location.host + '/ws/chat/admin';
+      
+      socket = new WebSocket(wsUrl);
+      
+      socket.onopen = function(e) {
+        console.log('تم الاتصال بخادم WebSocket');
+        updateConnectionStatus(true);
+      };
+      
+      socket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        
+        // إضافة صوت تنبيه للرسائل الجديدة
+        if (data.type === 'new_message' && (!document.hasFocus() || data.message.sender_type === 'company')) {
+          const audio = new Audio('/static/sounds/notification.mp3');
+          audio.play().catch(e => console.log('تعذر تشغيل صوت التنبيه:', e));
+        } else if (data.type === 'typing_status') {
+          handleTypingStatus(data);
+        }
+        
+        if (data.type === 'new_message') {
+          if (data.message.chat_room_id.includes(`_${selectedCompanyId}_`) || data.message.chat_room_id.includes(`${selectedCompanyId}_`)) {
+            // This is a rough check, better to pass selectedCompanyId to backend or check precise sender/receiver logic
+            addNewMessage(data.message);
+          }
+          updateCompanyLastMessage(data.message.sender_id, data.message);
+        } else if (data.type === 'new_chat') {
+          loadCompanies();
+        }
+      };
+      
+      socket.onclose = function(event) {
+        if (event.wasClean) {
+          console.log(`تم إغلاق الاتصال، الرمز=${event.code} السبب=${event.reason}`);
+        } else {
+          console.log('فقد الاتصال بالخادم');
+          updateConnectionStatus(false);
+          // محاولة إعادة الاتصال بعد 5 ثواني
+          setTimeout(initWebSocket, 5000);
+        }
+      };
+      
+      socket.onerror = function(error) {
+        console.log('حدث خطأ في WebSocket:', error);
+        updateConnectionStatus(false);
+      };
+    }
+    
+    function updateConnectionStatus(connected) {
+      const statusElement = document.getElementById('connectionStatus');
+      if (statusElement) { // Check if element exists before updating
+          if (connected) {
+            statusElement.innerHTML = '<i class="fas fa-circle"></i> متصل';
+            statusElement.className = 'badge bg-success';
+          } else {
+            statusElement.innerHTML = '<i class="fas fa-circle"></i> غير متصل';
+            statusElement.className = 'badge bg-danger';
+          }
+      }
+    }
+    
+    let isNearBottom = true;
+    let unreadCount = 0;
+
+    function checkNearBottom() {
+      const box = document.getElementById('chatMessages');
+      if (!box) return true;
+      
+      const threshold = 100; // pixels from bottom
+      const position = box.scrollHeight - box.scrollTop - box.clientHeight;
+      return position < threshold;
+    }
+
+    function scrollToBottom(force = false) {
+      const box = document.getElementById('chatMessages');
+      const indicator = document.getElementById('newMessagesIndicator');
+      
+      if (!box) return;
+      
+      if (force || isNearBottom) {
+        box.scrollTop = box.scrollHeight;
+        if (indicator) {
+          indicator.classList.remove('visible');
+          unreadCount = 0;
+        }
+      } else if (indicator && !indicator.classList.contains('visible')) {
+        unreadCount++;
+        indicator.querySelector('.count').textContent = unreadCount;
+        indicator.classList.add('visible');
+      }
+    }
+
+    function handleScroll() {
+      isNearBottom = checkNearBottom();
+      if (isNearBottom) {
+        const indicator = document.getElementById('newMessagesIndicator');
+        if (indicator) {
+          indicator.classList.remove('visible');
+          unreadCount = 0;
+        }
+      }
+    }
+    
+    function formatMessageTime(dateTimeStr) {
+      if (!dateTimeStr) return '';
+      const date = new Date(dateTimeStr); // Assuming dateTimeStr is UTC
+      // Convert to Cairo timezone for display (requires full date-time string)
+      const options = { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Africa/Cairo' };
+      return date.toLocaleString('ar-EG', options);
+    }
+    
+    function formatShortDate(dateTimeStr) {
+      if (!dateTimeStr) return '';
+      const date = new Date(dateTimeStr); // Assuming dateTimeStr is UTC
+      const options = { month: 'short', day: 'numeric', timeZone: 'Africa/Cairo' };
+      return date.toLocaleDateString('ar-EG', options);
+    }
+    
+    const emojis = {
+      smileys: ['😊', '😃', '😄', '😁', '😅', '😂', '🤣', '😇', '😉', '😍', '🥰', '😘', '😗', '😚', '😙', '🥲'],
+      gestures: ['👍', '👎', '👌', '✌️', '🤞', '🤝', '👊', '✊', '🤛', '🤜', '👏', '🙌', '👐', '🤲', '🤝', '🙏'],
+      symbols: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💯', '✨', '💫', '💥', '💢', '💦', '💨']
+    };
+
+    function initEmojiPicker() {
+      const smileysGrid = document.getElementById('smileysEmojis');
+      const gesturesGrid = document.getElementById('gesturesEmojis');
+      const symbolsGrid = document.getElementById('symbolsEmojis');
+
+      emojis.smileys.forEach(emoji => addEmojiToGrid(emoji, smileysGrid));
+      emojis.gestures.forEach(emoji => addEmojiToGrid(emoji, gesturesGrid));
+      emojis.symbols.forEach(emoji => addEmojiToGrid(emoji, symbolsGrid));
+    }
+
+    function addEmojiToGrid(emoji, grid) {
+      const emojiItem = document.createElement('div');
+      emojiItem.className = 'emoji-item';
+      emojiItem.textContent = emoji;
+      emojiItem.addEventListener('click', () => insertEmoji(emoji));
+      grid.appendChild(emojiItem);
+    }
+
+    function insertEmoji(emoji) {
+      const messageInput = document.getElementById('messageInput');
+      const cursorPos = messageInput.selectionStart;
+      const textBefore = messageInput.value.substring(0, cursorPos);
+      const textAfter = messageInput.value.substring(cursorPos);
+      
+      messageInput.value = textBefore + emoji + textAfter;
+      messageInput.focus();
+      messageInput.selectionStart = cursorPos + emoji.length;
+      messageInput.selectionEnd = cursorPos + emoji.length;
+      
+      // تحديث ارتفاع textarea
+      adjustTextareaHeight(messageInput);
+      
+      // إخفاء قائمة الرموز التعبيرية
+      document.getElementById('emojiPicker').classList.remove('active');
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function createMessageElement(msg) {
+      const isSent = msg.sender_type === 'admin'; // Admin is the 'sent' user in this context
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+      
+      const avatarImg = document.createElement('img');
+      avatarImg.className = 'message-avatar';
+      // Use dynamic avatar based on sender_type or a default
+      if (msg.sender_type === 'admin') {
+          avatarImg.src = "{{ url_for('static', filename='images/admin_avatar.png') }}";
+      } else if (msg.sender_type === 'company') {
+          avatarImg.src = "{{ url_for('static', filename='images/company_avatar.png') }}";
+      } else {
+          avatarImg.src = "{{ url_for('static', filename='images/default_avatar.png') }}"; // Fallback
+      }
+      avatarImg.alt = msg.sender_name || 'صورة';
+      
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'message-content';
+      
+      const bubbleDiv = document.createElement('div');
+      bubbleDiv.className = 'message-bubble';
+      
+      if (msg.is_deleted) {
+        bubbleDiv.innerHTML = `<em><i class="fas fa-trash-alt me-1"></i> ${msg.message_text}</em>`;
+      } else {
+        bubbleDiv.textContent = msg.message_text;
+      }
+      
+      const infoDiv = document.createElement('div');
+      infoDiv.className = 'message-info';
+      
+      // Display sender name for received messages (from company)
+      if (!isSent) {
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'message-sender';
+        nameSpan.textContent = msg.sender_name;
+        infoDiv.appendChild(nameSpan);
+      }
+      
+      const timeSpan = document.createElement('span');
+      timeSpan.className = 'message-time';
+      timeSpan.textContent = formatMessageTime(msg.created_at);
+      infoDiv.appendChild(timeSpan);
+      
+      if (isSent) {
+        const statusIcon = document.createElement('i');
+        statusIcon.className = msg.is_read_by_company ? 'fas fa-check-double text-info' : 'fas fa-check';
+        statusIcon.title = msg.is_read_by_company ? 'تمت قراءتها من الشركة' : 'لم تقرأ بعد من الشركة';
+        infoDiv.appendChild(statusIcon);
+      }
+      
+      if (msg.attachment_url) {
+        const attachmentDiv = document.createElement('div');
+        attachmentDiv.className = 'attachment-container';
+        
+        if (msg.attachment_url.match(/\.(jpeg|jpg|gif|png)$/i)) {
+          const previewDiv = document.createElement('div');
+          previewDiv.className = 'attachment-preview';
+          
+          const attachmentImg = document.createElement('img');
+          attachmentImg.src = msg.attachment_url;
+          attachmentImg.alt = 'مرفق المحادثة';
+          attachmentImg.loading = 'lazy';
+          
+          const downloadBtn = document.createElement('a');
+          downloadBtn.href = msg.attachment_url;
+          downloadBtn.className = 'download-btn';
+          downloadBtn.download = '';
+          downloadBtn.innerHTML = '<i class="fas fa-download"></i> تنزيل';
+          
+          previewDiv.appendChild(attachmentImg);
+          previewDiv.appendChild(downloadBtn);
+          attachmentDiv.appendChild(previewDiv);
+        } else {
+          const fileAttachment = document.createElement('div');
+          fileAttachment.className = 'file-attachment';
+          
+          const fileIcon = document.createElement('i');
+          fileIcon.className = getFileIcon(msg.attachment_url);
+          
+          const fileInfo = document.createElement('div');
+          fileInfo.className = 'file-info';
+          
+          const fileName = document.createElement('div');
+          fileName.className = 'file-name';
+          fileName.textContent = getFileName(msg.attachment_url);
+          
+          const fileSize = document.createElement('div');
+          fileSize.className = 'file-size';
+          // يمكن إضافة حجم الملف إذا كان متوفراً في البيانات
+          fileSize.textContent = msg.file_size ? formatFileSize(msg.file_size) : '';
+          
+          const downloadLink = document.createElement('a');
+          downloadLink.href = msg.attachment_url;
+          downloadLink.download = '';
+          downloadLink.className = 'download-btn';
+          downloadLink.innerHTML = '<i class="fas fa-download"></i>';
+          
+          fileInfo.appendChild(fileName);
+          fileInfo.appendChild(fileSize);
+          
+          fileAttachment.appendChild(fileIcon);
+          fileAttachment.appendChild(fileInfo);
+          fileAttachment.appendChild(downloadLink);
+          
+          attachmentDiv.appendChild(fileAttachment);
+        }
+        
+        bubbleDiv.appendChild(attachmentDiv);
+      }
+      
+      contentDiv.appendChild(bubbleDiv);
+      contentDiv.appendChild(infoDiv);
+      
+      if (isSent) {
+        messageDiv.appendChild(contentDiv);
+        messageDiv.appendChild(avatarImg);
+      } else {
+        messageDiv.appendChild(avatarImg);
+        messageDiv.appendChild(contentDiv);
+      }
+      
+      return messageDiv;
+    }
+    
+    function addNewMessage(msg) {
+      const box = document.getElementById('chatMessages');
+      const messageElement = createMessageElement(msg);
+      
+      // إضافة تأثير ظهور تدريجي للرسالة
+      messageElement.style.opacity = '0';
+      messageElement.style.transform = 'translateY(20px)';
+      
+      box.appendChild(messageElement);
+      
+      // تطبيق التأثير بعد إضافة العنصر
+      requestAnimationFrame(() => {
+        messageElement.style.opacity = '1';
+        messageElement.style.transform = 'translateY(0)';
+      });
+      
+      // تحديث مؤشر الرسائل الجديدة
+      if (!isNearBottom && msg.sender_type === 'company') {
+        unreadCount++;
+        const indicator = document.getElementById('newMessagesIndicator');
+        if (indicator) {
+          indicator.querySelector('.count').textContent = unreadCount;
+          indicator.classList.add('visible');
+        }
+      } else {
+        scrollToBottom();
+      }
+      
+      lastMessageId = msg.id;
+      
+      // تشغيل صوت التنبيه للرسائل الجديدة من الشركات
+      if (msg.sender_type === 'company' && (!document.hasFocus() || !isNearBottom)) {
+        playNotificationSound();
+      }
+      
+      // وضع علامة مقروءة إذا كانت الرسالة جديدة من الشركة وكنا قريبين من القاع
+      if (msg.sender_type === 'company' && !msg.is_read_by_admin && selectedCompanyId === msg.sender_id && isNearBottom) {
+        markMessagesAsRead(selectedCompanyId);
+      }
+    }
+    
+    async function updateUnreadBadge(card, count) {
+      const badge = card.querySelector('.unread-badge');
+      if (badge) {
+        if (count > 0) {
+          badge.textContent = count;
+          badge.classList.add('visible');
+          card.classList.add('unread');
+        } else {
+          badge.classList.remove('visible');
+          card.classList.remove('unread');
+        }
+      }
+    }
+
+    function loadCompanies() {
+      try {
+        const res = await fetch('/api/chat/companies');
+        const companies = await res.json();
+        const container = document.getElementById('companiesList');
+        const emptyState = document.getElementById('emptyCompanies');
+        
+        container.innerHTML = '';
+        
+        if (companies.length === 0) {
+          emptyState.style.display = 'flex';
+          return;
+        }
+        
+        emptyState.style.display = 'none';
+        
+        companies.forEach(company => {
+          const companyCard = document.createElement('div');
+          companyCard.className = `company-card ${company.company_id === selectedCompanyId ? 'active' : ''}`;
+          companyCard.setAttribute('data-company-id', company.company_id); // Add data-attribute for selection
+          companyCard.innerHTML = `
+            <img src="${company.logo_url || '{{ url_for('static', filename='images/company_avatar.png') }}'}" class="company-avatar" alt="${company.company_name}">
+            <div class="company-info">
+              <div class="company-name">${company.company_name}</div>
+              <div class="company-last-message">${company.last_message ? company.last_message.message_text.substring(0, 30) + (company.last_message.message_text.length > 30 ? '...' : '') : 'لا توجد رسائل'}</div>
+            </div>
+            <div class="company-meta">
+              <div class="company-time">${company.last_message_time ? formatShortDate(company.last_message_time) : ''}</div>
+              ${company.unread_count > 0 ? `<div class="unread-badge">${company.unread_count}</div>` : '<div style="width:20px;"></div>'}
+            </div>
+          `;
+          
+          companyCard.addEventListener('click', () => {
+            openChat(company.company_id, company.company_name, company.logo_url);
+          });
+          
+          container.appendChild(companyCard);
+        });
+      } catch (error) {
+        console.error('حدث خطأ أثناء جلب قائمة الشركات:', error);
+      }
+    }
+    
+    async function openChat(companyId, companyName, companyLogo) {
+      if (selectedCompanyId !== companyId) { // Only load if a different company is selected
+        selectedCompanyId = companyId;
+      
+        // تحديث واجهة المستخدم
+        document.getElementById('emptyChat').style.display = 'none';
+        document.getElementById('chatContainer').style.display = 'flex';
+        document.getElementById('companyNameHeader').textContent = companyName; // Update company name in chat header
+        
+        // تحديث حالة بطاقة الشركة المحددة
+        document.querySelectorAll('.company-card').forEach(card => {
+          card.classList.remove('active');
+        });
+        
+        document.querySelector(`.company-card[data-company-id="${companyId}"]`)?.classList.add('active');
+        
+        // جلب الرسائل
+        await loadMessages();
+        
+        // وضع علامة مقروءة على الرسائل
+        await markMessagesAsRead(companyId);
+      }
+    }
+    
+    async function loadMessages() {
+      if (!selectedCompanyId) return;
+      
+      try {
+        const res = await fetch(`/api/chat/messages?company_id=${selectedCompanyId}`);
+        const data = await res.json();
+        const box = document.getElementById('chatMessages');
+        box.innerHTML = '';
+        
+        if (data.messages && data.messages.length > 0) {
+          data.messages.forEach(msg => {
+            addNewMessage(msg);
+          });
+          
+          lastMessageId = data.messages[data.messages.length - 1].id;
+        }
+        
+        scrollToBottom();
+      } catch (error) {
+        console.error('حدث خطأ أثناء جلب الرسائل:', error);
+      }
+    }
+    
+    async function markMessagesAsRead(companyIdToMark) {
+      if (!companyIdToMark) return; // Ensure a companyId is provided
+      
+      try {
+        const res = await fetch('/api/chat/mark-read', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ company_id: companyIdToMark })
+        });
+        
+        if (res.ok) {
+          // تحديث واجهة المستخدم لإزالة علامات "غير مقروء"
+          loadCompanies(); // Reload companies list to update unread counts
+        }
+      } catch (error) {
+        console.error('حدث خطأ أثناء وضع علامة مقروءة:', error);
+      }
+    }
+    
+    function playNotificationSound() {
+      const audio = new Audio('/static/sounds/notification.mp3');
+      audio.volume = 0.5; // خفض مستوى الصوت
+      audio.play().catch(e => console.log('تعذر تشغيل صوت التنبيه:', e));
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const fileInput = document.getElementById('fileInput');
+      const text = input.value.trim();
+      const file = fileInput.files[0];
+      
+      // إظهار مؤشر الإرسال
+      const sendButton = document.getElementById('sendButton');
+      const originalIcon = sendButton.innerHTML;
+      sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      sendButton.disabled = true;
+      
+      if (!text && !file) return;
+      if (!selectedCompanyId) {
+          alert('يرجى اختيار شركة لبدء المحادثة.');
+          return;
+      }
+      
+      try {
+        let attachmentUrl = null;
+        
+        if (file) {
+          const formData = new FormData();
+          formData.append('file', file);
+          
+          const uploadRes = await fetch('/api/chat/upload', {
+            method: 'POST',
+            body: formData
+          });
+          
+          if (!uploadRes.ok) {
+            throw new Error('فشل في رفع الملف');
+          }
+          
+          const uploadData = await uploadRes.json();
+          attachmentUrl = uploadData.url;
+          fileInput.value = '';
+        }
+        
+        const messageData = {
+          message: text,
+          receiver_id: selectedCompanyId, // Receiver is the company
+          attachment_url: attachmentUrl
+        };
+        
+        // إرسال الرسالة عبر WebSocket
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify({
+            type: 'send_message',
+            data: messageData
+          }));
+        } else {
+          // Fallback إلى HTTP إذا كان WebSocket غير متاح
+          const sendRes = await fetch('/api/chat/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(messageData)
+          });
+          
+          if (!sendRes.ok) {
+            throw new Error('فشل في إرسال الرسالة');
+          }
+        }
+        
+        input.value = '';
+        input.focus();
+        adjustTextareaHeight(input);
+        
+        // إعادة زر الإرسال إلى حالته الطبيعية
+        sendButton.innerHTML = originalIcon;
+        sendButton.disabled = false;
+        
+      } catch (error) {
+        console.error('حدث خطأ أثناء إرسال الرسالة:', error);
+        alert('حدث خطأ أثناء إرسال الرسالة: ' + error.message);
+        
+        // إعادة زر الإرسال إلى حالته الطبيعية في حالة الخطأ
+        sendButton.innerHTML = originalIcon;
+        sendButton.disabled = false;
+      }
+    }
+    
+    function updateCompanyLastMessage(companyId, message) {
+      const companyCards = document.querySelectorAll('.company-card');
+      companyCards.forEach(card => {
+        if (parseInt(card.dataset.companyId) === companyId) {
+          const lastMessageEl = card.querySelector('.company-last-message');
+          const timeEl = card.querySelector('.company-time');
+          const unreadBadge = card.querySelector('.unread-badge');
+
+          if (lastMessageEl) {
+            lastMessageEl.textContent = message.message_text.substring(0, 30) +
+              (message.message_text.length > 30 ? '...' : '');
+          }
+          
+          if (timeEl) {
+            timeEl.textContent = formatShortDate(message.created_at);
+          }
+          
+          // Update unread count if the message is from company and it's not the currently selected chat
+          if (message.sender_type === 'company' && selectedCompanyId !== companyId && unreadBadge) {
+              let currentCount = parseInt(unreadBadge.textContent) || 0;
+              unreadBadge.textContent = currentCount + 1;
+              unreadBadge.style.display = 'flex';
+          } else if (message.sender_type === 'company' && selectedCompanyId === companyId) {
+              // If it's the current chat and from company, it should be marked as read immediately by addNewMessage
+          }
+
+          // نقل البطاقة إلى الأعلى
+          card.parentNode.insertBefore(card, card.parentNode.firstChild);
+        }
+      });
+    }
+    
+    let typingTimer;
+    let isTyping = false;
+
+    function adjustTextareaHeight(textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    }
+
+    function showTypingIndicator() {
+      if (!isTyping) {
+        isTyping = true;
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify({
+            type: 'typing_status',
+            data: {
+              is_typing: true,
+              company_id: selectedCompanyId
+            }
+          }));
+        }
+      }
+    }
+
+    function hideTypingIndicator() {
+      if (isTyping) {
+        isTyping = false;
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify({
+            type: 'typing_status',
+            data: {
+              is_typing: false,
+              company_id: selectedCompanyId
+            }
+          }));
+        }
+      }
+    }
+
+    function getFileIcon(url) {
+      const ext = url.split('.').pop().toLowerCase();
+      const iconMap = {
+        pdf: 'fas fa-file-pdf',
+        doc: 'fas fa-file-word',
+        docx: 'fas fa-file-word',
+        xls: 'fas fa-file-excel',
+        xlsx: 'fas fa-file-excel',
+        ppt: 'fas fa-file-powerpoint',
+        pptx: 'fas fa-file-powerpoint',
+        txt: 'fas fa-file-alt',
+        zip: 'fas fa-file-archive',
+        rar: 'fas fa-file-archive',
+        '7z': 'fas fa-file-archive',
+      };
+      return iconMap[ext] || 'fas fa-file';
+    }
+
+    function getFileName(url) {
+      return url.split('/').pop();
+    }
+
+    // تهيئة الصفحة عند التحميل
+    document.addEventListener('DOMContentLoaded', () => {
+      initWebSocket();
+      loadCompanies();
+      
+      // إعداد مستمعات الأحداث
+      document.getElementById('sendButton').addEventListener('click', sendMessage);
+      
+      const messageInput = document.getElementById('messageInput');
+      
+      messageInput.addEventListener('input', (e) => {
+        adjustTextareaHeight(e.target);
+        
+        clearTimeout(typingTimer);
+        if (socket && socket.readyState === WebSocket.OPEN && selectedCompanyId) {
+          socket.send(JSON.stringify({
+            type: 'typing_status',
+            data: {
+              is_typing: true,
+              company_id: selectedCompanyId
+            }
+          }));
+          
+          typingTimer = setTimeout(() => {
+            socket.send(JSON.stringify({
+              type: 'typing_status', 
+              data: {
+                is_typing: false,
+                company_id: selectedCompanyId
+              }
+            }));
+          }, 2000);
+        }
+      });
+
+      messageInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+
+      // إضافة مؤشر الكتابة للشركة
+      socket.addEventListener('message', (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'typing_status' && data.company_id === selectedCompanyId) {
+          const typingIndicator = document.getElementById('typingIndicator');
+          if (data.is_typing) {
+            typingIndicator.classList.add('active');
+          } else {
+            typingIndicator.classList.remove('active');
+          }
+        }
+      });
+      
+      // تهيئة قائمة الرموز التعبيرية
+      initEmojiPicker();
+
+      // إضافة مستمع لزر الرموز التعبيرية
+      document.getElementById('emojiButton').addEventListener('click', () => {
+        const picker = document.getElementById('emojiPicker');
+        picker.classList.toggle('active');
+      });
+
+      // إغلاق قائمة الرموز التعبيرية عند النقر خارجها
+      document.addEventListener('click', (e) => {
+        const picker = document.getElementById('emojiPicker');
+        const emojiButton = document.getElementById('emojiButton');
+        if (!picker.contains(e.target) && !emojiButton.contains(e.target)) {
+          picker.classList.remove('active');
+        }
+      });
+
+      document.getElementById('fileInput').addEventListener('change', () => {
+        const file = document.getElementById('fileInput').files[0];
+        if (file) {
+          // التحقق من حجم الملف (10MB كحد أقصى)
+          if (file.size > 10 * 1024 * 1024) {
+            alert('حجم الملف كبير جداً. الحد الأقصى المسموح به هو 10 ميجابايت.');
+            return;
+          }
+          sendMessage(); // إرسال الرسالة مع الملف
+        }
+      });
+      
+      // إضافة مستمع لحدث التمرير
+      document.getElementById('chatMessages').addEventListener('scroll', handleScroll);
+
+      // تحديث الرسائل الجديدة كل 10 ثواني (كحماية إضافية إذا تعطل WebSocket)
+      setInterval(() => {
+        if (socket && socket.readyState !== WebSocket.OPEN) {
+          if (selectedCompanyId) {
+            loadMessages();
+          }
+          loadCompanies();
+        }
+      }, 10000);
+
+      // إضافة مستمع لتركيز النافذة
+      window.addEventListener('focus', () => {
+        if (selectedCompanyId) {
+          markMessagesAsRead(selectedCompanyId);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

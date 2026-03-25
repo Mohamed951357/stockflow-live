@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مجتمع بونص فارما - عرض توضيحي</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --border-radius: 16px;
+            --mobile-padding: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            position: relative;
+            background-attachment: fixed;
+        }
+
+        /* Mobile-First Container */
+        .mobile-container {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            min-height: 100vh;
+            max-width: 100%;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 16px var(--mobile-padding);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .header-title {
+            flex: 1;
+            text-align: center;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .header-subtitle {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Mobile Navigation Tabs */
+        .mobile-tabs {
+            display: flex;
+            background: white;
+            border-radius: var(--border-radius);
+            margin: 12px var(--mobile-padding);
+            padding: 4px;
+            box-shadow: var(--card-shadow);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 12px 8px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #6c757d;
+            transition: var(--transition);
+            white-space: nowrap;
+            min-width: 80px;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Mobile Post Form */
+        .post-form-mobile {
+            background: white;
+            border-radius: var(--border-radius);
+            margin: 12px var(--mobile-padding);
+            padding: 16px;
+            box-shadow: var(--card-shadow);
+            position: sticky;
+            top: 80px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .post-input-wrapper {
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .post-textarea {
+            width: 100%;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 0.95rem;
+            resize: none;
+            transition: var(--transition);
+            font-family: inherit;
+            min-height: 80px;
+        }
+
+        .post-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .char-counter {
+            position: absolute;
+            bottom: 8px;
+            left: 12px;
+            font-size: 0.7rem;
+            color: #6c757d;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .anonymous-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .anonymous-toggle input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+
+        .submit-btn {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Mobile Posts Container */
+        .posts-container {
+            padding: 0 var(--mobile-padding) 80px;
+            min-height: 200px;
+        }
+
+        .post-card-mobile {
+            background: white;
+            border-radius: var(--border-radius);
+            margin-bottom: 12px;
+            padding: 16px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .post-card-mobile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .post-info {
+            flex: 1;
+        }
+
+        .post-company-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #2c3e50;
+            margin-bottom: 2px;
+        }
+
+        .post-time {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        .post-content {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #f8f9fa;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: #6c757d;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 8px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .action-btn:hover {
+            background: #f8f9fa;
+            color: #495057;
+        }
+
+        .action-btn.liked {
+            color: #e74c3c;
+        }
+
+        .action-btn.liked:hover {
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        /* Loading and Empty States */
+        .loading-state, .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #6c757d;
+            font-size: 0.7rem;
+            transition: var(--transition);
+            border-radius: 8px;
+        }
+
+        .bottom-nav-item.active {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .bottom-nav-item i {
+            font-size: 1.2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 375px) {
+            .mobile-tabs {
+                margin: 8px 8px;
+            }
+            
+            .post-form-mobile, .posts-container {
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .mobile-container {
+                max-width: 500px;
+                margin: 20px auto;
+                border-radius: 24px;
+                min-height: calc(100vh - 40px);
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        /* Safe area for modern devices */
+        @supports (padding: max(0px)) {
+            .mobile-header {
+                padding-top: max(16px, env(safe-area-inset-top));
+            }
+            
+            .mobile-bottom-nav {
+                padding-bottom: max(8px, env(safe-area-inset-bottom));
+            }
+            
+            .posts-container {
+                padding-bottom: max(80px, env(safe-area-inset-bottom) + 80px);
+            }
+        }
+
+        /* Touch-friendly improvements */
+        .tab-btn, .action-btn, .submit-btn, .header-btn, .bottom-nav-item {
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+
+        /* Demo badge */
+        .demo-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 193, 7, 0.9);
+            color: #212529;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            z-index: 9999;
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-badge">
+        <i class="fas fa-eye"></i> عرض توضيحي
+    </div>
+
+    <div class="mobile-container">
+        <!-- Mobile Header -->
+        <div class="mobile-header">
+            <div class="header-content">
+                <button class="header-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                <div class="header-title">
+                    <h1>مجتمع بونص فارما</h1>
+                    <div class="header-subtitle">تواصل مع زملائك الصيادلة</div>
+                </div>
+                <div class="header-actions">
+                    <button class="header-btn" onclick="refreshPage()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button class="header-btn" onclick="showNotifications()">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="mobile-tabs">
+            <button class="tab-btn active" onclick="switchTab('all')">
+                <i class="fas fa-globe"></i> الكل
+            </button>
+            <button class="tab-btn" onclick="switchTab('my')">
+                <i class="fas fa-user"></i> منشوراتي
+            </button>
+            <button class="tab-btn" onclick="switchTab('liked')">
+                <i class="fas fa-heart"></i> المفضلة
+            </button>
+        </div>
+
+        <!-- Post Creation Form -->
+        <div class="post-form-mobile">
+            <div class="post-input-wrapper">
+                <textarea class="post-textarea" placeholder="ماذا يخطر ببالك؟ شارك تجربتك مع زملائك..." maxlength="500"></textarea>
+                <div class="char-counter">0/500</div>
+            </div>
+            <div class="form-actions">
+                <div class="anonymous-toggle">
+                    <input type="checkbox" id="anonymousDemo">
+                    <label for="anonymousDemo" style="font-size: 0.8rem; color: #6c757d;">نشر بشكل مجهول</label>
+                </div>
+                <button class="submit-btn" onclick="createDemoPost()">
+                    <i class="fas fa-paper-plane"></i> نشر
+                </button>
+            </div>
+        </div>
+
+        <!-- Posts Container -->
+        <div class="posts-container" id="postsContainer">
+            <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>جاري تحميل المنشورات...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-bottom-nav">
+        <a href="#" class="bottom-nav-item active">
+            <i class="fas fa-home"></i>
+            <span>الرئيسية</span>
+        </a>
+        <a href="#" class="bottom-nav-item">
+            <i class="fas fa-search"></i>
+            <span>بحث</span>
+        </a>
+        <a href="#" class="bottom-nav-item">
+            <i class="fas fa-plus-circle"></i>
+            <span>إضافة</span>
+        </a>
+        <a href="#" class="bottom-nav-item">
+            <i class="fas fa-bell"></i>
+            <span>الإشعارات</span>
+        </a>
+        <a href="#" class="bottom-nav-item">
+            <i class="fas fa-user"></i>
+            <span>حسابي</span>
+        </a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Demo data
+        const demoPosts = [
+            {
+                id: 1,
+                company_name: 'صيدلية النهدي',
+                content: 'اليوم وصلت شحنة جديدة من فيتامين دي 1000 وحدة. السعر ممتاز والكمية محدودة. أنصح الجميع بالتعجيل بالحجز.',
+                created_at: 'منذ 2 ساعة',
+                likes_count: 15,
+                comments_count: 8,
+                views_count: 45,
+                is_liked: false
+            },
+            {
+                id: 2,
+                company_name: 'صيدلية الوطنية',
+                content: 'لدينا عرض خاص هذا الأسبوع على جميع مستحضرات الأطفال. خصم يصل إلى 25٪ على الحفاضات والمناديل المبللة.',
+                created_at: 'منذ 5 ساعات',
+                likes_count: 23,
+                comments_count: 12,
+                views_count: 67,
+                is_liked: true
+            },
+            {
+                id: 3,
+                company_name: 'صيدلية السلام',
+                content: 'نبحث عن مورد موثوق للأدوية المستوردة. إذا كان لديكم توصية، يرجى التواصل. شكراً لتعاونكم الدائم.',
+                created_at: 'منذ يوم',
+                likes_count: 31,
+                comments_count: 19,
+                views_count: 89,
+                is_liked: false
+            }
+        ];
+
+        // Initialize the demo
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                loadDemoPosts();
+                setupCharacterCounter();
+            }, 1000);
+        });
+
+        function loadDemoPosts() {
+            const container = document.getElementById('postsContainer');
+            container.innerHTML = '';
+
+            demoPosts.forEach(post => {
+                const postElement = createDemoPostElement(post);
+                container.appendChild(postElement);
+            });
+        }
+
+        function createDemoPostElement(post) {
+            const postDiv = document.createElement('div');
+            postDiv.className = 'post-card-mobile';
+            postDiv.innerHTML = `
+                <div class="post-header">
+                    <div class="post-avatar">
+                        ${post.company_name.charAt(0)}
+                    </div>
+                    <div class="post-info">
+                        <div class="post-company-name">${post.company_name}</div>
+                        <div class="post-time">${post.created_at}</div>
+                    </div>
+                </div>
+                <div class="post-content">${post.content}</div>
+                <div class="post-actions">
+                    <button class="action-btn ${post.is_liked ? 'liked' : ''}" onclick="toggleLikeDemo(${post.id})">
+                        <i class="fas fa-heart"></i>
+                        <span>${post.likes_count}</span>
+                    </button>
+                    <button class="action-btn" onclick="showCommentsDemo(${post.id})">
+                        <i class="fas fa-comment"></i>
+                        <span>${post.comments_count}</span>
+                    </button>
+                    <button class="action-btn" onclick="showViewsDemo(${post.id})">
+                        <i class="fas fa-eye"></i>
+                        <span>${post.views_count}</span>
+                    </button>
+                    <button class="action-btn" onclick="sharePostDemo(${post.id})">
+                        <i class="fas fa-share"></i>
+                    </button>
+                </div>
+            `;
+            return postDiv;
+        }
+
+        function setupCharacterCounter() {
+            const textarea = document.querySelector('.post-textarea');
+            const counter = document.querySelector('.char-counter');
+            
+            textarea.addEventListener('input', function() {
+                const length = this.value.length;
+                counter.textContent = `${length}/500`;
+                
+                if (length > 450) {
+                    counter.style.color = '#e74c3c';
+                } else if (length > 400) {
+                    counter.style.color = '#f39c12';
+                } else {
+                    counter.style.color = '#6c757d';
+                }
+            });
+        }
+
+        function switchTab(tab) {
+            // Update active tab
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Reload posts (demo)
+            loadDemoPosts();
+        }
+
+        function createDemoPost() {
+            const textarea = document.querySelector('.post-textarea');
+            const content = textarea.value.trim();
+            
+            if (!content) {
+                alert('يرجى كتابة محتوى للمنشور');
+                return;
+            }
+            
+            // Add new post to demo data
+            const newPost = {
+                id: demoPosts.length + 1,
+                company_name: 'شركتك',
+                content: content,
+                created_at: 'الآن',
+                likes_count: 0,
+                comments_count: 0,
+                views_count: 1,
+                is_liked: false
+            };
+            
+            demoPosts.unshift(newPost);
+            loadDemoPosts();
+            
+            // Clear form
+            textarea.value = '';
+            document.querySelector('.char-counter').textContent = '0/500';
+            
+            // Show success message
+            showToast('تم نشر المنشور بنجاح!');
+        }
+
+        function toggleLikeDemo(postId) {
+            const post = demoPosts.find(p => p.id === postId);
+            if (post) {
+                post.is_liked = !post.is_liked;
+                post.likes_count += post.is_liked ? 1 : -1;
+                loadDemoPosts();
+            }
+        }
+
+        function showCommentsDemo(postId) {
+            showToast('عرض التعليقات - قريباً');
+        }
+
+        function showViewsDemo(postId) {
+            showToast('عرض المشاهدات - قريباً');
+        }
+
+        function sharePostDemo(postId) {
+            showToast('مشاركة المنشور - قريباً');
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function refreshPage() {
+            location.reload();
+        }
+
+        function showNotifications() {
+            showToast('الإشعارات - قريباً');
+        }
+
+        function showToast(message) {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 25px;
+                font-size: 0.9rem;
+                z-index: 9999;
+                backdrop-filter: blur(10px);
+                animation: slideDown 0.3s ease;
+            `;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideUp 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown {
+                from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+                to { transform: translateX(-50%) translateY(0); opacity: 1; }
+            }
+            @keyframes slideUp {
+                from { transform: translateX(-50%) translateY(0); opacity: 1; }
+                to { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

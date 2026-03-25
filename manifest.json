@@ -1,0 +1,29 @@
+{
+  "background_color": "#7772cd",
+  "description": "تسجيل الدخول إلى نظام بونص فارما - إدارة مواعيدك وأرصدة الأصناف بسهولة.",
+  "dir": "rtl",
+  "display": "fullscreen",
+  "name": "Stockflow",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "Stockflow",
+  "start_url": "https://bonuspharma1.pythonanywhere.com/",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "https://bonuspharma1.pythonanywhere.com/static/logos/favicon.png",
+      "type": "image/png",
+      "sizes": "2938x2463",
+      "isSquare": false,
+      "isPng": true,
+      "isWebp": false,
+      "isJpg": false,
+      "width": 2938,
+      "is512x512": false,
+      "is256x256": false,
+      "is192x192": false
+    }
+  ],
+  "id": "https://bonuspharma1.pythonanywhere.com/",
+  "lang": "ar"
+}

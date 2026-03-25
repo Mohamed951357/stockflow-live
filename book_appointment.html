@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حجز موعد - نظام حجز المواعيد</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* NEW: Root CSS variables for consistent theming - Copied from company_dashboard */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            --text-color-dark: #2d3748;
+            --text-color-light: #f7fafc;
+            --accent-color: #00f2fe;
+            --shadow-light: rgba(0, 0, 0, 0.08);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+            --highlight-color: #4facfe;
+            --success-color: #0bab7c;
+            --error-color: #dc3545;
+            --border-radius-lg: 15px;
+            --transition-speed: 0.3s;
+
+            /* Default Light Mode Variables for consistency */
+            --body-bg: #f8f9fa;
+            --text-color: #212529;
+            --card-bg: white;
+            --card-shadow-rgb: 0, 0, 0, 0.08;
+            --card-border: #e0e6f0;
+            --muted-text: #6c757d;
+            --input-bg: white;
+            --input-border: #e9ecef;
+            --alert-bg-info: #e2f0fe;
+            --alert-border-info: #cce5ff;
+            --alert-color-info: #004085;
+            --alert-bg-warning: #fff3cd;
+            --alert-border-warning: #ffc107;
+            --alert-color-warning: #664d03;
+            --alert-bg-danger: #f8d7da;
+            --alert-border-danger: #f5c2c7;
+            --alert-color-danger: #842029;
+            --alert-bg-success: #d1e7dd;
+            --alert-border-success: #badbcc;
+            --alert-color-success: #0f5132;
+            --navbar-icon-color: #000000; /* Black for icons */
+        }
+
+        body {
+            background-color: var(--body-bg); /* Unified background */
+            font-family: 'Cairo', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 56px; /* Added padding for fixed navbar */
+            color: var(--text-color);
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+        }
+
+        .navbar {
+            background: var(--primary-gradient);
+            box-shadow: 0 4px 15px rgba(var(--card-shadow-rgb));
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1030;
+            transition: all 0.3s ease;
+        }
+        .navbar-brand {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+        .navbar-logo {
+            height: 35px;
+            width: auto;
+            margin-left: 10px;
+        }
+        /* Hide full text for smaller screens */
+        .navbar-brand .full-text {
+            display: inline;
+        }
+        @media (max-width: 767.98px) {
+            .navbar-brand .full-text {
+                display: none;
+            }
+            .navbar-brand .short-text {
+                display: none;
+            }
+        }
+        @media (min-width: 768px) {
+            .navbar-brand .short-text {
+                display: none;
+            }
+        }
+
+        /* Notification badge specific styles for clarity */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            padding: 5px 8px;
+            border-radius: 50%;
+            background-color: var(--error-color);
+            color: white;
+            font-size: 0.75em;
+            font-weight: bold;
+            z-index: 10;
+            min-width: 20px;
+            text-align: center;
+            line-height: 1;
+        }
+
+        /* Navbar icons container and styling */
+        .navbar-nav-notification-wrapper {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            margin-right: 15px;
+            flex-grow: 1;
+            justify-content: space-around;
+            max-width: 200px;
+            flex-shrink: 0;
+            gap: 10px;
+        }
+        .navbar-nav-notification-wrapper .nav-link {
+            padding: 0.5rem;
+            position: relative;
+            color: var(--navbar-icon-color);
+            transition: color 0.3s ease, transform 0.3s ease;
+            background: none;
+            border: none;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .navbar-nav-notification-wrapper .nav-link:hover {
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+        .navbar-nav-notification-wrapper .nav-link .fa-lg {
+            font-size: 1.25em;
+        }
+
+        /* Mobile specific adjustments for navbar icons */
+        @media (max-width: 991.98px) {
+            .navbar-nav-notification-wrapper {
+                order: -1;
+                margin-left: auto;
+                margin-right: 10px;
+                padding: 0;
+                max-width: 150px;
+                justify-content: space-between;
+            }
+            .navbar-nav-notification-wrapper .nav-link {
+                padding: 0.5rem;
+            }
+            .navbar-nav-notification-wrapper .notification-badge {
+                top: 0px;
+                right: 0px;
+                font-size: 0.65em;
+                padding: 3px 6px;
+            }
+            /* Hide company info in collapsed menu */
+            .navbar-nav-user-info {
+                display: none;
+            }
+            /* Collapsed menu styles */
+            .navbar-collapse .navbar-nav {
+                width: 100%;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+            .navbar-collapse .nav-item {
+                text-align: center;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .navbar-collapse .nav-item:last-child {
+                border-bottom: none;
+            }
+            .navbar-collapse .nav-link {
+                padding: 12px 15px;
+                color: rgba(255, 255, 255, 0.9);
+                font-size: 1.1rem;
+                transition: background-color 0.3s ease;
+            }
+            .navbar-collapse .nav-link:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                border-radius: 5px;
+            }
+            /* Style for company name in mobile collapsed menu */
+            .navbar-collapse .navbar-text {
+                display: block;
+                padding: 12px 15px;
+                color: rgba(255, 255, 255, 0.7);
+                font-weight: 600;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+        }
+        /* Desktop specific adjustments */
+        @media (min-width: 992px) {
+            .navbar-nav-notification-wrapper {
+                margin-left: 15px;
+                margin-right: 0;
+                gap: 15px;
+            }
+            .navbar-nav-notification-wrapper .nav-link {
+                padding: 0.5rem 0.75rem;
+            }
+            .navbar-nav-notification-wrapper .notification-badge {
+                top: -5px;
+                right: -5px;
+                font-size: 0.75em;
+                padding: 5px 8px;
+            }
+            .navbar-nav-user-info {
+                display: flex;
+            }
+        }
+        
+        .main-content-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        .card {
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 5px 15px rgba(var(--card-shadow-rgb));
+            border: 1px solid var(--card-border);
+            width: 100%;
+            max-width: 650px;
+            margin: 20px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+        
+        .card-header {
+            background: var(--primary-gradient);
+            color: white;
+            border-top-left-radius: var(--border-radius-lg);
+            border-top-right-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            font-size: 1.25rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid var(--input-border);
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            border-radius: 8px;
+            padding: 12px 25px;
+            font-weight: 600;
+            background-color: var(--muted-text); /* Use muted text color for consistency */
+            border-color: var(--muted-text);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #5a6268;
+        }
+
+        .alert {
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            background-color: var(--alert-bg-info);
+            border-color: var(--alert-border-info);
+            color: var(--alert-color-info);
+            transition: all 0.3s ease;
+        }
+        .alert.alert-danger {
+            background-color: var(--alert-bg-danger);
+            border-color: var(--alert-border-danger);
+            color: var(--alert-color-danger);
+        }
+        .alert.alert-success {
+            background-color: var(--alert-bg-success);
+            border-color: var(--alert-border-success);
+            color: var(--alert-color-success);
+        }
+        .alert.alert-info {
+            background-color: var(--alert-bg-info);
+            border-color: var(--alert-border-info);
+            color: var(--alert-color-info);
+        }
+        .btn-close {
+            filter: none;
+            transition: filter 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                margin: 15px;
+            }
+            .card-body {
+                padding: 1.5rem;
+            }
+            .d-md-flex {
+                flex-direction: column;
+            }
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .d-grid.gap-2 > .btn {
+                margin-bottom: 10px;
+            }
+            .d-grid.gap-2 > .btn:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        /* Styles for disabled page content */
+        .disabled-page-overlay {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 56px); /* Adjusted for fixed navbar */
+            text-align: center;
+            padding: 20px;
+            background-color: var(--body-bg); /* Use page background */
+            color: var(--text-color);
+        }
+        .disabled-page-overlay .alert {
+            max-width: 600px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .disabled-page-overlay .btn {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('company_dashboard') }}">
+                {% if current_logo_path %}
+                    <img src="{{ current_logo_path }}" alt="Logo" class="navbar-logo">
+                {% else %}
+                    <img src="{{ url_for('static', filename='images/default_logo.png') }}" alt="Default Logo" class="navbar-logo">
+                {% endif %}
+                <span class="full-text">{{ system_subtitle }}</span>
+                <span class="short-text d-none"></span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavCompany" aria-controls="navbarNavCompany" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            {# Navbar icons container - Copied from company_dashboard #}
+            <div class="navbar-nav-notification-wrapper">
+                <a class="nav-link" href="{{ url_for('company_profile') }}" title="ملفي الشخصي">
+                    <i class="fas fa-user-circle fa-lg"></i>
+                </a>
+                <a class="nav-link" href="{{ url_for('community_chat') }}" title="المساعد الذكي">
+                    <i class="fas fa-comments fa-lg"></i>
+                    <span class="notification-badge" id="community-count" style="display: none;">0</span>
+                </a>
+                <a class="nav-link" href="{{ url_for('instructions') }}" title="تعليمات وإرشادات">
+                    <i class="fas fa-question-circle fa-lg"></i>
+                </a>
+                <a class="nav-link position-relative" href="{{ url_for('notifications') }}" title="الإشعارات">
+                    <i class="fas fa-bell fa-lg"></i>
+                    <span class="notification-badge" id="notification-count" style="display: none;">0</span>
+                </a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="navbarNavCompany">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    {# User Info on Mobile Menu - Hidden on desktop #}
+                    <li class="nav-item d-lg-none">
+                        <span class="navbar-text">
+                            <i class="fas fa-building me-2"></i>
+                            {{ current_user.company_name }}
+                        </span>
+                    </li>
+                    {# User Info on Desktop Navbar - Hidden on mobile #}
+                    <li class="nav-item d-none d-lg-flex align-items-center me-3">
+                        <span class="navbar-text">
+                            <i class="fas fa-building me-2"></i>
+                            {{ current_user.company_name }}
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('company_dashboard') }}">
+                            <i class="fas fa-home me-2"></i>
+                            الرئيسية
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('my_products') }}">
+                            <i class="fas fa-boxes me-2"></i>
+                            أصنافي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('search_products') }}">
+                            <i class="fas fa-search me-2"></i>
+                            البحث في الأصناف
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('company_stock_reports') }}">
+                            <i class="fas fa-chart-line me-2"></i>
+                            تقارير الأرصدة
+                        </a>
+                    </li>
+                    <li class="nav-item active" aria-current="page">
+                        <a class="nav-link" href="{{ url_for('appointments') }}">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            مواعيدي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            تسجيل الخروج
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {# Conditional content based on appointments_enabled variable #}
+    {% if appointments_enabled %}
+    <div class="main-content-wrapper">
+        <div class="container">
+            <div class="row justify-content-center w-100">
+                <div class="col-md-10 col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>
+                                <i class="fas fa-calendar-plus me-2"></i>
+                                حجز موعد جديد
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                    {% for category, message in messages %}
+                                        <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
+                                            <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                                            {{ message }}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
+
+                            <form method="POST">
+                                <div class="mb-3">
+                                    <label for="companyName" class="form-label">
+                                        <i class="fas fa-building me-2"></i>
+                                        اسم الشركة
+                                    </label>
+                                    <input type="text" class="form-control" id="companyName" 
+                                           value="{{ current_user.company_name }}" disabled>
+                                    <div class="form-text text-muted">اسم الشركة يظهر تلقائياً من حسابك.</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="appointment_date" class="form-label">
+                                            <i class="fas fa-calendar-alt me-2"></i>
+                                            تاريخ الموعد *
+                                        </label>
+                                        <input type="date" class="form-control" id="appointment_date" 
+                                               name="appointment_date" required>
+                                        <div class="form-text text-muted">يرجى اختيار تاريخ اليوم أو تاريخ مستقبلي.</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="appointment_time" class="form-label">
+                                            <i class="fas fa-clock me-2"></i>
+                                            وقت الموعد *
+                                        </label>
+                                        <input type="time" class="form-control" id="appointment_time" 
+                                               name="appointment_time" min="10:00" max="16:00" required>
+                                        <div class="form-text text-muted">المواعيد متاحة من 10:00 صباحاً حتى 04:00 عصراً.</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="phone_number" class="form-label">
+                                        <i class="fas fa-phone me-2"></i>
+                                        رقم الموبايل *
+                                    </label>
+                                    <input type="text" class="form-control" id="phone_number" 
+                                           name="phone_number" value="{{ company_phone or '' }}" 
+                                           pattern="01[0-9]{9}" 
+                                           title="يرجى إدخال رقم موبايل صحيح مكون من 11 رقم ويبدأ بـ 01" 
+                                           required>
+                                    <div class="form-text text-muted">يرجى إدخال رقم موبايل صحيح (مثال: 01xxxxxxxxxx)</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="purpose" class="form-label">
+                                        <i class="fas fa-clipboard-list me-2"></i>
+                                        الغرض من الموعد *
+                                    </label>
+                                    <select class="form-select" id="purpose" name="purpose" required>
+                                        <option value="">-- اختر الغرض --</option>
+                                        <option value="تحصيل">تحصيل</option>
+                                        <option value="مقابلة">مقابلة</option>
+                                        <option value="تنزيل أصناف">تنزيل أصناف</option>
+                                        <option value="سحب أصناف">سحب أصناف</option>
+                                    </select>
+                                    <div class="form-text text-muted">حدد نوع الموعد المطلوب.</div>
+                                </div>
+
+                                {# NEW REQUIRED FIELD: Product Item #}
+                                <div class="mb-3">
+                                    <label for="product_item_name" class="form-label">
+                                        <i class="fas fa-box me-2"></i>
+                                        اكتب صنف من أصناف الشركة *
+                                    </label>
+                                    <input type="text" class="form-control" id="product_item_name" name="product_item_name" required 
+                                           placeholder="مثال: دواء معين، منتج كيميائي، etc.">
+                                    <div class="form-text text-muted">الرجاء إدخال اسم صنف واحد فقط من أصناف شركتكم.</div>
+                                </div>
+                                {# END NEW REQUIRED FIELD #}
+
+                                <div class="mb-3" id="collectionAmountField" style="display: none;">
+                                    <label for="collection_amount" class="form-label">
+                                        <i class="fas fa-money-bill-wave me-2"></i>
+                                        مبلغ التحصيل المتوقع (اختياري)
+                                    </label>
+                                    <input type="number" step="0.01" class="form-control" id="collection_amount" name="collection_amount" placeholder="أدخل مبلغ التحصيل المتوقع">
+                                    <div class="form-text text-muted">هذا الحقل يظهر فقط عند اختيار "تحصيل" كغرض للموعد.</div>
+                                </div>
+
+
+                                <div class="mb-3">
+                                    <label for="notes" class="form-label">
+                                        <i class="fas fa-comment-dots me-2"></i>
+                                        ملاحظات إضافية (اختياري)
+                                    </label>
+                                    <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                              placeholder="أضف أي ملاحظات إضافية هنا..."></textarea>
+                                </div>
+                                
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                                    <button type="submit" class="btn btn-primary" id="submitAppointmentBtn">
+                                        <i class="fas fa-paper-plane me-2"></i>إرسال الطلب
+                                    </button>
+                                    <a href="{{ url_for('company_dashboard') }}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-right me-2"></i>العودة
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    {# Display message if appointments are disabled #}
+    <div class="disabled-page-overlay">
+        <div class="alert alert-warning text-center">
+            <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+            <h3>نظام حجز المواعيد غير متاح حالياً!</h3>
+            <p class="lead">
+                يرجى العلم أن نظام حجز المواعيد مع الإدارة قيد التفعيل حالياً.
+            </p>
+            <p>
+                سيتم إتاحة هذه الخدمة قريباً. نعتذر عن أي إزعاج.
+            </p>
+            <a href="{{ url_for('company_dashboard') }}" class="btn btn-primary">
+                <i class="fas fa-home me-2"></i>
+                العودة للصفحة الرئيسية
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Check if appointments are enabled before executing form-related JS
+        {% if appointments_enabled %}
+        const maxDailyRequests = {{ max_daily_requests | tojson }};
+        const disabledDaysList = {{ disabled_days_list | tojson }}; // أيام الأسبوع المعطلة (0 = الأحد, 6 = السبت)
+        const disabledDaysMessage = {{ disabled_days_message | tojson }};
+        const todayDateInput = document.getElementById('appointment_date');
+        const appointmentTimeInput = document.getElementById('appointment_time');
+        const phoneNumberInput = document.getElementById('phone_number');
+        const purposeSelect = document.getElementById('purpose');
+        const productItemNameInput = document.getElementById('product_item_name'); // NEW input field
+        const submitAppointmentBtn = document.getElementById('submitAppointmentBtn');
+        const collectionAmountField = document.getElementById('collectionAmountField');
+        const collectionAmountInput = document.getElementById('collection_amount');
+
+
+        // وظيفة مساعدة لعرض رسالة خطأ
+        function showCustomError(element, message) {
+            element.setCustomValidity(message);
+            element.reportValidity();
+            submitAppointmentBtn.disabled = true; // تعطيل زر الإرسال عند وجود خطأ
+        }
+
+        // وظيفة مساعدة لمسح رسالة الخطأ
+        function clearCustomError(element) {
+            element.setCustomValidity('');
+            // إعادة تفعيل زر الإرسال إذا لم تكن هناك أخطاء أخرى
+            if (todayDateInput.checkValidity() && 
+                appointmentTimeInput.checkValidity() && 
+                phoneNumberInput.checkValidity() && 
+                purposeSelect.checkValidity() &&
+                productItemNameInput.checkValidity()) { // Added new field to check
+                submitAppointmentBtn.disabled = false;
+            }
+        }
+
+        // وظيفة لتحديد ما إذا كان حقل مبلغ التحصيل يجب أن يظهر
+        function toggleCollectionAmountField() {
+            if (purposeSelect.value === 'تحصيل') {
+                collectionAmountField.style.display = 'block';
+            } else {
+                collectionAmountField.style.display = 'none';
+                collectionAmountInput.value = ''; // مسح القيمة عند الإخفاء
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // ضبط الحد الأدنى لتاريخ اليوم في حقل التاريخ
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const todayDateString = `${year}-${month}-${day}`;
+            todayDateInput.setAttribute('min', todayDateString);
+
+            // التحقق من الأيام المعطلة عند تغيير التاريخ
+            todayDateInput.addEventListener('change', function() {
+                const selectedDateStr = this.value;
+                if (!selectedDateStr) {
+                    clearCustomError(this);
+                    return;
+                }
+                const selectedDate = new Date(selectedDateStr);
+                const dayOfWeek = selectedDate.getDay(); // 0 for Sunday, 6 for Saturday
+
+                if (disabledDaysList.includes(String(dayOfWeek))) {
+                    showCustomError(this, disabledDaysMessage);
+                } else {
+                    clearCustomError(this);
+                }
+            });
+
+            // التحقق من الوقت
+            appointmentTimeInput.addEventListener('input', function() {
+                const timeInput = this.value;
+                if (!timeInput) {
+                    clearCustomError(this);
+                    return;
+                }
+                const [hours, minutes] = timeInput.split(':').map(Number);
+                
+                const startHours = 10;
+                const endHours = 16; // 4 PM
+                const endMinutes = 0; // 4 PM exactly
+
+                if (hours < startHours || hours > endHours || (hours === endHours && minutes > endMinutes)) {
+                    showCustomError(this, 'الحجز متاح فقط من الساعة 10:00 صباحاً حتى الساعة 04:00 عصراً.');
+                } else {
+                    clearCustomError(this);
+                }
+            });
+
+            // التحقق من رقم الموبايل
+            phoneNumberInput.addEventListener('input', function() {
+                const phoneInput = this.value;
+                if (!phoneInput.startsWith('01') || phoneInput.length !== 11 || !/^\d{11}$/.test(phoneInput)) {
+                    showCustomError(this, 'يرجى إدخال رقم موبايل صحيح مكون من 11 رقم ويبدأ بـ 01.');
+                } else {
+                    clearCustomError(this);
+                }
+            });
+
+            // التحقق من اختيار الغرض
+            purposeSelect.addEventListener('change', function() {
+                if (this.value === "") {
+                    showCustomError(this, 'يرجى اختيار الغرض من الموعد.');
+                } else {
+                    clearCustomError(this);
+                }
+                toggleCollectionAmountField(); // استدعاء الوظيفة عند تغيير الغرض
+            });
+
+            // NEW: Check for product item name input
+            productItemNameInput.addEventListener('input', function() {
+                if (this.value.trim() === "") {
+                    showCustomError(this, 'يرجى إدخال صنف من أصناف الشركة.');
+                } else {
+                    clearCustomError(this);
+                }
+            });
+
+            // تشغيل التحقق الأولي عند التحميل (خاصة إذا كان هناك قيم محددة مسبقًا)
+            todayDateInput.dispatchEvent(new Event('change'));
+            appointmentTimeInput.dispatchEvent(new Event('input'));
+            phoneNumberInput.dispatchEvent(new Event('input'));
+            purposeSelect.dispatchEvent(new Event('change')); // تحديث حالة حقل التحصيل عند التحميل
+            productItemNameInput.dispatchEvent(new Event('input')); // NEW: Trigger check for product item name
+        });
+        {% endif %} {# End of appointments_enabled conditional block #}
+
+        // Unified update function for all counts
+        function updateCounts() {
+            fetch('/api/unread_counts')
+                .then(response => response.json())
+                .then(data => {
+                    const notificationBadge = document.getElementById('notification-count');
+                    if (notificationBadge) {
+                        if (data.unread_notifications_count > 0) {
+                            notificationBadge.textContent = data.unread_notifications_count;
+                            notificationBadge.style.display = 'block';
+                        } else {
+                            notificationBadge.style.display = 'none';
+                        }
+                    }
+
+                    const communityBadge = document.getElementById('community-count');
+                    if (communityBadge) {
+                        if (data.unread_community_messages_count > 0) {
+                            communityBadge.textContent = data.unread_community_messages_count;
+                            communityBadge.style.display = 'block';
+                        } else {
+                            communityBadge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching unread counts:', error));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCounts();
+            setInterval(updateCounts, 30000);
+        });
+
+        // Removed Toby Popup related JS as it's not present on this page by request.
+    </script>
+</body>
+</html>

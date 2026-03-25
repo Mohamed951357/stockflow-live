@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بونص فارما - البحث في الأصناف</title>
+    <!-- View Transition API Meta Tags -->
+    <meta name="view-transition" content="same-origin">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    {% if ramadan_theme_enabled %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ramadan_theme.css') }}">
+    {% endif %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .fairy-lights, #fallingStars {
+            pointer-events: none !important;
+        }
+
+        /* Ensure interactive elements are clickable */
+        .search-container, .navbar, .card, .btn, input, select, .product-card {
+            position: relative;
+            z-index: 10001;
+        }
+
+        /* NEW: Root CSS variables for consistent theming */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            --text-color-dark: #2d3748;
+            --text-color-light: #f7fafc;
+            --accent-color: #00f2fe;
+            --shadow-light: rgba(0, 0, 0, 0.08);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+            --highlight-color: #4facfe;
+            --success-color: #0bab7c;
+            --error-color: #e74c3c;
+            --border-radius-lg: 15px;
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            background-image: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            background-attachment: fixed;
+            font-family: 'Cairo', sans-serif;
+            min-height: 100vh;
+            padding-top: 56px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding-bottom: 2rem;
+        }
+
+        .navbar {
+            background: var(--primary-gradient);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1030;
+            transition: all 0.3s ease;
+        }
+
+        .search-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 5px 20px var(--shadow-light);
+        }
+
+        .search-input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-input {
+            padding-right: 50px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            height: 50px;
+        }
+
+        .search-input:focus {
+            border-color: var(--highlight-color);
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.2);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            height: 40px;
+            width: 40px;
+            border-radius: 8px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #edf2f7;
+            transition: background-color 0.2s ease;
+        }
+
+        .result-item:hover {
+            background-color: #f8fafc;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .loading-container {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-left-color: var(--highlight-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .page-title.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .suggestions-container {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #f8fafc;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        /* View Transition API Styles */
+        @view-transition {
+            navigation: auto;
+        }
+
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+            animation: none;
+        }
+
+        /* Search page specific transitions */
+        .main-content {
+            view-transition-name: search-content;
+        }
+
+        ::view-transition-old(search-content) {
+            animation: search-slide-out 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        ::view-transition-new(search-content) {
+            animation: search-slide-in 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        @keyframes search-slide-out {
+            0% {
+                opacity: 1;
+                transform: translateX(0) scale(1) rotateY(0deg);
+                filter: blur(0px);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-50px) scale(0.9) rotateY(-15deg);
+                filter: blur(5px);
+            }
+        }
+
+        @keyframes search-slide-in {
+            0% {
+                opacity: 0;
+                transform: translateX(50px) scale(0.9) rotateY(15deg);
+                filter: blur(5px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1) rotateY(0deg);
+                filter: blur(0px);
+            }
+        }
+
+        /* Mobile optimization */
+        @media (max-width: 768px) {
+            @view-transition {
+                navigation: none;
+            }
+            
+            ::view-transition-old(root),
+            ::view-transition-new(root) {
+                animation: none;
+            }
+        }
+        /* Back button styles */
+        .back-button-wrapper {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 0.75rem;
+            position: relative;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: #6b7280;
+            color: #fff;
+            border-radius: 999px;
+            padding: 0.45rem 1rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+        }
+        .back-btn:hover { opacity: 0.95; }
+        .back-btn:active { transform: scale(0.98); }
+        .back-button-wrapper::before {
+            content: '';
+            position: absolute;
+            right: 0.25rem;
+            left: 0.25rem;
+            top: -0.1rem;
+            height: 2.3rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.6);
+            filter: blur(8px);
+            z-index: -1;
+        }
+        @media (max-width: 768px) {
+            .back-btn {
+                padding: 0.4rem 0.9rem;
+                font-size: 0.85rem;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            }
+            .back-button-wrapper { margin-bottom: 0.5rem; }
+        }
+    </style>
+</head>
+<body{% if ramadan_theme_enabled %} class="ramadan-theme" {% endif %}>
+
+    {% if ramadan_theme_enabled %}
+    <div class="fairy-lights"></div>
+    <div id="fallingStars"></div>
+    {% endif %}
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/company" onclick="navigateWithTransition('/company', event); return false;">
+                <span class="full-text">بونص فارما - البحث في الأصناف</span>
+                <span class="short-text">بونص فارما</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="main-content container">
+        <h1 class="page-title">البحث في الأصناف</h1>
+
+        <div class="search-container">
+            <div class="back-button-wrapper">
+                <a href="/company" class="back-btn" onclick="navigateWithTransition('/company', event); return false;" aria-label="العودة للوحة الرئيسية">
+                    العودة للوحة الرئيسية <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+            <div class="search-input-group">
+                <input type="text" id="searchInput" class="form-control search-input" placeholder="ابحث عن اسم الصنف..." autocomplete="off">
+                <button id="searchButton" class="search-btn" onclick="performSearch()">
+                    <i class="fas fa-search"></i>
+                </button>
+                <div class="autocomplete-container">
+                    <div id="autocompleteList" class="autocomplete-list list-group"></div>
+                </div>
+            </div>
+
+            <div id="loadingContainer" class="loading-container">
+                <div class="spinner"></div>
+                <p class="mt-3">جاري البحث...</p>
+            </div>
+
+            <div id="resultsContainer" style="display: none;">
+                <h5 id="resultsTitle" class="mb-3"></h5>
+                <div id="resultsContent"></div>
+            </div>
+
+            <div id="suggestionsContainer" class="suggestions-container">
+                <h6 class="mb-3">اقتراحات البحث:</h6>
+                <div id="suggestionsList" class="d-flex flex-wrap"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inject User Data for JS -->
+    <script>
+        window.currentUser = {
+            id: "{{ current_user.id if current_user.is_authenticated else 'guest' }}",
+            name: "{{ current_user.name if current_user.is_authenticated else 'Guest' }}",
+            isPremium: {{ 'true' if current_user.is_premium else 'false' }},
+            isAuthenticated: {{ 'true' if current_user.is_authenticated else 'false' }}
+        };
+    </script>
+
+    <!-- استدعاء ملف الوظائف الخارجي -->
+    <script src="search_functions.js"></script>
+    
+    <script>
+        // View Transition API Navigation Helper
+        function navigateWithTransition(url, event) {
+            if (event) event.preventDefault();
+            var s = ensurePageSpinner();
+            s.classList.add('active');
+            
+            // Check if View Transition API is supported
+            if (!document.startViewTransition) {
+                window.location.href = url;
+                return;
+            }
+            
+            // Detect mobile and disable transitions for performance
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (isMobile) {
+                window.location.href = url;
+                return;
+            }
+            
+            // Start View Transition
+            const transition = document.startViewTransition(() => {
+                window.location.href = url;
+            });
+            
+            transition.finished.then(() => {
+                console.log('View transition completed');
+            }).catch((error) => {
+                console.error('View transition failed:', error);
+                // Fallback navigation
+                window.location.href = url;
+            });
+        }
+        function ensurePageSpinner() {
+            var spinner = document.getElementById('pageSpinner');
+            if (!spinner) {
+                var style = document.createElement('style');
+                style.textContent = ".spinner-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;justify-content:center;align-items:center}.spinner-overlay.active{display:flex;animation:fadeIn 0.3s ease}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.elegant-spinner{position:relative;width:80px;height:80px}.elegant-spinner::before,.elegant-spinner::after{content:'';position:absolute;border-radius:50%}.elegant-spinner::before{width:80px;height:80px;border:4px solid transparent;border-top-color:#667eea;border-right-color:#764ba2;animation:spinOuter 1.2s linear infinite}.elegant-spinner::after{width:50px;height:50px;top:15px;left:15px;border:4px solid transparent;border-bottom-color:#667eea;border-left-color:#764ba2;animation:spinInner 1.2s linear infinite reverse}@keyframes spinOuter{to{transform:rotate(360deg)}}@keyframes spinInner{to{transform:rotate(360deg)}}";
+                document.head.appendChild(style);
+                spinner = document.createElement('div');
+                spinner.className = 'spinner-overlay';
+                spinner.id = 'pageSpinner';
+                spinner.innerHTML = '<div class="elegant-spinner"><div class="spinner-dot"></div></div>';
+                document.body.appendChild(spinner);
+            }
+            return spinner;
+        }
+        window.addEventListener('pageshow', function(){
+            var s = document.getElementById('pageSpinner');
+            if (s) { s.classList.remove('active'); }
+        });
+
+        window.addEventListener('popstate', function(){
+            var s = document.getElementById('pageSpinner');
+            if (s) { s.classList.remove('active'); }
+        });
+
+        document.addEventListener('visibilitychange', function(){
+            if (!document.hidden) {
+                var s = document.getElementById('pageSpinner');
+                if (s) { s.classList.remove('active'); }
+            }
+        });
+        
+        // تفعيل تأثير العنوان الرئيسي بعد تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                document.querySelector('.page-title').classList.add('visible');
+            }, 500);
+
+            // تركيز تلقائي على حقل البحث عند تحميل الصفحة
+            setTimeout(() => {
+                document.getElementById('searchInput').focus();
+            }, 800);
+            
+            // إضافة مستمع حدث للضغط على زر البحث
+            document.getElementById('searchButton').addEventListener('click', function() {
+                performSearch();
+            });
+            
+            // إضافة مستمع حدث للضغط على مفتاح الإدخال في حقل البحث
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // منع السلوك الافتراضي للنموذج
+                    performSearch();
+                }
+            });
+            
+            // إضافة مستمع حدث للتركيز على حقل البحث
+            document.getElementById('searchInput').addEventListener('focus', function() {
+                // إذا كان هناك نص في حقل البحث، قم بتشغيل الاقتراحات التلقائية
+                if (this.value.trim().length >= 2) {
+                    const event = new Event('input');
+                    this.dispatchEvent(event);
+                }
+            });
+            
+            // إضافة مستمع حدث للإدخال في حقل البحث للاقتراحات التلقائية
+            const searchInputEl = document.getElementById('searchInput');
+            const autocompleteListEl = document.getElementById('autocompleteList');
+            let autocompleteTimer = null;
+            const AUTOCOMPLETE_DELAY_MS = 220;
+            
+            searchInputEl.addEventListener('input', function() {
+                const q = this.value.trim();
+                if (!q || q.length < 2) {
+                    hideAutocomplete();
+                    return;
+                }
+                clearTimeout(autocompleteTimer);
+                autocompleteTimer = setTimeout(() => {
+                    // محاكاة الاقتراحات التلقائية (في الإصدار الحقيقي، سيتم استدعاء API)
+                    console.log('طلب اقتراحات لـ:', q);
+                    // هنا نقوم بمحاكاة الاقتراحات بدلاً من استدعاء API
+                    const mockSuggestions = [
+                        q + " 500 مجم",
+                        q + " 250 مجم",
+                        q + " شراب",
+                        q + " أقراص",
+                        q + " حقن"
+                    ];
+                    renderAutocomplete(mockSuggestions);
+                }, AUTOCOMPLETE_DELAY_MS);
+            });
+            
+            // إخفاء الاقتراحات عند النقر خارجها
+            document.addEventListener('click', function(e) {
+                if (!autocompleteListEl.contains(e.target) && e.target !== searchInputEl) {
+                    hideAutocomplete();
+                }
+            });
+            
+            function renderAutocomplete(items) {
+                if (!items || items.length === 0) {
+                    hideAutocomplete();
+                    return;
+                }
+                const html = items.map(name => `
+                    <a href="#" class="list-group-item list-group-item-action" onclick="selectSuggestion('${name.replace(/'/g, "&#39;")}'); return false;">
+                        <i class="fas fa-search text-muted me-2"></i>${escapeHtml(name)}
+                    </a>
+                `).join('');
+                autocompleteListEl.innerHTML = html;
+                autocompleteListEl.style.display = 'block';
+            }
+            
+            // تعريف وظيفة اختيار اقتراح
+            window.selectSuggestion = function(name) {
+                searchInputEl.value = name;
+                hideAutocomplete();
+                performSearch();
+            };
+            
+            // محاكاة وظيفة فتح نافذة إضافة منتج
+            window.openAddProductModal = function(name, quantity, price) {
+                alert(`تم النقر على زر إضافة المنتج: ${name}، الكمية: ${quantity}، السعر: ${price}`);
+            };
+            
+            // محاكاة وظيفة تذكر كمية المنتج
+            window.rememberProductQuantity = function(name, quantity, price) {
+                alert(`تم النقر على زر تذكر الكمية: ${name}، الكمية: ${quantity}، السعر: ${price}`);
+            };
+            
+            // محاكاة وظيفة بناء ترميز الكمية المتحركة
+            window.buildAnimatedQuantityMarkup = function(quantity) {
+                try {
+                    const q = String(quantity == null ? '' : quantity);
+                    const match = q.match(/^(\D*)(\d+(?:\.\d+)?)[\s\S]*$/);
+                    if (!match) {
+                        return escapeHtml(q);
+                    }
+                    const prefix = match[1] || '';
+                    const numStr = match[2] || '0';
+                    const suffix = match[3] || '';
+                    const decimals = (numStr.includes('.') ? (numStr.split('.')[1] || '').length : 0);
+                    return `<span class="counter-value" data-count="${numStr}" data-prefix="${escapeHtml(prefix)}" data-suffix="${escapeHtml(suffix)}" data-decimals="${decimals}">0</span>`;
+                } catch (e) {
+                    return escapeHtml(String(quantity == null ? '' : quantity));
+                }
+            };
+        });
+    </script>
+</body>
+</html>

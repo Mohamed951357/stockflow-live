@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بونص فارما - إدارة الملفات - نظام حجز المواعيد</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Styles below were for upload_file.html, but were previously in manage_files.html.
+           They are kept here for consistency, but might not be strictly needed if this page
+           is only for listing files and purging.
+           Consider cleaning them up if they don't apply to the design. */
+        .files-container { /* هذا ستايل قديم، يمكن إزالته لو لم يتم استخدامه هنا */
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+
+        .upload-area { /* هذا ستايل قديم، يمكن إزالته لو لم يتم استخدامه هنا */
+            border: 2px dashed #e9ecef;
+            border-radius: 10px;
+            padding: 3rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover { /* هذا ستايل قديم، يمكن إزالته لو لم يتم استخدامه هنا */
+            border-color: #dc3545;
+        }
+
+        .upload-icon { /* هذا ستايل قديم، يمكن إزالته لو لم يتم استخدامه هنا */
+            font-size: 3rem;
+            color: #dc3545;
+            margin-bottom: 1rem;
+        }
+
+        .btn-upload { /* هذا ستايل قديم، يمكن إزالته لو لم يتم استخدامه هنا */
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-upload:hover { /* هذا ستايل قديم، يمكن إزالته لو لم يتم استخدامه هنا */
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .tips-container { /* هذا ستايل قديم، يمكن إزالته لو لم يتم استخدامه هنا */
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .tip-item { /* هذا ستايل قديم، يمكن إزالته لو لم يتم استخدامه هنا */
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .tip-item:last-child { /* هذا ستايل قديم، يمكن إزالته لو لم يتم استخدامه هنا */
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .file-list-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-top: 2rem;
+            padding: 1.5rem;
+        }
+        .file-item {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .file-item:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+                <i class="fas fa-shield-alt me-2"></i>
+                لوحة الإدارة
+            </a>
+
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                    <i class="fas fa-home me-2"></i>
+                    الرئيسية
+                </a>
+                <a class="nav-link" href="{{ url_for('manage_files') }}"> {# تصحيح الرابط #}
+                    <i class="fas fa-file-excel me-2"></i>
+                    إدارة الملفات
+                </a>
+                <a class="nav-link" href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    تسجيل الخروج
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="mb-4">
+                    <i class="fas fa-file-alt me-2"></i>
+                    سجلات الملفات المرفوعة
+                </h2>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
+                                <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-right me-2"></i>
+                        العودة للوحة الإدارة
+                    </a>
+                    <button type="button" class="btn btn-danger" onclick="confirmPurgeAllProductData()">
+                        <i class="fas fa-eraser me-2"></i> مسح جميع بيانات الأصناف
+                    </button>
+                </div>
+                <p class="form-text text-muted text-end mt-2">
+                    هذا سيحذف جميع الأصناف الرئيسية وملفاتها وسجلات المخزون، مع تحديث الأصناف المفضلة للمندوبين إلى "غير متوفر".
+                </p>
+
+                <div class="file-list-card">
+                    <h4 class="mb-3"><i class="fas fa-file-alt me-2"></i> قائمة الملفات المرفوعة (للسجلات)</h4>
+                    {% if files %}
+                        {% for file in files %}
+                        <div class="file-item">
+                            <div>
+                                <strong><i class="fas fa-file-excel me-2"></i>{{ file.original_filename }}</strong><br>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    تم الرفع: {{ file.upload_date.strftime('%Y-%m-%d %H:%M') }}
+                                </small>
+                            </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-center text-muted">لا توجد ملفات مرفوعة بعد.</p>
+                        <p class="text-center text-muted">يمكنك <a href="{{ url_for('upload_file') }}">رفع ملف جديد</a>.</p>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="purgeConfirmModal" tabindex="-1" aria-labelledby="purgeConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="purgeConfirmModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        تأكيد مسح جميع بيانات الأصناف
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>هل أنت متأكد أنك تريد مسح <strong class="text-danger">جميع بيانات الأصناف والملفات وسجلات المخزون</strong>؟</p>
+                    <p class="text-danger">**تحذير هام**: هذا الإجراء لا يمكن التراجع عنه وسيحذف:
+                        <ul>
+                            <li>جميع الأصناف من نتائج البحث.</li>
+                            <li>جميع سجلات المخزون التاريخية.</li>
+                            <li>جميع ملفات Excel المرفوعة من الخادم وقاعدة البيانات.</li>
+                            <li>سيتم تحديث الكميات والأسعار في "أصناف المندوبين المفضلة" إلى "غير متوفر".</li>
+                        </ul>
+                        ستحتاج إلى رفع ملف أصناف جديد لإعادة ملء النظام.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>إلغاء
+                    </button>
+                    <form id="purgeDataForm" action="{{ url_for('purge_main_product_data') }}" method="POST">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-eraser me-2"></i>تأكيد المسح الشامل
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Function to open the purge all product data confirmation modal
+        function confirmPurgeAllProductData() {
+            var purgeConfirmModal = new bootstrap.Modal(document.getElementById('purgeConfirmModal'));
+            purgeConfirmModal.show();
+        }
+    </script>
+</body>
+</html>

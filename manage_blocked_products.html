@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الأصناف المحجوبة - بونص فارما</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-header {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .add-form {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .blocked-list {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .blocked-item {
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .blocked-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .blocked-item:last-child {
+            border-bottom: none;
+        }
+
+        .badge-blocked {
+            background: #dc3545;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .btn-remove {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-remove:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+                <i class="fas fa-shield-alt me-2"></i>
+                لوحة الإدارة
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>
+                    <i class="fas fa-ban me-2 text-danger"></i>
+                    إدارة الأصناف المحجوبة وتقارير الطلبات
+                </h2>
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right me-2"></i>
+                    العودة للوحة الإدارة
+                </a>
+            </div>
+            <p class="text-muted mt-2 mb-0">
+                الأصناف المحجوبة لن تظهر في نتائج البحث ولن يتم إضافتها عند رفع ملفات جديدة
+            </p>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" style="border-radius: 14px;"
+            role="alert">
+            <i
+                class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="blocked-list mb-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <h4 class="mb-0">
+                    <i class="fas fa-clipboard-list me-2 text-primary"></i>
+                    تقارير الطلبات (طلبات المستخدمين)
+                </h4>
+                <a href="{{ url_for('admin_toby_requests_report') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-external-link-alt me-2"></i>
+                    فتح تقرير الطلبات الكامل
+                </a>
+            </div>
+
+            {% if pending_requests %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th style="white-space: nowrap;">التاريخ</th>
+                            <th style="white-space: nowrap;">الشركة</th>
+                            <th style="white-space: nowrap;">الصنف</th>
+                            <th style="white-space: nowrap;">الإجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in pending_requests %}
+                        <tr>
+                            <td style="white-space: nowrap;">{{ r.timestamp_cairo or '—' }}</td>
+                            <td style="white-space: nowrap;">{{ r.company_name }}</td>
+                            <td style="min-width: 260px;">{{ r.product_name }}</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('accept_product_report_request', request_id=r.id) }}" style="display: inline;" onsubmit="return confirm('هل تريد قبول هذا الطلب؟');">
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="fas fa-check me-1"></i>
+                                        قبول
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('reject_product_report_request', request_id=r.id) }}" style="display: inline;" onsubmit="return confirm('هل تريد رفض هذا الطلب؟');">
+                                    <button type="submit" class="btn btn-danger btn-sm ms-1">
+                                        <i class="fas fa-times me-1"></i>
+                                        رفض
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-inbox fa-3x text-muted mb-2"></i>
+                <p class="text-muted mb-0">لا توجد طلبات مرسلة من المستخدمين حالياً.</p>
+            </div>
+            {% endif %}
+
+            <div class="mt-4">
+                <h5 class="mb-3">
+                    <i class="fas fa-check-circle me-2 text-success"></i>
+                    الطلبات المقبولة
+                </h5>
+
+                {% if accepted_requests %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th style="white-space: nowrap;">التاريخ</th>
+                                <th style="white-space: nowrap;">الشركة</th>
+                                <th style="white-space: nowrap;">الصنف</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in accepted_requests %}
+                            <tr>
+                                <td style="white-space: nowrap;">{{ r.timestamp_cairo or '—' }}</td>
+                                <td style="white-space: nowrap;">
+                                    <a href="#" class="text-decoration-none fw-bold js-open-send-company-message"
+                                       data-company-id="{{ r.company_id }}"
+                                       data-company-name="{{ r.company_name|e }}"
+                                       data-product-name="{{ r.product_name|e }}">
+                                        {{ r.company_name }}
+                                    </a>
+                                </td>
+                                <td style="min-width: 260px;">{{ r.product_name }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-3">
+                    <p class="text-muted mb-0">لا توجد طلبات مقبولة حتى الآن.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Add New Blocked Product Form -->
+        <div class="add-form">
+            <h4 class="mb-3">
+                <i class="fas fa-plus-circle me-2 text-primary"></i>
+                إضافة صنف للحجب
+            </h4>
+            <form method="POST" action="{{ url_for('add_blocked_product') }}">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="product_name" class="form-label">
+                            <i class="fas fa-box me-2"></i>
+                            اسم الصنف *
+                        </label>
+                        <input type="text" class="form-control" id="product_name" name="product_name" required
+                            placeholder="أدخل اسم الصنف المراد حجبه">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="reason" class="form-label">
+                            <i class="fas fa-comment me-2"></i>
+                            سبب الحجب (اختياري)
+                        </label>
+                        <input type="text" class="form-control" id="reason" name="reason"
+                            placeholder="مثال: صنف غير متوفر، صنف متوقف">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-ban me-2"></i>
+                    حجب الصنف
+                </button>
+            </form>
+        </div>
+
+        <!-- Search Box -->
+        <div class="mb-3">
+            <input type="text" class="form-control" id="searchBox" placeholder="ابحث في الأصناف المحجوبة..."
+                onkeyup="filterBlocked()">
+        </div>
+
+        <!-- Blocked Products List -->
+        <div class="blocked-list">
+            <h4 class="mb-3">
+                <i class="fas fa-list me-2 text-primary"></i>
+                قائمة الأصناف المحجوبة ({{ blocked_products|length }})
+            </h4>
+
+            {% if blocked_products %}
+            <div id="blockedProductsList">
+                {% for product in blocked_products %}
+                <div class="blocked-item" data-product-name="{{ product.product_name.lower() }}">
+                    <div class="row align-items-center">
+                        <div class="col-md-5">
+                            <h5 class="mb-1">
+                                <i class="fas fa-box-open me-2 text-danger"></i>
+                                {{ product.product_name }}
+                            </h5>
+                            {% if product.reason %}
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                {{ product.reason }}
+                            </small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">
+                                <i class="fas fa-user me-1"></i>
+                                حجبه: {{ product.blocker.full_name or product.blocker.username }}
+                                <br>
+                                <i class="fas fa-clock me-1"></i>
+                                {{ product.blocked_at.strftime('%Y-%m-%d %H:%M') }}
+                            </small>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <form method="POST" action="{{ url_for('remove_blocked_product', product_id=product.id) }}"
+                                style="display: inline;"
+                                onsubmit="return confirm('هل أنت متأكد من إلغاء حجب هذا الصنف؟');">
+                                <button type="submit" class="btn btn-remove">
+                                    <i class="fas fa-check me-2"></i>
+                                    إلغاء الحجب
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">لا توجد أصناف محجوبة حالياً</h5>
+                <p class="text-muted">يمكنك إضافة أصناف للحجب من النموذج أعلاه</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="modal fade" id="sendCompanyMessageModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">إرسال رسالة للشركة</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info py-2" id="sendCompanyMessageInfo" style="display:none;"></div>
+                        <div class="alert alert-danger py-2" id="sendCompanyMessageError" style="display:none;"></div>
+
+                        <input type="hidden" id="scm_company_id" value="">
+
+                        <div class="mb-3">
+                            <label class="form-label">إسم الصنف :</label>
+                            <input type="text" class="form-control" id="scm_item_name" maxlength="200">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">آخر كمية واردة :</label>
+                            <input type="text" class="form-control" id="scm_last_received_qty" maxlength="200">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">إجمالى مبيعات الشهر الحالى :</label>
+                            <input type="text" class="form-control" id="scm_month_sales" maxlength="200">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                        <button type="button" class="btn btn-primary" id="scm_send_btn" onclick="sendCompanyMessage()">
+                            <i class="fas fa-paper-plane me-1"></i>
+                            إرسال
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let sendCompanyMessageModalInstance = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.js-open-send-company-message').forEach(function (el) {
+                el.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const companyId = this.getAttribute('data-company-id');
+                    const companyName = this.getAttribute('data-company-name') || '';
+                    const productName = this.getAttribute('data-product-name') || '';
+                    openSendCompanyMessageModal(companyId, companyName, productName);
+                });
+            });
+        });
+
+        function openSendCompanyMessageModal(companyId, companyName, productName) {
+            const infoEl = document.getElementById('sendCompanyMessageInfo');
+            const errEl = document.getElementById('sendCompanyMessageError');
+            infoEl.style.display = 'block';
+            infoEl.textContent = `سيتم إرسال الرسالة إلى: ${companyName} (من STOCK FLOW)`;
+            errEl.style.display = 'none';
+            errEl.textContent = '';
+
+            document.getElementById('scm_company_id').value = companyId;
+            document.getElementById('scm_item_name').value = productName || '';
+            document.getElementById('scm_last_received_qty').value = '';
+            document.getElementById('scm_month_sales').value = '';
+
+            const modalEl = document.getElementById('sendCompanyMessageModal');
+            sendCompanyMessageModalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+            sendCompanyMessageModalInstance.show();
+        }
+
+        async function sendCompanyMessage() {
+            const btn = document.getElementById('scm_send_btn');
+            const errEl = document.getElementById('sendCompanyMessageError');
+            errEl.style.display = 'none';
+            errEl.textContent = '';
+
+            const payload = {
+                company_id: document.getElementById('scm_company_id').value,
+                item_name: document.getElementById('scm_item_name').value,
+                last_received_qty: document.getElementById('scm_last_received_qty').value,
+                month_sales: document.getElementById('scm_month_sales').value
+            };
+
+            btn.disabled = true;
+            try {
+                const resp = await fetch('/admin/product_report_requests/send_company_message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await resp.json().catch(() => ({}));
+                if (!resp.ok || !data.success) {
+                    errEl.style.display = 'block';
+                    errEl.textContent = data.error || 'فشل إرسال الرسالة';
+                    return;
+                }
+
+                if (sendCompanyMessageModalInstance) {
+                    sendCompanyMessageModalInstance.hide();
+                }
+                window.location.reload();
+            } catch (e) {
+                errEl.style.display = 'block';
+                errEl.textContent = 'حدث خطأ أثناء إرسال الرسالة';
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function filterBlocked() {
+            const searchValue = document.getElementById('searchBox').value.toLowerCase();
+            const items = document.querySelectorAll('.blocked-item');
+
+            items.forEach(item => {
+                const productName = item.getAttribute('data-product-name');
+                if (productName.includes(searchValue)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

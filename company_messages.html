@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>المراسلات - بونص فارما</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #ECE5DD;
+            /* خلفية واتساب */
+            min-height: 100vh;
+            padding-top: 76px;
+            /* Space for fixed navbar */
+            overflow: hidden;
+            /* منع سكرول صفحة البودي، والسماح بالسكرول داخل الكارت فقط */
+        }
+
+        /* Navbar styles from company_dashboard.html */
+        .navbar {
+            /* ألوان واتساب للهيدر */
+            background: linear-gradient(135deg, #075E54 0%, #128C7E 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1030;
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-logo {
+            height: 35px;
+            width: auto;
+            margin-left: 10px;
+        }
+
+        .navbar-brand .full-text {
+            display: inline;
+        }
+
+        @media (max-width: 767.98px) {
+            .navbar-brand .full-text {
+                display: none;
+            }
+
+            .navbar-brand .short-text {
+                display: none;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .navbar-brand .short-text {
+                display: none;
+            }
+
+            .navbar-brand .full-text {
+                display: inline;
+            }
+        }
+
+        .navbar-nav-notification-wrapper {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            margin-right: 15px;
+            flex-grow: 1;
+            justify-content: space-around;
+            max-width: 200px;
+            flex-shrink: 0;
+            gap: 10px;
+        }
+
+        .navbar-nav-notification-wrapper .nav-link {
+            padding: 0.5rem;
+            position: relative;
+            color: #000000;
+            transition: color 0.3s ease, transform 0.3s ease;
+            background: none;
+            border: none;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .navbar-nav-notification-wrapper .nav-link:hover {
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        .navbar-nav-notification-wrapper .nav-link .fa-lg {
+            font-size: 1.25em;
+        }
+
+        @media (max-width: 991.98px) {
+            .navbar-nav-notification-wrapper {
+                order: -1;
+                margin-left: auto;
+                margin-right: 10px;
+                flex-grow: 0;
+                max-width: 150px;
+                justify-content: space-between;
+            }
+
+            .navbar-nav-notification-wrapper .nav-link {
+                padding: 0.5rem;
+            }
+
+            .navbar-nav-user-info {
+                display: none;
+            }
+
+            .navbar-collapse .navbar-nav {
+                width: 100%;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+
+            .navbar-collapse .nav-item {
+                text-align: center;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .navbar-collapse .nav-item:last-child {
+                border-bottom: none;
+            }
+
+            .navbar-collapse .nav-link {
+                padding: 12px 15px;
+                color: rgba(255, 255, 255, 0.9);
+                font-size: 1.1rem;
+                transition: background-color 0.3s ease;
+            }
+
+            .navbar-collapse .nav-link:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                border-radius: 5px;
+            }
+
+            .navbar-collapse .navbar-text {
+                display: block;
+                padding: 12px 15px;
+                color: rgba(255, 255, 255, 0.7);
+                text-align: center;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        @media (min-width: 992px) {
+            .navbar-nav-notification-wrapper {
+                margin-left: 15px;
+                margin-right: 0;
+            }
+
+            .navbar-nav-notification-wrapper .nav-link {
+                padding: 0.5rem 0.75rem;
+            }
+
+            .navbar-nav-user-info {
+                display: flex;
+            }
+        }
+
+        .messages-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            position: relative;
+            /* لدعم الزر العائم */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .messages-header {
+            background: linear-gradient(135deg, #075E54 0%, #128C7E 100%);
+            color: white;
+            padding: 16px 20px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .conversations-list {
+            flex: 1;
+            max-height: none;
+            overflow-y: auto;
+        }
+
+        .conversation-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .conversation-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .conversation-item.active {
+            background-color: #e3f2fd;
+            border-right: 4px solid #667eea;
+        }
+        .conversation-menu-dropdown { position: absolute; top: 50%; right: 12px; transform: translateY(-50%); background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.12); display: none; min-width: 160px; z-index: 10; }
+        .conversation-menu-dropdown.show { display: block; }
+        .conversation-menu-dropdown .menu-item { width: 100%; padding: 10px 12px; background: transparent; border: 0; text-align: start; font-size: 14px; }
+        .conversation-menu-dropdown .menu-item:hover { background: #f8f9fa; }
+        .conversation-menu-dropdown .menu-item.danger { color: #dc3545; }
+
+        .avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #075E54 0%, #128C7E 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            overflow: hidden;
+        }
+
+        .avatar-image {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            overflow: hidden;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .conversation-info {
+            flex: 1;
+        }
+
+        .company-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .last-message {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .unread-badge {
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .chat-section {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #ECE5DD;
+            /* خلفية محادثة واتساب */
+        }
+
+        .message {
+            margin-bottom: 15px;
+            max-width: 70%;
+        }
+
+        .message.sent {
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .message.received {
+            margin-right: auto;
+        }
+
+        .message-content {
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+
+        .message.sent .message-content {
+            background: #DCF8C6;
+            /* فقاعة مرسلة في واتساب */
+            color: #111;
+        }
+
+        .message.received .message-content {
+            background: #FFFFFF;
+            border: 1px solid #e0e0e0;
+            color: #111;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+            padding: 0 5px;
+        }
+
+        .message-meta {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+        }
+
+        .message-status {
+            font-size: 11px;
+            color: #777;
+        }
+
+        .message-status.read {
+            color: #34b7f1;
+            /* أزرق واتساب للرسائل المقروءة */
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            background: white;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .message-input {
+            flex: 1;
+            border: none;
+            border-radius: 999px;
+            padding: 10px 16px;
+            font-size: 15px;
+            outline: none;
+            background: #f0f2f5;
+        }
+
+        .message-input:focus {
+            background: #e6ebf0;
+            box-shadow: none;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            color: white;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .send-btn:hover {
+            transform: translateY(-1px) scale(1.03);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 40px;
+            color: #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+                padding-top: 76px;
+                /* مساحة للنافبار الثابت */
+            }
+
+            .messages-container {
+                border-radius: 0;
+                margin: 0;
+                max-width: 100%;
+                height: calc(100vh - 76px);
+            }
+
+            .message {
+                max-width: 85%;
+            }
+
+            .conversations-list {
+                max-height: none;
+            }
+
+            .chat-section {
+                height: auto;
+            }
+        }
+
+        .messages-header .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .messages-header .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .chat-section .messages-header,
+        #mainMessagesHeader {
+            justify-content: space-between;
+        }
+
+        .chat-section .messages-header {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        /* شريط البحث في أعلى قائمة المراسلات */
+        #mainSearchBar {
+            background: #f0f2f5;
+        }
+
+        #mainSearchBar .messages-search-group {
+            background: #ffffff;
+            border-radius: 999px;
+            border: 1px solid #dddddd;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            padding-inline: 12px;
+            align-items: center;
+        }
+
+        #mainSearchBar .messages-search-group .input-group-text {
+            border: none;
+            background: transparent;
+            color: #777777;
+        }
+
+        #mainSearchBar .messages-search-group .form-control {
+            border: none;
+            box-shadow: none;
+            background: transparent;
+        }
+
+        #mainSearchBar .messages-search-group .form-control::placeholder {
+            color: #999999;
+        }
+
+        #mainSearchBar .messages-search-group .form-control:focus {
+            box-shadow: none;
+        }
+
+        .chat-header-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2px;
+        }
+
+        #chatTitle {
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        #chatSubtitle {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        #typingIndicator {
+            font-size: 0.8rem;
+            color: #C8F0C8;
+        }
+
+        .fab-all-companies {
+            position: absolute;
+            bottom: 22px;
+            left: 22px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            outline: none;
+            background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+            z-index: 20;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .fab-all-companies:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .fab-all-companies:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* قائمة إجراءات الرسالة (bottom sheet) */
+        #messageActionModal .modal-dialog {
+            margin: 0;
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            transform: translate3d(0, 0, 0);
+        }
+
+        #messageActionModal .modal-content {
+            border-radius: 18px 18px 0 0;
+            border: none;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        #messageActionModal .modal-header {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        #messageActionModal .modal-body {
+            padding-top: 10px;
+            padding-bottom: 18px;
+        }
+
+        .message-action-btn {
+            border-radius: 999px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .message-action-btn i {
+            font-size: 0.9rem;
+        }
+
+        @media (min-width: 768px) {
+            #messageActionModal .modal-dialog {
+                position: static;
+                margin: 1.75rem auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('company_dashboard') }}">
+                {% if current_logo_path %}
+                <img src="{{ current_logo_path }}" alt="Logo" class="navbar-logo">
+                {% endif %}
+                <span class="full-text">{{ system_subtitle }}</span>
+                <span class="short-text"></span>
+            </a>
+
+            <div class="navbar-nav-notification-wrapper d-flex">
+                <a class="nav-link" href="{{ url_for('company_profile') }}" title="ملفي الشخصي">
+                    <i class="fas fa-user-circle fa-lg"></i>
+                </a>
+                <a class="nav-link" href="{{ url_for('company_messages') }}">
+                    <i class="fas fa-comments fa-lg"></i>
+                </a>
+                <a class="nav-link" href="{{ url_for('instructions') }}" title="تعليمات وإرشادات">
+                    <i class="fas fa-question-circle fa-lg"></i>
+                </a>
+                <a class="nav-link position-relative" href="{{ url_for('notifications') }}">
+                    <i class="fas fa-bell fa-lg"></i>
+                </a>
+            </div>
+
+            <!-- مودال إجراءات الرسالة -->
+            <div class="modal fade" id="messageActionModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">إجراء على الرسالة</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <button id="msgActionEdit" type="button"
+                                class="btn btn-outline-primary w-100 message-action-btn"
+                                onclick="performMessageAction('edit')">
+                                <i class="fas fa-pen"></i>
+                                <span>تعديل الرسالة</span>
+                            </button>
+                            <button id="msgActionDeleteMe" type="button"
+                                class="btn btn-outline-secondary w-100 message-action-btn"
+                                onclick="performMessageAction('delete_me')">
+                                <i class="fas fa-trash-alt"></i>
+                                <span>حذف الرسالة لدي فقط</span>
+                            </button>
+                            <button id="msgActionDeleteAll" type="button"
+                                class="btn btn-outline-danger w-100 message-action-btn mb-0"
+                                onclick="performMessageAction('delete_all')">
+                                <i class="fas fa-ban"></i>
+                                <span>حذف الرسالة للجميع</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavCompany"
+                aria-controls="navbarNavCompany" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNavCompany">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item d-lg-none">
+                        <span class="navbar-text">
+                            <i class="fas fa-building me-2"></i>
+                            {{ current_user.company_name if current_user.company_name else 'شركة' }}
+                        </span>
+                    </li>
+                    <li class="nav-item d-none d-lg-flex align-items-center me-3">
+                        <span class="navbar-text">
+                            <i class="fas fa-building me-2"></i>
+                            {{ current_user.company_name if current_user.company_name else 'شركة' }}
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('company_dashboard') }}">
+                            <i class="fas fa-home me-2"></i>
+                            الرئيسية
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('company_messages') }}">
+                            <i class="fas fa-envelope me-2"></i>
+                            المراسلات
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('my_products') }}">
+                            <i class="fas fa-boxes me-2"></i>
+                            أصنافي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('search_products') }}">
+                            <i class="fas fa-search me-2"></i>
+                            البحث في الأصناف
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('appointments') }}">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            مواعيدي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            تسجيل الخروج
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="messages-container">
+        <div class="messages-header" id="mainMessagesHeader">
+            <h3><i class="fas fa-comments"></i> المراسلات</h3>
+            <a class="back-btn" href="{{ url_for('company_dashboard') }}">
+                <i class="fas fa-home"></i> الرئيسية
+            </a>
+        </div>
+
+        <!-- شريط البحث عن شركة (ستايل واتساب) -->
+        <div class="p-3 border-bottom bg-light" id="mainSearchBar">
+            <div class="input-group messages-search-group">
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                <input type="text" id="companySearchInput" class="form-control"
+                    placeholder="ابحث عن شركة لبدء محادثة...">
+            </div>
+        </div>
+
+        <!-- قائمة المحادثات وجهات الاتصال -->
+        <div id="conversationsList" class="conversations-list">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i> جاري تحميل المحادثات...
+            </div>
+        </div>
+
+        <!-- قسم الدردشة -->
+        <div id="chatSection" class="chat-section" style="display: none;">
+            <div class="messages-header">
+                <button class="back-btn" onclick="showConversationsList()">
+                    <i class="fas fa-arrow-right"></i> العودة للمحادثات
+                </button>
+                <div class="chat-header-text">
+                    <h4 id="chatTitle">محادثة مع شركة</h4>
+                    <div id="chatSubtitle"></div>
+                    <div id="typingIndicator" style="display:none;">يكتب الآن...</div>
+                </div>
+            </div>
+
+            <div id="chatMessages" class="chat-messages">
+                <!-- الرسائل ستظهر هنا -->
+            </div>
+
+            <div class="chat-input-container">
+                <div class="input-group">
+                    <input type="text" id="messageInput" class="message-input" placeholder="اكتب رسالتك هنا..."
+                        maxlength="1000">
+                    <button id="sendBtn" class="send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- زر عائم لعرض كل الشركات -->
+        <button id="allCompaniesFab" class="fab-all-companies" title="كل الشركات">
+            <i class="fas fa-users"></i>
+        </button>
+    </div>
+
+    <!-- مودال: كل الشركات -->
+    <div class="modal fade" id="allCompaniesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-users me-2"></i>كل الشركات</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <input type="text" id="companiesModalSearch" class="form-control" placeholder="ابحث عن شركة...">
+                    </div>
+                    <div id="allCompaniesList" class="list-group">
+                        <!-- قائمة الشركات ستظهر هنا -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentConversationId = null;
+        let conversationsData = [];
+        let companiesData = [];
+        let allCompaniesModalInstance = null;
+
+        // تحميل قائمة المحادثات (الأخيرة مثل واتساب)
+        async function loadConversations() {
+            try {
+                const response = await fetch('/messages/conversations');
+                const data = await response.json();
+                if (data.success) {
+                    conversationsData = data.conversations || [];
+                    renderConversationAndContacts();
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل المحادثات:', error);
+                document.getElementById('conversationsList').innerHTML =
+                    '<div class="error-message">فشل في تحميل المحادثات: حدث خطأ في النظام</div>';
+            }
+        }
+
+        // تحميل قائمة الشركات المتاحة للمراسلة (جهات الاتصال)
+        async function loadCompaniesList(query = '') {
+            try {
+                const url = query ? `/messages/companies?q=${encodeURIComponent(query)}` : '/messages/companies';
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.success) {
+                    companiesData = data.companies || [];
+                    renderConversationAndContacts();
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل قائمة الشركات:', error);
+            }
+        }
+
+        function buildVerifiedBadgeHtml(isVerified) {
+            if (!isVerified) return '';
+            return '<i class="fas fa-check-circle text-primary me-1" title="شركة موثقة"></i>';
+        }
+
+        function buildAvatarHtml(name, avatarKey) {
+            const key = avatarKey || 'male-1';
+            // Use the .jpg extension as verified
+            const imagePath = `/static/images/avatars/${key}.jpg`;
+
+            return `
+                <div class="avatar-image">
+                    <img src="${imagePath}" alt="${name}" onerror="this.src='/static/images/avatars/male-1.jpg'">
+                </div>
+            `;
+        }
+
+        function getLastSeenLabel(companyId) {
+            let lastSeenIso = null;
+            const conv = conversationsData.find(c => c.company_id === companyId);
+            if (conv && conv.last_seen) {
+                lastSeenIso = conv.last_seen;
+            } else {
+                const comp = companiesData.find(c => c.id === companyId);
+                if (comp && comp.last_seen) {
+                    lastSeenIso = comp.last_seen;
+                }
+            }
+            if (!lastSeenIso) return '';
+            const d = new Date(lastSeenIso);
+            const formatted = d.toLocaleString('ar-EG', {
+                day: '2-digit',
+                month: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            return `آخر ظهور: ${formatted}`;
+        }
+
+        function updateChatHeaderMeta(companyId, companyName) {
+            const titleEl = document.getElementById('chatTitle');
+            const subtitleEl = document.getElementById('chatSubtitle');
+
+            let isVerified = false;
+            const conv = conversationsData.find(c => c.company_id === companyId);
+            if (conv && typeof conv.is_verified !== 'undefined') {
+                isVerified = !!conv.is_verified;
+            } else {
+                const comp = companiesData.find(c => c.id === companyId);
+                if (comp && typeof comp.is_verified !== 'undefined') {
+                    isVerified = !!comp.is_verified;
+                }
+            }
+
+            const verifiedHtml = buildVerifiedBadgeHtml(isVerified);
+            if (titleEl) titleEl.innerHTML = `${companyName} ${verifiedHtml}`;
+            if (subtitleEl) subtitleEl.textContent = getLastSeenLabel(companyId);
+        }
+
+        function toggleConversationMenu(companyId) {
+            const menu = document.getElementById(`conv-menu-${companyId}`);
+            const isVisible = menu.classList.contains('show');
+            document.querySelectorAll('.conversation-menu-dropdown.show').forEach(m => m.classList.remove('show'));
+            if (!isVisible) {
+                menu.classList.add('show');
+                const close = (e) => {
+                    if (!e.target.closest(`#conv-menu-${companyId}`)) {
+                        menu.classList.remove('show');
+                        window.removeEventListener('click', close);
+                    }
+                };
+                setTimeout(() => window.addEventListener('click', close), 0);
+            }
+        }
+
+        async function toggleBlockCompany(companyId, action) {
+            try {
+                const response = await fetch('/messages/block_company', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ company_id: companyId, action })
+                });
+                const data = await response.json();
+                if (!response.ok || !data.success) {
+                    alert((data && data.message) || 'فشل في تنفيذ الإجراء');
+                    return;
+                }
+                await loadConversations();
+            } catch (error) {
+                console.error('خطأ في تغيير حالة الحظر:', error);
+                alert('حدث خطأ في تغيير حالة الحظر');
+            }
+        }
+
+        async function deleteConversation(companyId) {
+            try {
+                const response = await fetch(`/messages/conversation/${companyId}/delete`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                if (!response.ok || !data.success) {
+                    alert((data && data.message) || 'فشل في حذف المحادثة');
+                    return;
+                }
+                // إعادة تحميل قائمة المحادثات بعد الحذف
+                await loadConversations();
+            } catch (error) {
+                console.error('خطأ في حذف المحادثة:', error);
+                alert('حدث خطأ في حذف المحادثة');
+            }
+        }
+
+        // عرض المحادثات وجهات الاتصال معاً (ستايل واتساب)
+        function renderConversationAndContacts() {
+            const conversationsList = document.getElementById('conversationsList');
+            const searchText = (document.getElementById('companySearchInput').value || '').toLowerCase();
+
+            conversationsList.innerHTML = '';
+
+            const hasFilter = searchText.length > 0;
+
+            // 1) المحادثات الأخيرة
+            const filteredConversations = conversationsData.filter(conv =>
+                conv.company_name.toLowerCase().includes(searchText)
+            );
+
+            if (filteredConversations.length > 0) {
+                const header = document.createElement('div');
+                header.className = 'px-3 pt-3 pb-1 text-muted small';
+                header.textContent = 'المحادثات الأخيرة';
+                conversationsList.appendChild(header);
+
+                filteredConversations.forEach(conversation => {
+                    const conversationItem = document.createElement('div');
+                    conversationItem.className = 'conversation-item';
+                    conversationItem.onclick = () => openConversation(conversation.company_id, conversation.company_name);
+
+                    const avatarHtml = buildAvatarHtml(conversation.company_name, conversation.avatar);
+                    const verifiedHtml = buildVerifiedBadgeHtml(conversation.is_verified);
+
+                    const unreadHtml = conversation.unread_count > 0
+                        ? `<div class="unread-badge">${conversation.unread_count}</div>`
+                        : '';
+
+                    conversationItem.innerHTML = `
+                        ${avatarHtml}
+                        <div class="conversation-info">
+                            <div class="company-name">${verifiedHtml} ${conversation.company_name}</div>
+                            <div class="last-message">${conversation.last_message}</div>
+                        </div>
+                        <div class="d-flex align-items-center ms-2" onclick="event.stopPropagation();">
+                            ${unreadHtml}
+                            <button type="button" class="btn btn-sm btn-link text-muted px-2 conversation-menu-btn" title="خيارات المحادثة" onclick="event.stopPropagation(); toggleConversationMenu(${conversation.company_id});">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                        </div>
+                        <div class="conversation-menu-dropdown" id="conv-menu-${conversation.company_id}" onclick="event.stopPropagation();">
+                            <button class="menu-item" onclick="deleteConversation(${conversation.company_id});">حذف المحادثة</button>
+                            <button class="menu-item ${conversation.is_blocked ? '' : 'danger'}" onclick="toggleBlockCompany(${conversation.company_id}, '${conversation.is_blocked ? 'unblock' : 'block'}');">${conversation.is_blocked ? 'إلغاء الحظر' : 'حظر الشركة'}</button>
+                        </div>
+                    `;
+
+                    conversationsList.appendChild(conversationItem);
+                });
+            }
+
+            // 2) جهات الاتصال (كل الشركات المتاحة)
+            const conversationCompanyIds = new Set(conversationsData.map(c => c.company_id));
+            const filteredCompanies = companiesData.filter(comp =>
+                !conversationCompanyIds.has(comp.id) &&
+                comp.company_name.toLowerCase().includes(searchText)
+            );
+
+            if (hasFilter && filteredCompanies.length > 0) {
+                const header = document.createElement('div');
+                header.className = 'px-3 pt-3 pb-1 text-muted small';
+                header.textContent = hasFilter ? 'نتائج البحث' : 'كل الشركات';
+                conversationsList.appendChild(header);
+
+                filteredCompanies.forEach(company => {
+                    const item = document.createElement('div');
+                    item.className = 'conversation-item';
+                    item.onclick = () => openConversation(company.id, company.company_name);
+
+                    const avatarHtml = buildAvatarHtml(company.company_name, company.avatar);
+                    const verifiedHtml = buildVerifiedBadgeHtml(company.is_verified);
+                    item.innerHTML = `
+                        ${avatarHtml}
+                        <div class="conversation-info">
+                            <div class="company-name">${verifiedHtml} ${company.company_name}</div>
+                            <div class="last-message text-muted">اضغط لبدء محادثة</div>
+                        </div>
+                    `;
+
+                    conversationsList.appendChild(item);
+                });
+            }
+
+            if (filteredConversations.length === 0 && filteredCompanies.length === 0) {
+                conversationsList.innerHTML = '<div class="text-center p-4 text-muted">لا توجد نتائج مطابقة</div>';
+            }
+        }
+
+        // عرض كل الشركات داخل المودال
+        function renderAllCompaniesModal(filterText = '') {
+            const listEl = document.getElementById('allCompaniesList');
+            if (!listEl) return;
+
+            const search = (filterText || '').toLowerCase();
+            const companies = companiesData.filter(comp =>
+                comp.company_name && comp.company_name.toLowerCase().includes(search)
+            );
+
+            listEl.innerHTML = '';
+
+            if (companies.length === 0) {
+                listEl.innerHTML = '<div class="text-center p-3 text-muted">لا توجد شركات مطابقة</div>';
+                return;
+            }
+
+            companies.forEach(company => {
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'list-group-item list-group-item-action d-flex align-items-center gap-2';
+
+                const avatarHtml = buildAvatarHtml(company.company_name, company.avatar);
+                const lastSeenLabel = getLastSeenLabel(company.id);
+
+                item.innerHTML = `
+                    ${avatarHtml}
+                    <div class="flex-grow-1 text-start">
+                        <div class="fw-semibold">${company.company_name}</div>
+                        ${lastSeenLabel ? `<div class="text-muted small">${lastSeenLabel}</div>` : ''}
+                    </div>
+                `;
+
+                item.addEventListener('click', () => {
+                    if (allCompaniesModalInstance) {
+                        allCompaniesModalInstance.hide();
+                    }
+                    openConversation(company.id, company.company_name);
+                });
+
+                listEl.appendChild(item);
+            });
+        }
+
+        // فتح محادثة
+        async function openConversation(companyId, companyName) {
+            currentConversationId = companyId;
+
+            const conversationsListEl = document.getElementById('conversationsList');
+            const chatSectionEl = document.getElementById('chatSection');
+            const mainHeaderEl = document.getElementById('mainMessagesHeader');
+            const mainSearchEl = document.getElementById('mainSearchBar');
+            const fabEl = document.getElementById('allCompaniesFab');
+            const chatInputContainerEl = document.querySelector('.chat-input-container');
+
+            if (conversationsListEl) conversationsListEl.style.display = 'none';
+            if (chatSectionEl) chatSectionEl.style.display = 'flex';
+            if (mainHeaderEl) mainHeaderEl.style.display = 'none';
+            if (mainSearchEl) mainSearchEl.style.display = 'none';
+            if (fabEl) fabEl.style.display = 'none';
+
+            // رسائل النظام (STOCK FLOW) تكون قراءة فقط بدون مربع كتابة
+            if (chatInputContainerEl) {
+                if (companyName === 'STOCK FLOW') {
+                    chatInputContainerEl.style.display = 'none';
+                } else {
+                    chatInputContainerEl.style.display = '';
+                }
+            }
+
+            updateChatHeaderMeta(companyId, companyName);
+
+            await loadMessages(companyId);
+        }
+
+        // تحميل الرسائل
+        async function loadMessages(companyId) {
+            try {
+                const response = await fetch(`/messages/conversation/${companyId}`);
+                const data = await response.json();
+
+                const chatMessages = document.getElementById('chatMessages');
+
+                if (data.success) {
+                    chatMessages.innerHTML = '';
+
+                    data.messages.forEach(message => {
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = `message ${message.is_sent ? 'sent' : 'received'}`;
+                        messageDiv.dataset.messageId = message.id;
+                        messageDiv.dataset.isSent = message.is_sent ? '1' : '0';
+
+                        const messageTime = new Date(message.sent_at).toLocaleString('ar-EG', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            day: '2-digit',
+                            month: '2-digit'
+                        });
+
+                        let contentHtml = '';
+                        if (message.deleted_for_all) {
+                            contentHtml = '<div class="message-content text-muted fst-italic">تم حذف هذه الرسالة للجميع</div>';
+                        } else {
+                            const editedLabel = message.is_edited ? '<div class="text-muted small mt-1">معدّلة</div>' : '';
+                            contentHtml = `
+                                <div class="message-content">${message.message}</div>
+                                ${editedLabel}
+                            `;
+                        }
+
+                        let statusHtml = '';
+                        if (message.is_sent && !message.deleted_for_all) {
+                            const isRead = !!message.read_at;
+                            statusHtml = `<span class="message-status ${isRead ? 'read' : ''}">${isRead ? '✓✓' : '✓'}</span>`;
+                        }
+
+                        messageDiv.innerHTML = `
+                            ${contentHtml}
+                            <div class="message-time">
+                                <div class="message-meta">
+                                    <span>${messageTime}</span>
+                                    ${statusHtml}
+                                </div>
+                            </div>
+                        `;
+
+                        // ربط أحداث الضغط المطوّل / كليك يمين
+                        attachMessageEvents(messageDiv);
+
+                        chatMessages.appendChild(messageDiv);
+                    });
+
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                } else {
+                    chatMessages.innerHTML = '<div class="error-message">فشل في تحميل الرسائل</div>';
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل الرسائل:', error);
+                document.getElementById('chatMessages').innerHTML =
+                    '<div class="error-message">حدث خطأ في تحميل الرسائل</div>';
+            }
+        }
+
+        let selectedMessageId = null;
+        let selectedMessageIsMine = false;
+        let messageActionModalInstance = null;
+
+        function attachMessageEvents(messageEl) {
+            const messageId = messageEl.dataset.messageId;
+            const isSent = messageEl.dataset.isSent === '1';
+
+            if (!messageId) return;
+
+            const openActions = (e) => {
+                e.preventDefault();
+                selectedMessageId = messageId;
+                selectedMessageIsMine = isSent;
+
+                const deleteAllBtn = document.getElementById('msgActionDeleteAll');
+                const editBtn = document.getElementById('msgActionEdit');
+
+                if (deleteAllBtn) deleteAllBtn.style.display = isSent ? 'block' : 'none';
+                if (editBtn) editBtn.style.display = isSent ? 'block' : 'none';
+
+                if (messageActionModalInstance) {
+                    messageActionModalInstance.show();
+                }
+            };
+
+            messageEl.addEventListener('contextmenu', openActions);
+
+            let touchTimer = null;
+            messageEl.addEventListener('touchstart', (e) => {
+                touchTimer = setTimeout(() => openActions(e), 500);
+            });
+            messageEl.addEventListener('touchend', () => {
+                if (touchTimer) clearTimeout(touchTimer);
+            });
+        }
+
+        async function performMessageAction(action) {
+            if (!selectedMessageId) return;
+
+            let newText = null;
+            if (action === 'edit') {
+                const currentText = prompt('نص الرسالة الجديد:');
+                if (!currentText) return;
+                newText = currentText;
+            }
+
+            try {
+                const response = await fetch('/messages/message_action', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message_id: selectedMessageId,
+                        action: action,
+                        new_text: newText
+                    })
+                });
+
+                let data = { success: false, message: 'استجابة غير صالحة' };
+                try {
+                    data = await response.json();
+                } catch (_) { }
+
+                if (!response.ok || !data.success) {
+                    alert((data && data.message) || 'فشل تنفيذ الإجراء');
+                } else {
+                    // إعادة تحميل الرسائل بعد أي إجراء ناجح
+                    if (currentConversationId) {
+                        await loadMessages(currentConversationId);
+                    }
+                }
+            } catch (error) {
+                console.error('خطأ في تنفيذ إجراء الرسالة:', error);
+                alert('حدث خطأ في تنفيذ الإجراء');
+            } finally {
+                if (messageActionModalInstance) {
+                    messageActionModalInstance.hide();
+                }
+            }
+        }
+
+        // إرسال رسالة
+        async function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const messageText = messageInput.value.trim();
+
+            console.log('🚀 بدء عملية إرسال الرسالة...');
+            console.log('📝 نص الرسالة:', messageText);
+            console.log('🎯 معرف المحادثة:', currentConversationId);
+
+            if (!messageText || !currentConversationId) {
+                console.log('❌ بيانات ناقصة - الرسالة أو معرف المحادثة فارغ');
+                return;
+            }
+
+            try {
+                console.log('📡 إرسال طلب إلى الخادم...');
+                const response = await fetch('/messages/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        receiver_id: currentConversationId,
+                        message: messageText
+                    })
+                });
+
+                console.log('📊 حالة الاستجابة:', response.status);
+                console.log('✅ الاستجابة صحيحة:', response.ok);
+
+                const data = await response.json();
+                console.log('📋 بيانات الاستجابة:', data);
+
+                if (data.success) {
+                    console.log('✅ تم إرسال الرسالة بنجاح!');
+                    messageInput.value = '';
+                    // إعادة تحميل الرسائل لإظهار الرسالة الجديدة
+                    await loadMessages(currentConversationId);
+                    // إعادة تحميل قائمة المحادثات لتحديث آخر رسالة
+                    await loadConversations();
+                } else {
+                    console.log('❌ فشل إرسال الرسالة:', data.message);
+                    alert('فشل في إرسال الرسالة: ' + data.message);
+                }
+            } catch (error) {
+                console.error('💥 خطأ في إرسال الرسالة:', error);
+                console.error('🔍 تفاصيل الخطأ:', error.message);
+                console.error('📚 Stack trace:', error.stack);
+                alert('حدث خطأ في إرسال الرسالة');
+            }
+        }
+
+        // العودة لقائمة المحادثات
+        function showConversationsList() {
+            const chatSectionEl = document.getElementById('chatSection');
+            const conversationsListEl = document.getElementById('conversationsList');
+            const mainHeaderEl = document.getElementById('mainMessagesHeader');
+            const mainSearchEl = document.getElementById('mainSearchBar');
+            const fabEl = document.getElementById('allCompaniesFab');
+
+            if (chatSectionEl) chatSectionEl.style.display = 'none';
+            if (conversationsListEl) conversationsListEl.style.display = 'block';
+            if (mainHeaderEl) mainHeaderEl.style.display = 'flex';
+            if (mainSearchEl) mainSearchEl.style.display = 'block';
+            if (fabEl) fabEl.style.display = '';
+
+            currentConversationId = null;
+            // إعادة تحميل المحادثات عند العودة لتحديث القائمة
+            loadConversations();
+        }
+
+        // أحداث الأزرار
+        document.getElementById('sendBtn').addEventListener('click', sendMessage);
+        const messageInputEl = document.getElementById('messageInput');
+        let typingTimeout = null;
+
+        function showTypingIndicator() {
+            const el = document.getElementById('typingIndicator');
+            if (!el) return;
+            el.style.display = 'block';
+            if (typingTimeout) clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                el.style.display = 'none';
+            }, 1500);
+        }
+
+        messageInputEl.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+            showTypingIndicator();
+        });
+
+        messageInputEl.addEventListener('input', () => {
+            showTypingIndicator();
+        });
+
+        messageInputEl.addEventListener('focus', () => {
+            const chatMessagesEl = document.getElementById('chatMessages');
+            if (!chatMessagesEl) return;
+            setTimeout(() => {
+                chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+            }, 300);
+        });
+
+        // تحميل المحادثات وقائمة الشركات عند بدء الصفحة + تهيئة المودال
+        document.addEventListener('DOMContentLoaded', () => {
+            loadConversations();
+            loadCompaniesList();
+
+            const modalEl = document.getElementById('allCompaniesModal');
+            if (modalEl) {
+                allCompaniesModalInstance = new bootstrap.Modal(modalEl);
+            }
+
+            const msgActionModalEl = document.getElementById('messageActionModal');
+            if (msgActionModalEl) {
+                messageActionModalInstance = new bootstrap.Modal(msgActionModalEl);
+            }
+
+            const fab = document.getElementById('allCompaniesFab');
+            if (fab && allCompaniesModalInstance) {
+                fab.addEventListener('click', async () => {
+                    try {
+                        // جلب كل الشركات من الخادم لضمان إظهار القائمة الكاملة في كل مرة
+                        const response = await fetch('/messages/companies');
+                        const data = await response.json();
+                        if (data.success) {
+                            companiesData = data.companies || [];
+                        }
+                    } catch (error) {
+                        console.error('خطأ في تحميل قائمة كل الشركات للمودال:', error);
+                    }
+
+                    renderAllCompaniesModal('');
+                    const searchInput = document.getElementById('companiesModalSearch');
+                    if (searchInput) searchInput.value = '';
+                    allCompaniesModalInstance.show();
+                });
+            }
+
+            const modalSearch = document.getElementById('companiesModalSearch');
+            if (modalSearch) {
+                modalSearch.addEventListener('input', (e) => {
+                    renderAllCompaniesModal(e.target.value || '');
+                });
+            }
+        });
+
+        // البحث أثناء الكتابة في القائمة الرئيسية
+        document.getElementById('companySearchInput').addEventListener('input', (e) => {
+            const query = e.target.value || '';
+            // فلترة محلية + تحديث من الخادم عند وجود نص بحث
+            renderConversationAndContacts();
+            if (query.length >= 2 || query.length === 0) {
+                loadCompaniesList(query);
+            }
+        });
+
+        // تحديث تلقائي كل 15 ثانية
+        setInterval(() => {
+            // تحديث قائمة المحادثات إذا كانت ظاهرة
+            if (document.getElementById('conversationsList').style.display !== 'none') {
+                loadConversations();
+            }
+            // تحديث الرسائل إذا كانت محادثة مفتوحة
+            if (currentConversationId) {
+                loadMessages(currentConversationId);
+            }
+        }, 15000); // 15 ثانية
+    </script>
+    <script>
+        function ensurePageSpinner() {
+            var spinner = document.getElementById('pageSpinner');
+            if (!spinner) {
+                var style = document.createElement('style');
+                style.textContent = ".spinner-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;justify-content:center;align-items:center}.spinner-overlay.active{display:flex;animation:fadeIn 0.3s ease}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.elegant-spinner{position:relative;width:80px;height:80px}.elegant-spinner::before,.elegant-spinner::after{content:'';position:absolute;border-radius:50%}.elegant-spinner::before{width:80px;height:80px;border:4px solid transparent;border-top-color:#667eea;border-right-color:#764ba2;animation:spinOuter 1.2s linear infinite}.elegant-spinner::after{width:50px;height:50px;top:15px;left:15px;border:4px solid transparent;border-bottom-color:#667eea;border-left-color:#764ba2;animation:spinInner 1.2s linear infinite reverse}@keyframes spinOuter{to{transform:rotate(360deg)}}@keyframes spinInner{to{transform:rotate(360deg)}}";
+                document.head.appendChild(style);
+                spinner = document.createElement('div');
+                spinner.className = 'spinner-overlay';
+                spinner.id = 'pageSpinner';
+                spinner.innerHTML = '<div class="elegant-spinner"><div class="spinner-dot"></div></div>';
+                document.body.appendChild(spinner);
+            }
+            return spinner;
+        }
+        window.addEventListener('pageshow', function(){
+            var s = document.getElementById('pageSpinner');
+            if (s) { s.classList.remove('active'); }
+        });
+        window.addEventListener('popstate', function(){
+            var s = document.getElementById('pageSpinner');
+            if (s) { s.classList.remove('active'); }
+        });
+        document.addEventListener('visibilitychange', function(){
+            if (!document.hidden) {
+                var s = document.getElementById('pageSpinner');
+                if (s) { s.classList.remove('active'); }
+            }
+        });
+        document.addEventListener('DOMContentLoaded', function(){
+            var homeLink = document.querySelector('a.nav-link[href*="company_dashboard"]');
+            if (homeLink) {
+                homeLink.addEventListener('click', function(e){
+                    e.preventDefault();
+                    var s = ensurePageSpinner();
+                    s.classList.add('active');
+                    var href = this.getAttribute('href');
+                    setTimeout(function(){ window.location.href = href; }, 150);
+                }, { passive: false });
+            }
+        });
+    </script>
+</body>
+</html>

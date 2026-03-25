@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بونص فارما - إرسال إشعار</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            background: white;
+            overflow: hidden;
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            color: white;
+            padding: 1.5rem;
+            border-bottom: none;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ced4da;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #fd7e14;
+            box-shadow: 0 0 0 0.25rem rgba(253, 126, 20, 0.25);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: transform 0.2s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-back {
+            background: #e9ecef;
+            color: #495057;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        .btn-back:hover {
+            background: #dee2e6;
+            color: #212529;
+        }
+
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-radius: 0 10px 10px 0 !important;
+            border: 1px solid #ced4da;
+            color: #6c757d;
+        }
+
+        .form-control {
+            border-radius: 10px 0 0 10px !important;
+        }
+        
+        .form-select {
+            border-radius: 10px !important;
+        }
+
+        .notification-preview {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1rem;
+            border-left: 4px solid #fd7e14;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+                <i class="fas fa-shield-alt me-2"></i>
+                لوحة الإدارة
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                    <i class="fas fa-home me-2"></i>
+                    الرئيسية
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container pb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="main-card">
+                    <div class="card-header-custom text-center">
+                        <h3 class="mb-0"><i class="fas fa-paper-plane me-2"></i>إرسال إشعار جديد</h3>
+                        <p class="mb-0 mt-2 text-white-50">أرسل تنبيهات وإعلانات للشركات المشتركة في النظام</p>
+                    </div>
+                    <div class="card-body p-4 p-md-5">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show mb-4" role="alert">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas {{ 'fa-exclamation-circle' if category == 'error' else 'fa-check-circle' }} me-2 fa-lg"></i>
+                                            <div>{{ message }}</div>
+                                        </div>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <form method="POST" id="notificationForm">
+                            <div class="row g-4">
+                                <div class="col-12">
+                                    <label for="title" class="form-label">عنوان الإشعار</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-heading"></i></span>
+                                        <input type="text" class="form-control" id="title" name="title" placeholder="مثال: تحديث هام في النظام" required>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="message" class="form-label">نص الإشعار</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-align-right"></i></span>
+                                        <textarea class="form-control" id="message" name="message" rows="5" placeholder="اكتب تفاصيل الإشعار هنا..." required></textarea>
+                                    </div>
+                                    <div class="form-text text-muted mt-2">
+                                        <i class="fas fa-info-circle me-1"></i> سيظهر هذا النص في لوحة تحكم الشركات
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="target_type" class="form-label">المستهدفون</label>
+                                    <select class="form-select" id="target_type" name="target_type" onchange="toggleTargetSelect()" required>
+                                        <option value="all" selected>📢 جميع الشركات</option>
+                                        <option value="specific">🎯 شركة محددة</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6" id="target_select" style="display: none;">
+                                    <label for="target_id" class="form-label">اختر الشركة</label>
+                                    <select class="form-select" id="target_id" name="target_id">
+                                        <option value="">-- اختر شركة من القائمة --</option>
+                                        {% for company in companies %}
+                                        <option value="{{ company.id }}">{{ company.company_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="col-12 mt-4">
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-back">
+                                            <i class="fas fa-arrow-right me-2"></i>عودة للرئيسية
+                                        </a>
+                                        <button type="submit" class="btn btn-submit text-white">
+                                            إرسال الإشعار <i class="fas fa-paper-plane ms-2"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Preview Card -->
+                <div class="main-card mt-4">
+                    <div class="card-body p-4">
+                        <h5 class="card-title text-muted mb-3"><i class="fas fa-eye me-2"></i>معاينة شكل الإشعار</h5>
+                        <div class="notification-preview">
+                            <div class="d-flex align-items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="rounded-circle bg-warning bg-opacity-10 p-3 text-warning">
+                                        <i class="fas fa-bell fa-lg"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5 class="mb-1 fw-bold" id="previewTitle">عنوان الإشعار</h5>
+                                    <p class="mb-0 text-muted" id="previewMessage">نص الإشعار سيظهر هنا...</p>
+                                    <small class="text-muted mt-2 d-block">الآن</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleTargetSelect() {
+            const targetType = document.getElementById('target_type').value;
+            const targetSelect = document.getElementById('target_select');
+            const targetIdInput = document.getElementById('target_id');
+
+            if (targetType === 'specific') {
+                targetSelect.style.display = 'block';
+                targetIdInput.required = true;
+                // Add animation class if needed
+                targetSelect.classList.add('fade-in');
+            } else {
+                targetSelect.style.display = 'none';
+                targetIdInput.required = false;
+                targetIdInput.value = "";
+            }
+        }
+
+        // Live Preview Logic
+        const titleInput = document.getElementById('title');
+        const messageInput = document.getElementById('message');
+        const previewTitle = document.getElementById('previewTitle');
+        const previewMessage = document.getElementById('previewMessage');
+
+        titleInput.addEventListener('input', function() {
+            previewTitle.textContent = this.value || 'عنوان الإشعار';
+        });
+
+        messageInput.addEventListener('input', function() {
+            previewMessage.textContent = this.value || 'نص الإشعار سيظهر هنا...';
+        });
+    </script>
+</body>
+
+</html>

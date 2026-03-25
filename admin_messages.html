@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المراسلات الخاصة - مجتمع بونص فارما</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+        }
+
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin: 20px;
+            min-height: calc(100vh - 40px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+
+        .content-area {
+            padding: 30px;
+        }
+
+        .messages-container {
+            display: flex;
+            gap: 20px;
+            height: 70vh;
+        }
+
+        .conversations-list {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            overflow-y: auto;
+        }
+
+        .chat-area {
+            flex: 2;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .conversation-item {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .conversation-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .conversation-item.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .conversation-item.unread {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .company-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .last-message {
+            font-size: 0.9rem;
+            color: #6c757d;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .conversation-item.active .last-message {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            color: #6c757d;
+            float: left;
+        }
+
+        .conversation-item.active .message-time {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .chat-header {
+            padding: 15px 0;
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            border-radius: 15px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .message.sent {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            margin-right: auto;
+            margin-left: 30%;
+        }
+
+        .message.received {
+            background: #f8f9fa;
+            color: #495057;
+            margin-left: auto;
+            margin-right: 30%;
+        }
+
+        .message-info {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            opacity: 0.7;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .message-input {
+            flex: 1;
+            resize: none;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 12px 15px;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .message-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover {
+            background: linear-gradient(135deg, #764ba2, #667eea);
+            transform: translateY(-2px);
+        }
+
+        .new-message-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .new-message-btn:hover {
+            background: linear-gradient(135deg, #20c997, #28a745);
+        }
+
+        .empty-chat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #6c757d;
+        }
+
+        .empty-chat i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .messages-container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .conversations-list,
+            .chat-area {
+                flex: none;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <h1><i class="fas fa-envelope"></i> المراسلات الخاصة</h1>
+            <p class="mb-0">تواصل مع أعضاء مجتمع بونص فارما</p>
+        </div>
+
+        <div class="content-area">
+            <div class="messages-container">
+                <!-- قائمة المحادثات -->
+                <div class="conversations-list">
+                    <button class="new-message-btn" onclick="showNewMessageModal()">
+                        <i class="fas fa-plus"></i> رسالة جديدة
+                    </button>
+                    <div id="conversationsList">
+                        <!-- المحادثات ستظهر هنا -->
+                    </div>
+                </div>
+
+                <!-- منطقة الدردشة -->
+                <div class="chat-area">
+                    <div id="chatContent">
+                        <div class="empty-chat">
+                            <i class="fas fa-comments"></i>
+                            <h4>اختر محادثة للبدء</h4>
+                            <p>اختر محادثة من القائمة أو ابدأ رسالة جديدة</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Message Modal -->
+    <div class="modal fade" id="newMessageModal" tabindex="-1" aria-labelledby="newMessageModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newMessageModalLabel">رسالة جديدة</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newMessageForm">
+                        <div class="mb-3">
+                            <label for="recipientSelect" class="form-label">المستقبل</label>
+                            <select class="form-select" id="recipientSelect" required>
+                                <option value="">اختر الشركة...</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="messageSubject" class="form-label">الموضوع</label>
+                            <input type="text" class="form-control" id="messageSubject" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="messageContent" class="form-label">الرسالة</label>
+                            <textarea class="form-control" id="messageContent" rows="4" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-primary" onclick="sendNewMessage()">إرسال</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentConversation = null;
+        let conversations = [];
+        let messages = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadConversations();
+            loadCompanies();
+            
+            // التحقق من وجود معرف شركة في URL للمراسلة المباشرة
+            const urlParams = new URLSearchParams(window.location.search);
+            const companyId = urlParams.get('company_id');
+            const companyName = urlParams.get('company_name');
+            
+            if (companyId && companyName) {
+                // فتح محادثة مع الشركة المحددة أو إنشاء محادثة جديدة
+                openDirectConversation(companyId, companyName);
+            }
+        });
+
+        function loadConversations() {
+            fetch('/messages/conversations')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        conversations = data.conversations;
+                        displayConversations();
+                    }
+                })
+                .catch(error => console.error('Error loading conversations:', error));
+        }
+
+        function loadCompanies() {
+            fetch('/community_bonus/get_companies')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const select = document.getElementById('recipientSelect');
+                        data.companies.forEach(company => {
+                            const option = document.createElement('option');
+                            option.value = company.id;
+                            option.textContent = company.company_name;
+                            select.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading companies:', error));
+        }
+
+        function displayConversations() {
+            const container = document.getElementById('conversationsList');
+            container.innerHTML = '';
+
+            conversations.forEach(conv => {
+                const item = document.createElement('div');
+                item.className = `conversation-item ${!conv.is_read ? 'unread' : ''}`;
+                item.onclick = () => openConversation(conv.other_company_id, conv.other_company_name);
+                
+                item.innerHTML = `
+                    <div class="company-name">${conv.other_company_name}</div>
+                    <div class="last-message">${conv.last_message}</div>
+                    <div class="message-time">${formatDate(conv.last_message_time)}</div>
+                `;
+                
+                container.appendChild(item);
+            });
+        }
+
+        function openConversation(companyId, companyName) {
+            currentConversation = companyId;
+            
+            // تحديث الواجهة
+            document.querySelectorAll('.conversation-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.conversation-item').classList.add('active');
+            
+            // تحميل الرسائل
+            loadMessages(companyId, companyName);
+        }
+
+        function openDirectConversation(companyId, companyName) {
+            // البحث عن المحادثة الموجودة أو إنشاء جديدة
+            const existingConv = conversations.find(c => c.other_company_id == companyId);
+            if (existingConv) {
+                openConversation(companyId, companyName);
+            } else {
+                // إنشاء محادثة جديدة
+                currentConversation = companyId;
+                loadMessages(companyId, companyName);
+            }
+        }
+
+        function loadMessages(companyId, companyName) {
+            fetch(`/messages/conversation/${companyId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        messages = data.messages;
+                        displayChat(companyId, companyName);
+                    }
+                })
+                .catch(error => console.error('Error loading messages:', error));
+        }
+
+        function displayChat(companyId, companyName) {
+            const chatContent = document.getElementById('chatContent');
+            
+            chatContent.innerHTML = `
+                <div class="chat-header">
+                    <h5><i class="fas fa-user"></i> ${companyName}</h5>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    ${messages.map(msg => `
+                        <div class="message ${msg.is_sent ? 'sent' : 'received'}">
+                            <div>${msg.message}</div>
+                            <div class="message-info">${formatDate(msg.sent_at)}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="chat-input">
+                    <textarea class="message-input" id="messageInput" placeholder="اكتب رسالتك هنا..." rows="2"></textarea>
+                    <button class="send-btn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i> إرسال
+                    </button>
+                </div>
+            `;
+            
+            // التمرير لآخر رسالة
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message || !currentConversation) return;
+            
+            fetch('/messages/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    receiver_id: currentConversation,
+                    subject: 'رسالة من المجتمع',
+                    message: message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    input.value = '';
+                    loadMessages(currentConversation, getCurrentConversationName());
+                    loadConversations(); // تحديث قائمة المحادثات
+                } else {
+                    alert('حدث خطأ في إرسال الرسالة');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending message:', error);
+                alert('حدث خطأ في الاتصال');
+            });
+        }
+
+        function showNewMessageModal() {
+            const modal = new bootstrap.Modal(document.getElementById('newMessageModal'));
+            modal.show();
+        }
+
+        function sendNewMessage() {
+            const recipientId = document.getElementById('recipientSelect').value;
+            const subject = document.getElementById('messageSubject').value;
+            const message = document.getElementById('messageContent').value;
+            
+            if (!recipientId || !subject || !message) {
+                alert('يرجى ملء جميع الحقول');
+                return;
+            }
+            
+            fetch('/messages/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    receiver_id: recipientId,
+                    subject: subject,
+                    message: message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('newMessageModal')).hide();
+                    document.getElementById('newMessageForm').reset();
+                    loadConversations();
+                    alert('تم إرسال الرسالة بنجاح');
+                } else {
+                    alert('حدث خطأ في إرسال الرسالة');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending message:', error);
+                alert('حدث خطأ في الاتصال');
+            });
+        }
+
+        function getCurrentConversationName() {
+            const activeItem = document.querySelector('.conversation-item.active');
+            return activeItem ? activeItem.querySelector('.company-name').textContent : '';
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ar-EG', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // إرسال الرسالة بالضغط على Enter
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.id === 'messageInput' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

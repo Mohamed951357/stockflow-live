@@ -1,0 +1,38 @@
+cd /home/Bonuspharma1/instance
+# 1) نسخة احتياطية للقاعدة الحالية إن وُجدت
+ts=$(date +%Y%m%d_%H%M)
+[ -f db.sqlite3 ] && cp db.sqlite3 db_backup_${ts}.sqlite3
+# 2) فك ملف الـ RAR (عدّل اسم الملف إن لزم)
+RAR_FILE="/home/Bonuspharma1/instance/db_old.rar"
+if command -v unrar >/dev/null 2>&1; then   unrar x -y "$RAR_FILE" /home/Bonuspharma1/instance; elif command -v 7z >/dev/null 2>&1; then   7z x -y -o/home/Bonuspharma1/instance "$RAR_FILE"; else   echo "لا توجد أداة unrar أو 7z لفك RAR.";   exit 1; fi
+# 3) اختيار أول ملف قاعدة بيانات مستخرج وإعادة تسميته إلى db.sqlite3
+DB_CAND="$(ls -1 *.sqlite3 *.sqlite *.db 2>/dev/null | head -n 1)"
+if [ -n "$DB_CAND" ]; then   mv -f "$DB_CAND" db.sqlite3; else   echo "لم يتم العثور على ملف قاعدة بعد فك الضغط.";   exit 1; fi
+find /home/Bonuspharma1 -maxdepth 6 -type f -name "*.rar" 2>/dev/null | head -n 10
+cd /home/Bonuspharma1/instance
+# نسخة احتياطية إن وُجدت قاعدة حالية
+ts=$(date +%Y%m%d_%H%M)
+[ -f db.sqlite3 ] && cp db.sqlite3 db_backup_${ts}.sqlite3
+# فك ملف RAR بصمت قدر الإمكان
+RAR_FILE="/home/Bonuspharma1/instance/site.db.rar"
+if command -v unrar >/dev/null 2>&1; then   unrar x -y "$RAR_FILE" /home/Bonuspharma1/instance >/dev/null 2>&1; elif command -v 7z >/dev/null 2>&1; then   7z x -y -o/home/Bonuspharma1/instance "$RAR_FILE" >/dev/null 2>&1; else   echo "لا توجد أداة unrar أو 7z لفك RAR.";   exit 1; fi
+# اختيار أول ملف قاعدة تم استخراجه وإعادة تسميته إلى db.sqlite3
+DB_CAND="$(find /home/Bonuspharma1/instance -maxdepth 3 -type f \( -name "*.sqlite3" -o -name "*.sqlite" -o -name "*.db" \) 2>/dev/null | head -n 1)"
+if [ -n "$DB_CAND" ]; then   mv -f "$DB_CAND" /home/Bonuspharma1/instance/db.sqlite3; else   echo "لم يتم العثور على ملف قاعدة بعد فك الضغط.";   exit 1; fi
+# تنظيف الملحقات وضبط الأذونات
+rm -f db.sqlite3-wal db.sqlite3-shm
+chmod 600 db.sqlite3
+# حذف ملف الـ RAR
+rm -f "$RAR_FILE"
+# عرض النتيجة
+ls -lh db.sqlite3
+cd /home/Bonuspharma1/instance
+# نسخة احتياطية إن وُجدت قاعدة حالية
+ts=$(date +%Y%m%d_%H%M)
+[ -f db.sqlite3 ] && cp db.sqlite3 db_backup_${ts}.sqlite3
+# فك ملف RAR بصمت قدر الإمكان
+RAR_FILE="/home/Bonuspharma1/instance/site.db.rar"
+if command -v unrar >/dev/null 2>&1; then   unrar x -y "$RAR_FILE" /home/Bonuspharma1/instance >/dev/null 2>&1; elif command -v 7z >/dev/null 2>&1; then   7z x -y -o/home/Bonuspharma1/instance "$RAR_FILE" >/dev/null 2>&1; else   echo "لا توجد أداة unrar أو 7z لفك RAR.";   exit 1; fi
+# اختيار أول ملف قاعدة تم استخراجه وإعادة تسميته إلى db.sqlite3
+DB_CAND="$(find /home/Bonuspharma1/instance -maxdepth 3 -type f \( -name "*.sqlite3" -o -name "*.sqlite" -o -name "*.db" \) 2>/dev/null | head -n 1)"
+if [ -n "$DB_CAND" ]; then   mv -f "$DB_CAND" /home/Bonuspharma1/instance/db.sqlite3; else   echo "لم يتم العثور على ملف قاعدة بعد فك الضغط.";   exit 1; fi

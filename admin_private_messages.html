@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بونص فارما - مراسلات الشركات</title>
+    <meta name="description" content="سجل مراسلات الشركات في نظام بونص فارما.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: none;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #17a2b8 0%, #0d6efd 100%);
+            color: white;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            padding: 1rem 1.5rem;
+            font-size: 1.15rem;
+        }
+
+        .table-responsive {
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+
+        .table {
+            margin-bottom: 0;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table thead th {
+            background-color: #e9ecef;
+            color: #495057;
+            font-weight: 600;
+            vertical-align: middle;
+            border-bottom: 2px solid #dee2e6;
+            padding: 12px 15px;
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table tbody td {
+            vertical-align: middle;
+            padding: 12px 15px;
+        }
+
+        .badge-status {
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 767.98px) {
+            .d-flex.justify-content-between.align-items-center.mb-4 {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .d-flex.justify-content-between.align-items-center.mb-4 > div {
+                width: 100%;
+                margin-top: 10px;
+            }
+            .d-flex.justify-content-between.align-items-center.mb-4 > div .btn {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+                <i class="fas fa-shield-alt me-2"></i>
+                لوحة الإدارة
+            </a>
+
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                    <i class="fas fa-home me-2"></i>
+                    الرئيسية
+                </a>
+                <a class="nav-link" href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    تسجيل الخروج
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>
+                        <i class="fas fa-comments me-2 text-info"></i>
+                        مراسلات الشركات
+                    </h2>
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-right me-2"></i>
+                        العودة للوحة الإدارة
+                    </a>
+                </div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" style="border-radius: 14px;" role="alert">
+                                <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- كارت إدارة حظر مراسلات الشركات -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-ban me-2"></i>
+                            إدارة حظر مراسلات الشركات
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{{ url_for('admin_private_messages') }}" class="row g-3 align-items-end">
+                            <input type="hidden" name="action" value="toggle_messaging_block">
+                            <div class="col-md-4">
+                                <label class="form-label">اختيار الشركة</label>
+                                <select name="company_id" class="form-select" required>
+                                    <option value="">-- اختر شركة --</option>
+                                    {% for c in companies %}
+                                        <option value="{{ c.id }}">
+                                            {{ c.id }} - {{ c.company_name }}
+                                            {% if c.messaging_blocked %}(محظورة){% endif %}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">سبب الحظر (يظهر للشركة)</label>
+                                <input type="text" name="block_reason" class="form-control" placeholder="مثال: إساءة استخدام ميزة المراسلات أو إرسال رسائل مزعجة">
+                            </div>
+                            <div class="col-md-2 mt-2">
+                                <button type="submit" class="btn btn-danger w-100">
+                                    <i class="fas fa-ban me-2"></i>
+                                    حظر/إلغاء حظر
+                                </button>
+                            </div>
+                        </form>
+                        <p class="text-muted mt-2 mb-0" style="font-size: 0.9rem;">
+                            عند تفعيل الحظر، لن تتمكن الشركة من استخدام صفحة المراسلات أو إرسال رسائل جديدة، وسيظهر لها سبب الحظر.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-paper-plane me-2"></i>
+                            إرسال رسالة للشركات
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{{ url_for('admin_private_messages') }}">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-4">
+                                    <label class="form-label">اختيار الشركة المستهدفة</label>
+                                    <select name="target_company_id" class="form-select">
+                                        <option value="all">كل الشركات (نشطة وغير نشطة)</option>
+                                        {% for c in companies %}
+                                            <option value="{{ c.id }}">{{ c.id }} - {{ c.company_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">العنوان (اختياري)</label>
+                                    <input type="text" name="subject" class="form-control" placeholder="مثال: إشعار هام من إدارة STOCK FLOW">
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label">نص الرسالة</label>
+                                    <textarea name="message_text" class="form-control" rows="3" maxlength="1000" placeholder="اكتب نص الرسالة التي سيتم إرسالها للشركات..."></textarea>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane me-2"></i>
+                                        إرسال الرسالة
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            إجمالي الرسائل الخاصة: ({{ messages|length }})
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if messages %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>وقت الإرسال</th>
+                                        <th>الشركة المرسلة</th>
+                                        <th>الشركة المستقبلة</th>
+                                        <th>العنوان</th>
+                                        <th>جزء من الرسالة</th>
+                                        <th>الحالة</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for msg in messages %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td>{{ msg.sent_at_cairo_formatted }}</td>
+                                        <td>
+                                            {% if msg.sender %}
+                                                {% if msg.sender.company_name == 'STOCK FLOW' %}
+                                                    {{ msg.sender.id }} - {{ msg.sender.company_name }}
+                                                    <i class="fas fa-check-circle text-success ms-1" title="مرسل معتمد"></i>
+                                                {% else %}
+                                                    {{ msg.sender.id }} - {{ msg.sender.company_name }}
+                                                {% endif %}
+                                            {% else %}
+                                                غير متاح
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if msg.total_recipients and msg.total_recipients > 1 %}
+                                                <span class="text-primary fw-semibold">إرسال جماعي إلى {{ msg.total_recipients }} شركة</span>
+                                            {% else %}
+                                                {% if msg.receiver %}
+                                                    {{ msg.receiver.id }} - {{ msg.receiver.company_name }}
+                                                    {% if msg.receiver.is_premium %}
+                                                        <i class="fas fa-check-circle text-success ms-1" title="شركة موثقة"></i>
+                                                    {% endif %}
+                                                {% else %}
+                                                    غير متاح
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ msg.subject or 'بدون عنوان' }}</td>
+                                        <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                            <a href="{{ url_for('admin_private_message_reads', message_id=msg.id) }}" class="text-decoration-none" title="عرض من قرأ هذه الرسالة">
+                                                {{ msg.message[:100] }}{% if msg.message and msg.message|length > 100 %}...{% endif %}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {% if msg.is_read %}
+                                                <span class="badge bg-success badge-status">مقروءة</span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark badge-status">غير مقروءة</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-comments fa-4x text-muted mb-3"></i>
+                                <h5 class="text-muted">لا توجد مراسلات بين الشركات حتى الآن.</h5>
+                                <p class="text-muted">عند بدء الشركات في تبادل الرسائل ستظهر هنا جميع المراسلات.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

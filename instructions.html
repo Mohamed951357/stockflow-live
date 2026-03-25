@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بونص فارما - تعليمات وإرشادات - {{ system_subtitle }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* NEW: Root CSS variables for consistent theming - Copied from company_dashboard */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Rich purple to vibrant blue */
+            --secondary-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); /* Cyan to bright blue */
+            --text-color-dark: #2d3748;
+            --text-color-light: #f7fafc;
+            --accent-color: #00f2fe; /* Brighter cyan for actions */
+            --shadow-light: rgba(0, 0, 0, 0.08);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+            --highlight-color: #4facfe; /* Used for some borders/highlights */
+            --success-color: #0bab7c; /* A vibrant green */
+            --error-color: #dc3545; /* A strong red */
+            --border-radius-lg: 15px;
+            --transition-speed: 0.3s;
+
+            /* Default Light Mode Variables for consistency */
+            --body-bg: #f8f9fa;
+            --text-color: #212529;
+            --card-bg: white;
+            --card-shadow-rgb: 0, 0, 0, 0.08;
+            --card-border: #e0e6f0;
+            --muted-text: #6c757d;
+            --input-bg: white;
+            --input-border: #e9ecef;
+            --alert-bg-info: #e2f0fe;
+            --alert-border-info: #cce5ff;
+            --alert-color-info: #004085;
+            --alert-bg-warning: #fff3cd;
+            --alert-border-warning: #ffc107;
+            --alert-color-warning: #664d03;
+            --alert-bg-danger: #f8d7da;
+            --alert-border-danger: #f5c2c7;
+            --alert-color-danger: #842029;
+            --alert-bg-success: #d1e7dd;
+            --alert-border-success: #badbcc;
+            --alert-color-success: #0f5132;
+            --navbar-icon-color: #000000; /* Black for icons */
+        }
+
+        body {
+            background-color: var(--body-bg);
+            font-family: 'Cairo', sans-serif;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 56px; /* Default padding for fixed-top navbar */
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+        }
+        .navbar {
+            background: var(--primary-gradient);
+            box-shadow: 0 4px 15px rgba(var(--card-shadow-rgb));
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1030;
+            transition: all 0.3s ease;
+        }
+        .navbar-brand {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+        .navbar-logo {
+            height: 35px;
+            width: auto;
+            margin-left: 10px;
+        }
+        /* Hide full text for smaller screens */
+        .navbar-brand .full-text {
+            display: inline;
+        }
+        @media (max-width: 767.98px) {
+            .navbar-brand .full-text {
+                display: none;
+            }
+            .navbar-brand .short-text {
+                display: none; /* Hidden consistently */
+            }
+        }
+        @media (min-width: 768px) {
+            .navbar-brand .short-text {
+                display: none;
+            }
+        }
+
+        /* Notification badge specific styles for clarity - Copied from company_dashboard */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            padding: 5px 8px;
+            border-radius: 50%;
+            background-color: var(--error-color);
+            color: white;
+            font-size: 0.75em;
+            font-weight: bold;
+            z-index: 10;
+            min-width: 20px;
+            text-align: center;
+            line-height: 1;
+        }
+
+        /* Navbar icons container and styling - Copied from company_dashboard */
+        .navbar-nav-notification-wrapper {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            margin-right: 15px;
+            flex-grow: 1;
+            justify-content: space-around;
+            max-width: 200px;
+            flex-shrink: 0;
+            gap: 10px;
+        }
+        .navbar-nav-notification-wrapper .nav-link {
+            padding: 0.5rem;
+            position: relative;
+            color: var(--navbar-icon-color);
+            transition: color 0.3s ease, transform 0.3s ease;
+            background: none;
+            border: none;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .navbar-nav-notification-wrapper .nav-link:hover {
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+        .navbar-nav-notification-wrapper .nav-link .fa-lg {
+            font-size: 1.25em;
+        }
+
+        /* Mobile specific adjustments for navbar icons - Copied from company_dashboard */
+        @media (max-width: 991.98px) {
+            .navbar-nav-notification-wrapper {
+                order: -1;
+                margin-left: auto;
+                margin-right: 10px;
+                padding: 0;
+                max-width: 150px;
+                justify-content: space-between;
+            }
+            .navbar-nav-notification-wrapper .nav-link {
+                padding: 0.5rem;
+            }
+            .navbar-nav-notification-wrapper .notification-badge {
+                top: 0px;
+                right: 0px;
+                font-size: 0.65em;
+                padding: 3px 6px;
+            }
+            /* Hide company info in collapsed menu */
+            .navbar-nav-user-info {
+                display: none;
+            }
+            /* Collapsed menu styles - Copied from company_dashboard */
+            .navbar-collapse .navbar-nav {
+                width: 100%;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+            .navbar-collapse .nav-item {
+                text-align: center;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .navbar-collapse .nav-item:last-child {
+                border-bottom: none;
+            }
+            .navbar-collapse .nav-link {
+                padding: 12px 15px;
+                color: rgba(255, 255, 255, 0.9);
+                font-size: 1.1rem;
+                transition: background-color 0.3s ease;
+            }
+            .navbar-collapse .nav-link:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                border-radius: 5px;
+            }
+            /* Style for company name in mobile collapsed menu */
+            .navbar-collapse .navbar-text {
+                display: block;
+                padding: 12px 15px;
+                color: rgba(255, 255, 255, 0.7);
+                font-weight: 600;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+        }
+        /* Desktop specific adjustments - Copied from company_dashboard */
+        @media (min-width: 992px) {
+            .navbar-nav-notification-wrapper {
+                margin-left: 15px;
+                margin-right: 0;
+                gap: 15px;
+            }
+            .navbar-nav-notification-wrapper .nav-link {
+                padding: 0.5rem 0.75rem;
+            }
+            .navbar-nav-notification-wrapper .notification-badge {
+                top: -5px;
+                right: -5px;
+                font-size: 0.75em;
+                padding: 5px 8px;
+            }
+            .navbar-nav-user-info {
+                display: flex;
+            }
+        }
+
+        .content-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 5px 15px rgba(var(--card-shadow-rgb));
+            padding: 2rem;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+        }
+        .section-header {
+            color: #667eea; /* Primary blue from gradient */
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--card-border); /* Use variable */
+            padding-bottom: 0.5rem;
+        }
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .feature-item i {
+            font-size: 1.5rem;
+            color: #764ba2; /* Purple from gradient */
+            margin-left: 15px;
+            margin-top: 5px;
+        }
+        .feature-item div h5 {
+            font-weight: 600;
+            color: var(--text-color-dark); /* Use variable */
+            margin-bottom: 0.2rem;
+        }
+        .feature-item div p {
+            font-size: 0.95rem;
+            color: var(--muted-text); /* Use variable */
+        }
+        .how-to-section {
+            background-color: var(--alert-bg-info); /* Use variable for consistency */
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--alert-color-info); /* Use variable */
+        }
+        .how-to-section h4 {
+            color: #007bff; /* Keep specific blue for header */
+            margin-bottom: 1rem;
+        }
+        .how-to-step {
+            margin-bottom: 0.8rem;
+        }
+        .how-to-step strong {
+            color: var(--text-color-dark); /* Use variable */
+        }
+        /* Responsive adjustments */
+        @media (max-width: 767.98px) {
+            .navbar-brand .full-text {
+                display: none;
+            }
+            .navbar-brand .short-text {
+                display: inline;
+            }
+            .content-card {
+                padding: 1rem;
+                margin-top: 1rem;
+            }
+            .feature-item {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .feature-item i {
+                margin-left: 0;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('company_dashboard') }}">
+                {% if current_logo_path %}
+                    <img src="{{ current_logo_path }}" alt="Logo" class="navbar-logo">
+                {% else %}
+                    <img src="{{ url_for('static', filename='images/default_logo.png') }}" alt="Default Logo" class="navbar-logo">
+                {% endif %}
+                <span class="full-text">{{ system_subtitle }}</span>
+                <span class="short-text d-none"></span>{# Hidden consistently #}
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavCompany" aria-controls="navbarNavCompany" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            {# NEW: Navbar icons container for Profile, Community, Instructions, Notifications #}
+            <div class="navbar-nav-notification-wrapper">
+                <a class="nav-link" href="{{ url_for('company_profile') }}" title="ملفي الشخصي">
+                    <i class="fas fa-user-circle fa-lg"></i>
+                </a>
+                <a class="nav-link" href="{{ url_for('community_chat') }}" title="المساعد الذكي">
+                    <i class="fas fa-comments fa-lg"></i>
+                    <span class="notification-badge" id="community-count" style="display: none;">0</span>
+                </a>
+                <a class="nav-link" href="{{ url_for('instructions') }}" title="تعليمات وإرشادات">
+                    <i class="fas fa-question-circle fa-lg"></i>
+                </a>
+                <a class="nav-link position-relative" href="{{ url_for('notifications') }}" title="الإشعارات">
+                    <i class="fas fa-bell fa-lg"></i>
+                    <span class="notification-badge" id="notification-count" style="display: none;">0</span>
+                </a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="navbarNavCompany">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0"> {# Added mb-2 mb-lg-0 for consistency #}
+                    {# User Info on Mobile Menu - Hidden on desktop #}
+                    <li class="nav-item d-lg-none">
+                        <span class="navbar-text">
+                            <i class="fas fa-building me-2"></i>
+                            {{ current_user.company_name }}
+                        </span>
+                    </li>
+                    {# User Info on Desktop Navbar - Hidden on mobile #}
+                    <li class="nav-item d-none d-lg-flex align-items-center me-3">
+                        <span class="navbar-text">
+                            <i class="fas fa-building me-2"></i>
+                            {{ current_user.company_name }}
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('company_dashboard') }}">
+                            <i class="fas fa-home me-2"></i>
+                            الرئيسية
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('my_products') }}">
+                            <i class="fas fa-boxes me-2"></i>
+                            أصنافي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('search_products') }}">
+                            <i class="fas fa-search me-2"></i>
+                            البحث في الأصناف
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('company_stock_reports') }}">
+                            <i class="fas fa-chart-line me-2"></i>
+                            تقارير الأرصدة
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('appointments') }}">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            مواعيدي
+                        </a>
+                    </li>
+                    <li class="nav-item active" aria-current="page"> {# Set active for Instructions page #}
+                        <a class="nav-link" href="{{ url_for('instructions') }}">
+                            <i class="fas fa-question-circle me-2"></i>
+                            التعليمات
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            تسجيل الخروج
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="content-card">
+            <h2 class="text-center section-header">
+                <i class="fas fa-info-circle me-3"></i>
+                تعليمات وإرشادات استخدام النظام
+            </h2>
+            <p class="text-center text-muted mb-4">
+                مرحباً بك في نظامنا المتكامل! إليك دليل سريع لمساعدتك في الاستفادة القصوى من جميع الميزات.
+            </p>
+
+            <h3 class="section-header mt-5">
+                <i class="fas fa-star me-2"></i>
+                مميزات النظام الأساسية
+            </h3>
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="feature-item">
+                        <i class="fas fa-search"></i>
+                        <div>
+                            <h5>البحث السريع عن الأصناف</h5>
+                            <p>ابحث عن أي صنف بسهولة وفعالية، واطلع على الكميات والأسعار المتاحة في الوقت الفعلي.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="feature-item">
+                        <i class="fas fa-boxes"></i>
+                        <div>
+                            <h5>إدارة أصنافك المفضلة</h5>
+                            <p>أضف الأصناف التي تهمك إلى قائمة "أصنافي" لتتابع أرصدتها وتعديل ملاحظاتك الخاصة بها.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="feature-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <div>
+                            <h5>حجز مواعيد مرنة</h5>
+                            <p>احجز مواعيد لمقابلة الإدارة لأغراض التحصيل، المقابلات، أو توريد/سحب الأصناف بكل يسر.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="feature-item">
+                        <i class="fas fa-bell"></i>
+                        <div>
+                            <h5>إشعارات وتنبيهات فورية</h5>
+                            <p>تلقى أحدث التحديثات، التغييرات في المواعيد، والإعلانات الهامة من الإدارة مباشرة.</p>
+                        </div>
+                    </div>
+                </div>
+                 <div class="col-md-6 mb-4">
+                    <div class="feature-item">
+                        <i class="fas fa-chart-line"></i>
+                        <div>
+                            <h5>تقارير الأرصدة الذكية</h5>
+                            <p>اطلع على تحليل لمتوسط استهلاك أصنافك المفضلة واقتراحات التوريد بناءً على نشاطك.</p>
+                        </div>
+                    </div>
+                </div>
+                 <div class="col-md-6 mb-4">
+                    <div class="feature-item">
+                        <i class="fas fa-comments"></i>
+                        <div>
+                            <h5>المساعد الذكي (المجتمع)</h5>
+                            <p>تواصل مع المديرين والشركات الأخرى عبر شات جماعي لتبادل الخبرات والاستفسارات.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="section-header mt-5">
+                <i class="fas fa-hand-pointer me-2"></i>
+                كيف تستخدم النظام؟ (خطوات سريعة)
+            </h3>
+            <div class="how-to-section">
+                <h4>للبحث عن صنف وإضافته لأصنافك:</h4>
+                <div class="how-to-step">
+                    1. من القائمة الرئيسية، اختر "<strong class="text-primary">البحث في الأصناف</strong>".
+                </div>
+                <div class="how-to-step">
+                    2. اكتب اسم الصنف في خانة البحث واضغط "بحث".
+                </div>
+                <div class="how-to-step">
+                    3. ستظهر لك النتائج، اضغط على زر "<strong class="text-success"><i class="fas fa-plus-circle"></i> إضافة لأصنافي</strong>" بجانب الصنف المطلوب.
+                </div>
+                <div class="how-to-step">
+                    4. يمكنك الآن متابعة هذا الصنف في صفحة "<strong class="text-primary">أصنافي</strong>" من القائمة الرئيسية.
+                </div>
+            </div>
+
+            <div class="how-to-section">
+                <h4>لحجز موعد جديد:</h4>
+                <div class="how-to-step">
+                    1. من القائمة الرئيسية، اختر "<strong class="text-primary">مواعيدي</strong>".
+                </div>
+                <div class="how-to-step">
+                    2. اضغط على زر "<strong class="text-primary"><i class="fas fa-calendar-plus"></i> حجز موعد جديد</strong>".
+                </div>
+                <div class="how-to-step">
+                    3. املأ البيانات المطلوبة (التاريخ، الوقت، الغرض، رقم الموبايل، الصنف) ثم اضغط "إرسال الطلب".
+                </div>
+                <div class="how-to-step">
+                    4. ستتلقى إشعاراً عند مراجعة الإدارة لطلبك وتغيير حالته.
+                </div>
+            </div>
+
+             <div class="how-to-section">
+                <h4>لعرض تقارير أرصدة أصنافك:</h4>
+                <div class="how-to-step">
+                    1. تأكد من إضافة الأصناف التي تهمك إلى قائمة "<strong class="text-primary">أصنافي</strong>".
+                </div>
+                <div class="how-to-step">
+                    2. من القائمة الرئيسية، اختر "<strong class="text-primary">تقارير الأرصدة</strong>".
+                </div>
+                <div class="how-to-step">
+                    3. سيظهر لك تحليل لمتوسط التغير اليومي واقتراحات التوريد لأصنافك المفضلة.
+                </div>
+            </div>
+
+            <div class="how-to-section">
+                <h4>للتواصل مع المساعد الذكي:</h4>
+                <div class="how-to-step">
+                    1. من القائمة الرئيسية، اختر "<strong class="text-primary">المساعد الذكي</strong>" (أيقونة الدردشة في الناف بار).
+                </div>
+                <div class="how-to-step">
+                    2. يمكنك البدء في محادثة مباشرة مع المساعد الذكي للاستفسارات والدعم.
+                </div>
+            </div>
+
+            <p class="text-center mt-5 text-muted">
+                - إذا كان لديك أي استفسارات أخرى، لا تتردد في التواصل مع الإدارة.
+                تمت برمجة هذا الموقع بواسطة أ/محمد ناجى - للتواصل 201554077727
+            </p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Unified update function for all counts - Copied from company_dashboard
+        function updateCounts() {
+            fetch('/api/unread_counts')
+                .then(response => response.json())
+                .then(data => {
+                    const notificationBadge = document.getElementById('notification-count');
+                    if (notificationBadge) {
+                        if (data.unread_notifications_count > 0) {
+                            notificationBadge.textContent = data.unread_notifications_count;
+                            notificationBadge.style.display = 'block';
+                        } else {
+                            notificationBadge.style.display = 'none';
+                        }
+                    }
+
+                    const communityBadge = document.getElementById('community-count');
+                    if (communityBadge) {
+                        if (data.unread_community_messages_count > 0) {
+                            communityBadge.textContent = data.unread_community_messages_count;
+                            communityBadge.style.display = 'block';
+                        } else {
+                            communityBadge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching unread counts:', error));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCounts(); // Initial call to update counts
+            setInterval(updateCounts, 30000); // Update every 30 seconds
+        });
+
+        // Removed Device detection and navbar positioning logic as requested.
+        // Removed Theme Toggle related JS as requested (no dark mode here).
+    </script>
+</body>
+</html>

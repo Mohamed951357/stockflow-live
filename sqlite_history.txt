@@ -1,0 +1,3 @@
+ALTER TABLE ad_image ADD COLUMN image_type VARCHAR(10) NOT NULL DEFAULT 'free';
+PRAGMA table_info(ad_image);
+.quit

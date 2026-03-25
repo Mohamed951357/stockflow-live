@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بونص فارما - إشعارات المديرين - نظام حجز المواعيد</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .notification-card {
+            border-left: 4px solid #dc3545;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .notification-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        /* تم تغيير هذه الستايلات لتطابق الستايلات في admin_notifications.html السابق */
+        .notification-card.status-active { background-color: #d4edda; border-color: #28a745; } /* اخضر للنشط */
+        .notification-card.status-inactive { background-color: #f8d7da; border-color: #dc3545; } /* أحمر لغير النشط */
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+                <i class="fas fa-shield-alt me-2"></i>
+                لوحة الإدارة
+            </a>
+
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                    <i class="fas fa-home me-2"></i>
+                    الرئيسية
+                </a>
+                <a class="nav-link" href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    تسجيل الخروج
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>
+                        <i class="fas fa-bell me-2 text-primary"></i>
+                        إشعارات المديرين
+                    </h2>
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-right me-2"></i>
+                        العودة للوحة الإدارة
+                    </a>
+                </div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" style="border-radius: 14px;" role="alert">
+                                <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            قائمة الإشعارات المرسلة
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if notifications %}
+                            {% for notification in notifications %}
+                            <div class="card notification-card status-{{ 'active' if notification.is_active else 'inactive' }}">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h6 class="mb-1">
+                                                <i class="fas fa-info-circle me-2 text-info"></i>
+                                                {{ notification.title }}
+                                            </h6>
+                                            <p class="mb-2">{{ notification.message }}</p>
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock me-1"></i>
+                                                تم الإرسال: {{ notification.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                                {% if notification.target_type == 'specific' and notification.target_id %}
+                                                    {% set target_company = Company.query.get(notification.target_id) %}
+                                                    <br>المستهدف: الشركة: {{ target_company.company_name if target_company else 'غير معروفة' }}
+                                                {% else %}
+                                                    <br>المستهدف: جميع الشركات
+                                                {% endif %}
+                                                <br>بواسطة: {{ notification.created_by_user.full_name if notification.created_by_user else 'مدير غير معروف' }}
+                                            </small>
+                                            <br>
+                                            <small class="text-muted">
+                                                الحالة:
+                                                {% if notification.is_active %}
+                                                    <span class="badge bg-success">نشط</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">غير نشط</span>
+                                                {% endif %}
+                                                | مقروء من الشركة:
+                                                {% if notification.is_read %}
+                                                    <span class="badge bg-info">مقروء</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning text-dark">غير مقروء</span>
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                        <div class="col-md-4 text-end">
+                                            {# Form for Deleting Notification #}
+                                            <form action="{{ url_for('delete_notification', notification_id=notification.id) }}" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('هل أنت متأكد من حذف هذا الإشعار؟ لا يمكن التراجع عن هذا الإجراء.')">
+                                                    <i class="fas fa-trash-alt me-1"></i>
+                                                    حذف
+                                                </button>
+                                            </form>
+                                            {# Button to toggle active status - Assuming you have this route/logic #}
+                                            {# تحتاج إلى التأكد من وجود دالة 'toggle_notification_active' في views.py #}
+                                            <a href="{{ url_for('toggle_notification_active', notification_id=notification.id) }}" class="btn btn-info btn-sm">
+                                                {% if notification.is_active %}
+                                                    <i class="fas fa-eye-slash me-1"></i> تعطيل
+                                                {% else %}
+                                                    <i class="fas fa-eye me-1"></i> تفعيل
+                                                {% endif %}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-bell-slash fa-4x text-muted mb-3"></i>
+                                <h5 class="text-muted">لم يتم إرسال إشعارات بعد</h5>
+                                <p class="text-muted">ابدأ بإرسال إشعارات للشركات من لوحة الإدارة.</p>
+                                <a href="{{ url_for('send_notification') }}" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i>
+                                    إرسال إشعار جديد
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

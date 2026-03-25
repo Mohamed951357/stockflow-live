@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بونص فارما - حجز موعد - نظام حجز المواعيد</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* NEW: Root CSS variables for consistent theming */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Matching dashboard primary gradient */
+            --secondary-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); /* Cyan to bright blue */
+            --text-color-dark: #2d3748;
+            --text-color-light: #f7fafc;
+            --accent-color: #00f2fe; /* Brighter cyan for actions */
+            --shadow-light: rgba(0, 0, 0, 0.08);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+            --highlight-color: #4facfe; /* Used for some borders/highlights */
+            --success-color: #0bab7c; /* A vibrant green */
+            --error-color: #dc3545; /* Red for notifications, matches original file's #dc3545 */
+            --border-radius-lg: 15px;
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Cairo', sans-serif;
+            min-height: 100vh;
+            padding-top: 56px; /* Keep default padding for fixed-top navbar */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Removed Android/iPhone specific navbar positioning styles */
+        
+        .navbar {
+            background: var(--primary-gradient); /* Using CSS variable for consistency */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Adjusted shadow for consistency */
+            position: fixed; /* Ensure it stays fixed at top */
+            width: 100%;
+            top: 0;
+            z-index: 1030;
+            transition: all 0.3s ease;
+        }
+
+        /* Notification badge specific styles for clarity */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            padding: 5px 8px;
+            border-radius: 50%;
+            background-color: var(--error-color); /* Using CSS variable for consistency */
+            color: white;
+            font-size: 0.75em;
+            font-weight: bold;
+            z-index: 10;
+            min-width: 20px;
+            text-align: center;
+            line-height: 1;
+        }
+
+        /* تحسينات عامة للـ Navbar */
+        .navbar-brand {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            color: white; /* Ensure text is white */
+        }
+
+        .navbar-logo {
+            height: 35px; /* Adjust logo size for better fit */
+            width: auto;
+            margin-left: 10px;
+        }
+
+        /* Hide full text for smaller screens - Matched to company_dashboard and search_products */
+        .navbar-brand .full-text {
+            display: inline;
+        }
+        @media (max-width: 767.98px) {
+            .navbar-brand .full-text {
+                display: none;
+            }
+            .navbar-brand .short-text { /* Hide short text completely on small screens */
+                display: none; 
+            }
+        }
+        @media (min-width: 768px) {
+            .navbar-brand .short-text {
+                display: none; /* Hide short text on larger screens */
+            }
+        }
+
+        /* NEW CSS for Navbar icons container - Matched to company_dashboard and search_products */
+        .navbar-nav-notification-wrapper {
+            display: flex;
+            align-items: center;
+            margin-left: auto; /* Push to the right in RTL */
+            margin-right: 15px; /* Space from right edge */
+            flex-grow: 1; /* Allow to take available space */
+            justify-content: space-around; /* Distribute items with even space */
+            max-width: 200px; /* Limit width as in company_dashboard */
+            flex-shrink: 0; /* Prevent icons from shrinking */
+            gap: 10px; /* Space between each icon */
+        }
+
+        .navbar-nav-notification-wrapper .nav-link {
+            padding: 0.5rem; /* Padding around each icon */
+            position: relative; /* For badge positioning */
+            color: #000000; /* Set to black as requested */
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .navbar-nav-notification-wrapper .nav-link:hover {
+            color: #ffffff; /* Solid white on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+        .navbar-nav-notification-wrapper .nav-link .fa-lg {
+            font-size: 1.25em; /* Standard large icon size */
+        }
+
+        /* Mobile specific adjustments for navbar icons - Matched to company_dashboard and search_products */
+        @media (max-width: 991.98px) {
+            .navbar-nav-notification-wrapper {
+                order: -1; /* Place before brand on mobile */
+                margin-left: auto; /* Push to the right next to toggler */
+                margin-right: 10px; /* Space from toggler */
+                gap: 5px; /* Smaller gap on mobile */
+                max-width: 150px; /* Smaller max-width for mobile icons */
+                justify-content: space-between; /* Align to the right on mobile */
+                flex-grow: 1; /* Allow to grow to fill space somewhat */
+            }
+            .navbar-nav-notification-wrapper .nav-link {
+                padding: 0.4rem; /* Smaller padding for icons on mobile */
+            }
+            .navbar-nav-notification-wrapper .notification-badge {
+                top: 0px; 
+                right: 0px;
+                font-size: 0.65em;
+                padding: 3px 6px;
+            }
+
+            /* Hide company info in collapsed menu */
+            .navbar-nav-user-info {
+                display: none;
+            }
+
+            /* تنسيق القائمة المنسدلة عند الفتح على الموبايل - Matched to company_dashboard and search_products */
+            .navbar-collapse .navbar-nav {
+                width: 100%; /* Make menu take full screen width */
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+            .navbar-collapse .nav-item {
+                text-align: center; /* Center menu items */
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Separator line */
+            }
+            .navbar-collapse .nav-item:last-child {
+                border-bottom: none; /* No separator for last item */
+            }
+            .navbar-collapse .nav-link {
+                padding: 12px 15px; /* Adequate padding for menu items */
+                color: rgba(255, 255, 255, 0.9); /* Text color */
+                font-size: 1.1rem; /* Font size */
+                transition: background-color 0.3s ease;
+            }
+            .navbar-collapse .nav-link:hover {
+                background-color: rgba(255, 255, 255, 0.1); /* Light background on hover */
+                border-radius: 5px; /* Rounded corners on hover */
+            }
+            /* Style for company name in mobile collapsed menu */
+            .navbar-collapse .navbar-text {
+                display: block; /* Make it take full line */
+                padding: 12px 15px;
+                color: rgba(255, 255, 255, 0.7);
+                font-weight: 600;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        /* على الشاشات الأكبر من 992px (الديسك توب) - Matched to company_dashboard and search_products */
+        @media (min-width: 992px) {
+            .navbar-nav-notification-wrapper {
+                margin-left: 15px;
+                margin-right: 0;
+                gap: 15px; /* Larger gap on desktop */
+            }
+            .navbar-nav-notification-wrapper .nav-link {
+                padding: 0.5rem 0.75rem;
+            }
+            .navbar-nav-notification-wrapper .notification-badge {
+                top: -5px;
+                right: -5px;
+                font-size: 0.75em;
+                padding: 5px 8px;
+            }
+            .navbar-nav-user-info {
+                display: flex; /* إظهار اسم الشركة على الديسك توب */
+            }
+        }
+
+        .appointment-card {
+            border-left: 4px solid #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .status-pending { background-color: #fff3cd; border-color: #ffc107; }
+        .status-approved { background-color: #d1edff; }
+        .status-rejected { background-color: #f8d7da; border-color: #dc3545; }
+
+
+        /* Floating Pop-up styles (Copied from search_products.html) */
+        .toby-popup-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            /* NEW: Use flex for dynamic width based on content */
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease-out; /* Smooth transition for all properties */
+            border: 2px solid #667eea; /* Adjusted to match primary gradient start color */
+            /* Initial width set for full popup, will change via JS */
+            width: 300px;
+        }
+
+        .toby-popup-container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Styles for pop-up when only Toby's image is visible */
+        .toby-popup-container.icon-only {
+            width: fit-content; /* Shrink to fit content */
+            padding: 10px; /* Smaller padding */
+            border-radius: 50px; /* More rounded for icon-only */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Lighter shadow */
+            flex-direction: row; /* Ensure elements are in a row */
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Center content vertically */
+        }
+
+        .toby-popup-image {
+            width: 60px; /* Adjust size as needed */
+            height: 60px; /* Keep aspect ratio */
+            border-radius: 50%; /* Make it circular */
+            object-fit: cover; /* Ensure image covers the area */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.6); /* Subtle glow */
+            animation: pulse-image 2s infinite ease-in-out; /* Gentle pulse animation */
+            border: 3px solid #667eea; /* Adjusted to match primary gradient start color */
+        }
+
+        .toby-popup-image:hover {
+            transform: scale(1.1) rotate(5deg); /* More pronounced hover effect */
+            box-shadow: 0 0 15px rgba(118, 75, 162, 0.8); /* Stronger glow on hover */
+        }
+
+        @keyframes pulse-image {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* toby-popup-content will be hidden and then its style will be changed to display:none */
+        .toby-popup-content {
+            flex-grow: 1;
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out; /* Smooth transition for hiding */
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .toby-popup-content.hidden-content {
+            opacity: 0;
+            transform: translateX(-20px);
+            pointer-events: none; /* Disable interaction when hidden */
+        }
+
+        .toby-popup-content p {
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .toby-popup-content .btn {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 20px;
+            padding: 5px 15px;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .toby-popup-content .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* toby-popup-close position adjustment for icon-only mode */
+        .toby-popup-close {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .toby-popup-close:hover {
+            color: #333;
+        }
+
+        /* Responsive adjustments for pop-up */
+        @media (max-width: 767.98px) {
+            .toby-popup-container {
+                width: calc(100% - 40px); /* Full width minus margins */
+                bottom: 15px;
+                right: 15px;
+                left: 15px;
+                flex-wrap: wrap; /* Allow wrapping content */
+                justify-content: center; /* Center content on small screens */
+            }
+            .toby-popup-container.icon-only {
+                width: fit-content;
+                height: auto; /* Allow height to adjust */
+                flex-direction: row; /* Keep elements in a row for small icon-only */
+            }
+            .toby-popup-image {
+                width: 50px; /* Adjusted for smaller screens */
+                height: 50px;
+            }
+            .toby-popup-content {
+                width: 100%; /* Take full width for message on small screen */
+                text-align: center;
+                margin-top: 10px; /* Space from image */
+            }
+            .toby-popup-content.hidden-content {
+                display: none; /* Hide fully for small screens for space */
+            }
+            .toby-popup-content p {
+                font-size: 0.9rem;
+            }
+            .toby-popup-content .btn {
+                font-size: 0.8rem;
+                padding: 4px 12px;
+            }
+        }
+        /* END Floating Pop-up styles */
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid"> {# Changed from .container to .container-fluid for full width #}
+            <a class="navbar-brand" href="{{ url_for('company_dashboard') }}">
+                {# UNIFIED LOGO PATH #}
+                {% if current_logo_path %}
+                    <img src="{{ current_logo_path }}" alt="Logo" class="navbar-logo">
+                {% else %}
+                    <img src="{{ url_for('static', filename='images/default_logo.png') }}" alt="Default Logo" class="navbar-logo">
+                {% endif %}
+                <span class="full-text">{{ system_subtitle }}</span> {# Added full text back #}
+                <span class="short-text d-none"></span>{# MODIFIED: Removed "النظام" to make it empty and d-none #}
+            </a>
+
+            {# NEW: Navbar icons container for Profile, Community, Instructions, Notifications #}
+            <div class="navbar-nav-notification-wrapper">
+                <a class="nav-link" href="{{ url_for('company_profile') }}" title="ملفي الشخصي">
+                    <i class="fas fa-user-circle fa-lg"></i>
+                </a>
+                <a class="nav-link" href="{{ url_for('company_messages') }}" title="المراسلات">
+                    <i class="fas fa-comments fa-lg"></i>
+                    <span class="notification-badge" id="community-count" style="display: none;">0</span>
+                </a>
+                <a class="nav-link" href="{{ url_for('instructions') }}" title="تعليمات وإرشادات">
+                    <i class="fas fa-question-circle fa-lg"></i>
+                </a>
+                <a class="nav-link position-relative" href="{{ url_for('notifications') }}" title="الإشعارات">
+                    <i class="fas fa-bell fa-lg"></i>
+                    <span class="notification-badge" id="notification-count" style="display: none;">0</span>
+                </a>
+            </div>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavCompany" aria-controls="navbarNavCompany" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNavCompany">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0"> {# Added mb-2 mb-lg-0 for consistency #}
+                    {# User Info on Mobile Menu - Hidden on desktop #}
+                    <li class="nav-item d-lg-none">
+                        <span class="navbar-text">
+                            <i class="fas fa-building me-2"></i>
+                            {{ current_user.company_name }}
+                        </span>
+                    </li>
+                    {# User Info on Desktop Navbar - Hidden on mobile #}
+                    <li class="nav-item d-none d-lg-flex align-items-center me-3">
+                        <span class="navbar-text">
+                            <i class="fas fa-building me-2"></i>
+                            {{ current_user.company_name }}
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('company_dashboard') }}">
+                            <i class="fas fa-home me-2"></i>
+                            الرئيسية
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('my_products') }}">
+                            <i class="fas fa-boxes me-2"></i>
+                            أصنافي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('search_products') }}">
+                            <i class="fas fa-search me-2"></i>
+                            البحث في الأصناف
+                        </a>
+                    </li>
+                    <li class="nav-item"> {# NEW: Link for Stock Reports #}
+                        <a class="nav-link" href="{{ url_for('company_stock_reports') }}">
+                            <i class="fas fa-chart-line me-2"></i>
+                            تقارير الأرصدة
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('appointments') }}">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            مواعيدي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            تسجيل الخروج
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-calendar-alt me-2 text-primary"></i>
+                مواعيدي المحجوزة
+            </h2>
+            <a href="{{ url_for('book_appointment') }}" class="btn btn-primary">
+                <i class="fas fa-calendar-plus me-2"></i>
+                حجز موعد جديد
+            </a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" style="border-radius: 14px;" role="alert">
+                        <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    قائمة مواعيدك ({{ appointments|length }} موعد)
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if appointments %}
+                    {% for appointment in appointments %}
+                    <div class="card appointment-card status-{{ appointment.status }}">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-3">
+                                    <h6 class="mb-1">
+                                        <i class="fas fa-building me-2"></i>
+                                        {{ appointment.company.company_name }}
+                                    </h6>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <strong>التاريخ:</strong><br>
+                                    <i class="fas fa-calendar me-1"></i>
+                                    {# CHANGED: Now uses `appointment_time_cairo` which is formatted in views.py #}
+                                    {{ appointment.appointment_date.strftime('%Y-%m-%d') }}
+                                </div>
+
+                                <div class="col-md-2">
+                                    <strong>الوقت:</strong><br>
+                                    <i class="fas fa-clock me-1"></i>
+                                    {# CHANGED: Now uses `appointment_time_cairo` which is formatted in views.py #}
+                                    {{ appointment.appointment_time_cairo }}
+                                </div>
+
+                                <div class="col-md-2">
+                                    <strong>الحالة:</strong><br>
+                                    {% if appointment.status == 'pending' %}
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="fas fa-clock me-1"></i>انتظار
+                                        </span>
+                                    {% elif appointment.status == 'approved' %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check me-1"></i>موافق
+                                        </span>
+                                    {% elif appointment.status == 'rejected' %}
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-times me-1"></i>مرفوض
+                                        </span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-3 text-end">
+                                    <button class="btn btn-sm btn-info"
+                                            onclick="viewDetails({{ appointment.id }}, '{{ appointment.company.company_name }}', '{{ appointment.purpose }}', '{{ appointment.notes or '' }}', '{{ appointment.admin_response or '' }}', '{{ appointment.collection_amount or '' }}')">
+                                        <i class="fas fa-eye"></i> التفاصيل
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-md-12">
+                                    <strong>الغرض:</strong>
+                                    <p class="mb-1">{{ appointment.purpose }}</p>
+                                    {% if appointment.admin_response %}
+                                        <strong>رد الإدارة:</strong>
+                                        <p class="mb-0 text-primary">{{ appointment.admin_response }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-md-12">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar-plus me-1"></i>
+                                        تم الطلب: {{ appointment.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                        <h5 class="text-muted">لا توجد مواعيد محجوزة بعد</h5>
+                        {# REMOVED: "يمكنك حجز موعد جديد من الزر أعلاه" #}
+                        {# REMOVED BUTTON: "حجز موعد جديد" #}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# NEW: Floating Pop-up for Toby (Copied from search_products.html) #}
+    <div class="toby-popup-container" id="tobyPopup" data-is-premium="{{ 'true' if current_user.is_premium else 'false' }}"
+        style="position: fixed; will-change: transform;">
+        <button class="toby-popup-close" onclick="hideTobyPopup()"><i class="fas fa-times"></i></button>
+        <a href="https://wa.me/201554077727" target="_blank" class="toby-popup-image d-flex justify-content-center align-items-center text-decoration-none" style="background-color: #25D366; border-color: #25D366;">
+            <i class="fab fa-whatsapp text-white" style="font-size: 32px;"></i>
+        </a>
+        <div class="toby-popup-content" id="tobyPopupContent">
+            <p id="tobyMessage">خدمة العملاء<br>هل تحتاج مساعدة؟ اضغط هنا</p>
+            <a href="https://wa.me/201554077727" target="_blank" class="btn btn-sm btn-success w-100 mt-2">تواصل معنا</a>
+        </div>
+    </div>
+    {# END NEW #}
+
+    <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="detailsModalLabel"><i class="fas fa-info-circle me-2"></i>تفاصيل الموعد</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="appointmentDetails">
+                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function viewDetails(appointmentId, companyName, purpose, companyNotes, adminResponse, collectionAmount) {
+            const detailsDiv = document.getElementById('appointmentDetails');
+
+            detailsDiv.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-building me-2"></i>اسم الشركة:</h6>
+                        <p>${companyName}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-hashtag me-2"></i>رقم الموعد:</h6>
+                        <p>#${appointmentId}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6><i class="fas fa-clipboard me-2"></i>الغرض من الموعد:</h6>
+                        <p class="bg-light p-3 rounded">${purpose}</p>
+                    </div>
+                </div>
+                ${companyNotes ? `
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6><i class="fas fa-sticky-note me-2"></i>ملاحظات الشركة:</h6>
+                        <p class="bg-light p-3 rounded">${companyNotes}</p>
+                    </div>
+                </div>
+                ` : ''}
+                ${collectionAmount ? `
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6><i class="fas fa-money-bill-wave me-2"></i>مبلغ التحصيل المتوقع:</h6>
+                        <p class="bg-success text-white p-3 rounded">${parseFloat(collectionAmount).toFixed(2)} جنيه</p>
+                    </div>
+                </div>
+                ` : ''}
+                ${adminResponse ? `
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6><i class="fas fa-reply me-2"></i>رد الإدارة:</h6>
+                        <p class="bg-primary text-white p-3 rounded">${adminResponse}</p>
+                    </div>
+                </div>
+                ` : ''}
+            `;
+
+            const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+            modal.show();
+        }
+
+        // Renamed and updated to fetch all counts, matching other pages
+        function updateCounts() {
+            fetch('/api/unread_counts')
+                .then(response => response.json())
+                .then(data => {
+                    const notificationBadge = document.getElementById('notification-count');
+                    if (notificationBadge) {
+                        if (data.unread_notifications_count > 0) {
+                            notificationBadge.textContent = data.unread_notifications_count;
+                            notificationBadge.style.display = 'block';
+                        } else {
+                            notificationBadge.style.display = 'none';
+                        }
+                    }
+
+                    const communityBadge = document.getElementById('community-count');
+                    if (communityBadge) {
+                        if (data.unread_community_messages_count > 0) {
+                            communityBadge.textContent = data.unread_community_messages_count;
+                            communityBadge.style.display = 'block';
+                        } else {
+                            communityBadge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching unread counts:', error));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCounts(); // Initial call to update counts
+            setInterval(updateCounts, 30000); // Update every 30 seconds
+
+            // Toby Pop-up functions
+            const tobyPopup = document.getElementById('tobyPopup');
+            const tobyPopupContent = document.getElementById('tobyPopupContent');
+            const tobyPopupImage = document.querySelector('.toby-popup-image');
+            const tobyPopupClose = document.querySelector('.toby-popup-close');
+
+            const isPremiumUser = tobyPopup.dataset.isPremium === 'true';
+
+            if (isPremiumUser) {
+                if (tobyPopupContent && tobyPopup && tobyPopupImage) {
+                    tobyPopupContent.style.display = 'none';
+                    tobyPopup.classList.add('icon-only');
+                    tobyPopupClose.style.display = 'none';
+                    tobyPopup.classList.add('show');
+                }
+            } else {
+                setTimeout(() => {
+                    tobyPopup.classList.add('show');
+                }, 1000);
+
+                setTimeout(() => {
+                    if (tobyPopupContent && tobyPopup) {
+                        tobyPopupContent.classList.add('hidden-content'); // Start fade out
+                        setTimeout(() => {
+                            tobyPopupContent.style.display = 'none'; // Fully hide content
+                            tobyPopup.classList.add('icon-only'); // Add class for icon-only styling
+                            tobyPopupClose.style.display = 'none'; // Hide close button in icon-only mode
+                        }, 300); // Duration of hidden-content transition
+                    }
+                }, 10000); // 10 seconds total for full display
+            }
+        });
+
+        function showTobyPopup() {
+            const tobyPopup = document.getElementById('tobyPopup');
+            if (tobyPopup) {
+                tobyPopup.classList.add('show');
+            }
+        }
+
+        function hideTobyPopup() {
+            const tobyPopup = document.getElementById('tobyPopup');
+            if (tobyPopup) {
+                tobyPopup.style.display = 'none';
+            }
+        }
+
+        function goToCommunity() {
+            window.location.href = "{{ url_for('community_bonus.community_bonus') }}";
+        }
+
+        // مجموعة رسائل مجتمع بونص المتنوعة والمشجعة
+        const communityMessages = [
+            "تقدر تعلق على البوستات بسهولة",
+            "تقدر تعمل لايك للبوستات اللي عاجباك",
+            "تقدر تنشر استفسارك في سرية تامة",
+            "تقدر تكلم الشركات على طول",
+            "تقدر تشارك تجاربك مع المنتجات",
+            "تقدر تشوف آراء الشركات التانية",
+            "تقدر تنشر من غير ما حد يعرفك",
+            "تقدر تتابع آخر البوستات والأخبار",
+            "تقدر تتفاعل مع محتوى الشركات",
+            "تقدر تسأل أسئلتك وتاخد إجابات",
+            "تقدر تشوف إحصائيات التفاعل",
+            "تقدر تدور في البوستات بسهولة",
+            "تقدر تحفظ البوستات المهمة ليك",
+            "تقدر تبلغ عن أي محتوى مش مناسب",
+            "تقدر تبني شبكة علاقات مهنية قوية"
+        ];
+
+        // دالة لاختيار رسالة مجتمع عشوائية
+        function getRandomCommunityMessage() {
+            const randomIndex = Math.floor(Math.random() * communityMessages.length);
+            return communityMessages[randomIndex];
+        }
+
+        function changeCommunityMessage() {
+            updateCommunityMessage();
+            
+            // إضافة تأثير بصري عند تغيير الرسالة
+            const messageElement = document.getElementById('tobyMessage');
+            if (messageElement) {
+                messageElement.style.opacity = '0.3';
+                setTimeout(() => {
+                    messageElement.style.opacity = '1';
+                }, 200);
+            }
+        }
+
+        // دالة لتحديث رسالة المجتمع
+        function updateCommunityMessage() {
+            const messageElement = document.getElementById('tobyMessage');
+            if (messageElement) {
+                messageElement.textContent = getRandomCommunityMessage();
+            }
+        }
+    </script>
+</body>
+</html>

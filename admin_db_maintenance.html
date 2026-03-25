@@ -1,0 +1,379 @@
+{% extends "admin_base.html" %}
+
+{% block title %}صيانة قاعدة البيانات{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2><i class="fas fa-database me-2"></i>صيانة قاعدة البيانات</h2>
+    <p class="text-muted">أداة لتحليل وتقليل حجم قاعدة البيانات بأمان.</p>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-search me-2"></i>التحليل (Dry-Run)</h5>
+        </div>
+        <div class="card-body">
+            <p>سيقوم هذا الإجراء بتحليل قاعدة البيانات واكتشاف الفهارس الزائدة أو غير المستخدمة دون إجراء أي تغييرات.</p>
+            <button id="btnAnalyze" class="btn btn-primary">
+                <i class="fas fa-play me-2"></i>بدء التحليل
+            </button>
+            
+            <div id="analysisLoading" class="mt-3 d-none">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">جاري التحميل...</span>
+                </div>
+                <span class="ms-2">جاري تحليل قاعدة البيانات...</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="analysisResult" class="card mb-4 d-none">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>نتائج التحليل</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h6>حجم قاعدة البيانات الحالي</h6>
+                            <h3 id="currentDbSize">0 MB</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h6>إجمالي الفهارس</h6>
+                            <h3 id="totalIndexes">0</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h6>فهارس مرشحة للحذف</h6>
+                            <h3 id="redundantCount" class="text-danger">0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="mt-4">الفهارس المرشحة للحذف</h5>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>الجدول</th>
+                            <th>الفهرس</th>
+                            <th>الأعمدة</th>
+                            <th>السبب</th>
+                            <th>النوع</th>
+                        </tr>
+                    </thead>
+                    <tbody id="redundantIndexesTable">
+                        <!-- Rows will be added here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="alert alert-warning mt-3">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                ملاحظة: النتائج أعلاه هي توصيات بناءً على تحليل الهيكل. يرجى المراجعة قبل التنفيذ.
+            </div>
+
+            <hr>
+            
+            <h4>خيارات الإصلاح</h4>
+            <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" id="safeMode" checked disabled>
+                <label class="form-check-label" for="safeMode">الوضع الآمن (مفعّل دائمًا للحماية)</label>
+            </div>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="optimizeTable">
+                <label class="form-check-label" for="optimizeTable">تشغيل OPTIMIZE TABLE (VACUUM) - قد يستغرق وقتًا طويلاً ويقفل قاعدة البيانات مؤقتًا</label>
+            </div>
+
+            <button id="btnConfirmRepair" class="btn btn-danger">
+                <i class="fas fa-tools me-2"></i>بدء الإصلاح
+            </button>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0"><i class="fas fa-broom me-2"></i>تنظيف البيانات</h5>
+        </div>
+        <div class="card-body">
+            <p>يمكنك حذف سجلات البحث القديمة لتوفير مساحة في قاعدة البيانات. هذا الإجراء لن يؤثر على عدد البحثات المتبقية للشركات في الشهر الحالي.</p>
+            <button id="btnCleanupSearch" class="btn btn-warning">
+                <i class="fas fa-history me-2"></i>حذف سجل البحث (الأقدم من شهرين)
+            </button>
+            <div id="cleanupLoading" class="mt-3 d-none">
+                <div class="spinner-border text-warning" role="status">
+                    <span class="visually-hidden">جاري التنظيف...</span>
+                </div>
+                <span class="ms-2">جاري تنظيف سجل البحث...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Repair Progress Modal -->
+    <div class="modal fade" id="repairModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">جاري إصلاح قاعدة البيانات</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="progress mb-3">
+                        <div id="repairProgress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%">0%</div>
+                    </div>
+                    <p id="repairStatus" class="text-center">جاري البدء...</p>
+                    <div id="repairError" class="alert alert-danger d-none"></div>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnCancelRepair" class="btn btn-secondary">إلغاء</button>
+                    <button id="btnCloseRepair" class="btn btn-primary d-none" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Result Section -->
+    <div id="repairFinalResult" class="card mb-4 d-none border-success">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>تم الإصلاح بنجاح</h5>
+        </div>
+        <div class="card-body">
+            <p>تمت عملية الإصلاح بنجاح.</p>
+            <div class="d-flex gap-2">
+                <a id="btnDownloadRecovery" href="#" class="btn btn-outline-primary">
+                    <i class="fas fa-download me-2"></i>تنزيل ملف الاسترجاع (SQL)
+                </a>
+                <button id="btnUndo" class="btn btn-outline-danger">
+                    <i class="fas fa-undo me-2"></i>تراجع (Undo)
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnAnalyze = document.getElementById('btnAnalyze');
+    const analysisLoading = document.getElementById('analysisLoading');
+    const analysisResult = document.getElementById('analysisResult');
+    const btnConfirmRepair = document.getElementById('btnConfirmRepair');
+    const repairModal = new bootstrap.Modal(document.getElementById('repairModal'));
+    const repairProgress = document.getElementById('repairProgress');
+    const repairStatus = document.getElementById('repairStatus');
+    const btnCancelRepair = document.getElementById('btnCancelRepair');
+    const btnCloseRepair = document.getElementById('btnCloseRepair');
+    const repairFinalResult = document.getElementById('repairFinalResult');
+    const btnDownloadRecovery = document.getElementById('btnDownloadRecovery');
+    const btnUndo = document.getElementById('btnUndo');
+    const btnCleanupSearch = document.getElementById('btnCleanupSearch');
+    const cleanupLoading = document.getElementById('cleanupLoading');
+    
+    let currentJobId = null;
+    let pollInterval = null;
+
+    btnAnalyze.addEventListener('click', function() {
+        btnAnalyze.disabled = true;
+        analysisLoading.classList.remove('d-none');
+        analysisResult.classList.add('d-none');
+        repairFinalResult.classList.add('d-none');
+        
+        fetch("{{ url_for('admin_db_maintenance.analyze') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.getElementById('currentDbSize').textContent = data.db_size_mb + ' MB';
+                document.getElementById('totalIndexes').textContent = data.total_indexes;
+                document.getElementById('redundantCount').textContent = data.redundant_indexes.length;
+                
+                const tbody = document.getElementById('redundantIndexesTable');
+                tbody.innerHTML = '';
+                
+                if (data.redundant_indexes.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center">لا توجد فهارس مرشحة للحذف.</td></tr>';
+                    btnConfirmRepair.disabled = true;
+                } else {
+                    btnConfirmRepair.disabled = false;
+                    data.redundant_indexes.forEach(idx => {
+                        const row = `
+                            <tr>
+                                <td>${idx.table}</td>
+                                <td>${idx.index}</td>
+                                <td>${idx.columns.join(', ')}</td>
+                                <td>${idx.reason}</td>
+                                <td><span class="badge bg-warning text-dark">${idx.type}</span></td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += row;
+                    });
+                }
+                
+                analysisResult.classList.remove('d-none');
+            } else {
+                alert('حدث خطأ أثناء التحليل: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('حدث خطأ في الاتصال.');
+        })
+        .finally(() => {
+            btnAnalyze.disabled = false;
+            analysisLoading.classList.add('d-none');
+        });
+    });
+    
+    btnConfirmRepair.addEventListener('click', function() {
+        if (!confirm('هل أنت متأكد من بدء عملية الإصلاح؟ يرجى أخذ نسخة احتياطية أولاً.')) return;
+        
+        const optimize = document.getElementById('optimizeTable').checked;
+        
+        fetch("{{ url_for('admin_db_maintenance.start_repair') }}", {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                safe_mode: true,
+                optimize_table: optimize
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                currentJobId = data.job_id;
+                repairModal.show();
+                startPolling();
+                btnCancelRepair.classList.remove('d-none');
+                btnCloseRepair.classList.add('d-none');
+                repairProgress.style.width = '0%';
+                repairProgress.textContent = '0%';
+                repairStatus.textContent = 'جاري البدء...';
+            } else {
+                alert('فشل بدء العملية: ' + data.error);
+            }
+        });
+    });
+    
+    function startPolling() {
+        pollInterval = setInterval(() => {
+            if (!currentJobId) return;
+            
+            fetch(`/admin/db-maintenance/status/${currentJobId}`)
+            .then(response => response.json())
+            .then(data => {
+                const pct = data.progress + '%';
+                repairProgress.style.width = pct;
+                repairProgress.textContent = pct;
+                repairStatus.textContent = data.message;
+                
+                if (data.status === 'completed') {
+                    clearInterval(pollInterval);
+                    repairStatus.textContent = 'تمت العملية بنجاح!';
+                    repairProgress.classList.remove('progress-bar-animated');
+                    repairProgress.classList.add('bg-success');
+                    btnCancelRepair.classList.add('d-none');
+                    btnCloseRepair.classList.remove('d-none');
+                    
+                    // Show final result
+                    repairFinalResult.classList.remove('d-none');
+                    btnDownloadRecovery.href = `/admin/db-maintenance/download-recovery/${currentJobId}`;
+                    
+                } else if (data.status === 'failed') {
+                    clearInterval(pollInterval);
+                    repairStatus.textContent = 'فشلت العملية: ' + data.error;
+                    repairProgress.classList.add('bg-danger');
+                    btnCancelRepair.classList.add('d-none');
+                    btnCloseRepair.classList.remove('d-none');
+                } else if (data.status === 'cancelled') {
+                    clearInterval(pollInterval);
+                    repairStatus.textContent = 'تم إلغاء العملية.';
+                    btnCancelRepair.classList.add('d-none');
+                    btnCloseRepair.classList.remove('d-none');
+                }
+            });
+        }, 1000);
+    }
+    
+    btnCancelRepair.addEventListener('click', function() {
+        if (currentJobId) {
+            fetch(`/admin/db-maintenance/cancel/${currentJobId}`, {method: 'POST'});
+        }
+    });
+
+    btnCleanupSearch.addEventListener('click', function() {
+        if (!confirm('هل أنت متأكد من حذف سجل البحث الأقدم من شهرين؟ هذا الإجراء سيوفر مساحة في قاعدة البيانات ولا يمكن التراجع عنه.')) return;
+        
+        btnCleanupSearch.disabled = true;
+        cleanupLoading.classList.remove('d-none');
+        
+        fetch("{{ url_for('admin_db_maintenance.cleanup_search_logs') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert('حدث خطأ أثناء التنظيف: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('حدث خطأ في الاتصال.');
+        })
+        .finally(() => {
+            btnCleanupSearch.disabled = false;
+            cleanupLoading.classList.add('d-none');
+        });
+    });
+
+    btnUndo.addEventListener('click', function() {
+        if (!currentJobId) return;
+        if (!confirm('هل أنت متأكد من التراجع عن جميع التغييرات؟ سيتم إعادة إنشاء الفهارس المحذوفة.')) return;
+        
+        btnUndo.disabled = true;
+        btnUndo.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري التراجع...';
+        
+        fetch(`/admin/db-maintenance/undo/${currentJobId}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('تم التراجع بنجاح.');
+                location.reload();
+            } else {
+                alert('فشل التراجع: ' + data.message);
+                btnUndo.disabled = false;
+                btnUndo.innerHTML = '<i class="fas fa-undo me-2"></i>تراجع (Undo)';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('حدث خطأ في الاتصال.');
+            btnUndo.disabled = false;
+            btnUndo.innerHTML = '<i class="fas fa-undo me-2"></i>تراجع (Undo)';
+        });
+    });
+});
+</script>
+{% endblock %}

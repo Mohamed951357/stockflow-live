@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>إعدادات الشركة - بونص فارما</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-top: 70px;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            background-size: 200% 200% !important;
+            animation: navbarGradient 15s ease infinite !important;
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.2),
+                0 5px 20px rgba(102, 126, 234, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1030;
+            backdrop-filter: blur(15px) !important;
+            -webkit-backdrop-filter: blur(15px) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+        }
+
+        @keyframes navbarGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            color: #000000 !important;
+        }
+
+        .navbar-brand span {
+            color: #000000 !important;
+        }
+
+        .navbar-logo {
+            height: 35px;
+            width: auto;
+            margin-left: 10px;
+        }
+
+        .navbar .nav-link,
+        .navbar i {
+            color: #000000 !important;
+        }
+
+        .navbar .nav-link:hover,
+        .navbar i:hover {
+            color: #ffffff !important;
+        }
+
+        .settings-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.4);
+            padding: 24px 24px 28px;
+        }
+
+        .settings-header {
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+        }
+
+        .settings-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+        }
+
+        .settings-item + .settings-item {
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .form-switch .form-check-input {
+            width: 3.6rem;
+            height: 1.8rem;
+            background: linear-gradient(135deg, #e5e7eb 0%, #cbd5e1 100%);
+            border: 2px solid rgba(0,0,0,0.06);
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.08);
+            position: relative;
+            transition: all 0.25s ease;
+        }
+
+        .form-switch .form-check-input::before {
+            content: '';
+            position: absolute;
+            top: 0.18rem;
+            left: 0.18rem;
+            width: 1.4rem;
+            height: 1.4rem;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 6px 18px rgba(102, 126, 234, 0.35);
+            transition: all 0.25s ease;
+        }
+
+        .form-switch .form-check-input:checked {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-color: rgba(99,102,241,0.6);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.12), 0 0 0 4px rgba(99,102,241,0.18);
+        }
+
+        .form-switch .form-check-input:checked::before {
+            transform: translateX(1.8rem);
+            box-shadow: 0 8px 22px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border: none;
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: #6b7280;
+            color: #fff;
+            border-radius: 999px;
+            padding: 0.45rem 1rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+        }
+        .back-btn:hover { opacity: 0.95; }
+        .back-btn:active { transform: scale(0.98); }
+        .page-header { display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-top: 1rem; }
+        .page-title { margin:0; font-size:1.35rem; display:inline-flex; align-items:center; gap:0.5rem; }
+        @media (max-width: 991.98px){ .page-title{ font-size:1.2rem } }
+        @media (max-width: 767.98px){ .page-title{ font-size:1.05rem } }
+
+        .avatar-section { padding: 8px 0 16px; }
+        .avatar-preview { width: 72px; height: 72px; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 20px rgba(15,23,42,0.25); border: 3px solid rgba(255,255,255,0.8); }
+        .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .btn-change-avatar { display:inline-flex; align-items:center; gap:.5rem; background:#f59e0b; color:#111827; border:none; border-radius:999px; padding:.4rem .85rem; font-weight:700; text-decoration:none; box-shadow:0 8px 20px rgba(245, 158, 11, 0.35); }
+        .btn-change-avatar:hover { opacity:.95; }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar (نفس نمط صفحات الشركة) -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('company_dashboard') }}">
+                {% if current_logo_path %}
+                <img src="{{ current_logo_path }}" alt="Logo" class="navbar-logo">
+                {% endif %}
+                <span class="full-text">{{ system_subtitle }}</span>
+                <span class="short-text"></span>
+            </a>
+
+            <div class="navbar-nav-notification-wrapper d-flex">
+                <a class="nav-link" href="{{ url_for('company_profile') }}" title="ملفي الشخصي">
+                    <i class="fas fa-user-circle fa-lg"></i>
+                </a>
+                <a class="nav-link" href="{{ url_for('company_messages') }}">
+                    <i class="fas fa-comments fa-lg"></i>
+                </a>
+                <a class="nav-link" href="{{ url_for('instructions') }}" title="تعليمات وإرشادات">
+                    <i class="fas fa-question-circle fa-lg"></i>
+                </a>
+                <a class="nav-link position-relative" href="{{ url_for('notifications') }}">
+                    <i class="fas fa-bell fa-lg"></i>
+                </a>
+            </div>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavCompany" aria-controls="navbarNavCompany" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNavCompany">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item d-lg-none">
+                        <span class="navbar-text">
+                            <i class="fas fa-building me-2"></i>
+                            {{ current_user.company_name if current_user else company.company_name }}
+                        </span>
+                    </li>
+                    <li class="nav-item d-none d-lg-flex align-items-center me-3">
+                        <span class="navbar-text">
+                            <i class="fas fa-building me-2"></i>
+                            {{ current_user.company_name if current_user else company.company_name }}
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('company_dashboard') }}">
+                            <i class="fas fa-home me-2"></i>
+                            الرئيسية
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('my_products') }}">
+                            <i class="fas fa-boxes me-2"></i>
+                            أصنافي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('search_products') }}">
+                            <i class="fas fa-search me-2"></i>
+                            البحث في الأصناف
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('company_stock_reports') }}">
+                            <i class="fas fa-chart-line me-2"></i>
+                            تقارير الأرصدة
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('appointments') }}">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            مواعيدي
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            تسجيل الخروج
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header d-flex justify-content-between align-items-center mb-2">
+            <h3 class="page-title mb-0"><i class="fas fa-cog me-2"></i> إعدادات الشركة</h3>
+            <a href="{{ url_for('company_dashboard') }}" class="back-btn" id="settingsBackBtn">العودة للوحة الرئيسية <i class="fas fa-arrow-right ms-2"></i></a>
+        </div>
+        <div class="settings-container mt-4">
+            <small class="text-muted d-block mb-3">تحكم في طريقة تواصُل الشركات الأخرى معك</small>
+            <div class="settings-item">
+                <div class="avatar-section d-flex align-items-center gap-3">
+                    {% set avatar_key = current_user.avatar if current_user.avatar else 'male-1' %}
+                    <div class="avatar-preview">
+                        <img src="{{ url_for('static', filename='images/avatars/' + avatar_key + '.jpg') }}" alt="Avatar" onerror="this.src='{{ url_for('static', filename='images/avatars/male-1.jpg') }}'">
+                    </div>
+                    <div>
+                        <div class="fw-bold">اختيار الأفاتار</div>
+                        <div class="text-muted small">يمكنك تغيير الأفاتار من صفحة الملف الشخصي.</div>
+                        <a href="{{ url_for('company_profile') }}" class="btn-change-avatar"><i class="fas fa-user-edit"></i> تغيير الأفاتار</a>
+                    </div>
+                </div>
+            </div>
+
+            <form method="post">
+                <div class="settings-item">
+                    <div>
+                        <strong>استقبال رسائل من الشركات الأخرى</strong>
+                        <div class="text-muted small">عند إيقاف هذا الخيار، لا يمكن للشركات الأخرى إرسال رسائل خاصة لك (ما عدا إدارة النظام).</div>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="allow_messages_from_companies" name="allow_messages_from_companies" {% if allow_messages_from_companies %}checked{% endif %}>
+                    </div>
+                </div>
+
+                <div class="mt-3 text-end">
+                    <button type="submit" class="btn-save">
+                        <i class="fas fa-save me-1"></i>
+                        حفظ الإعدادات
+                    </button>
+                </div>
+            </form>
+
+            {% if not current_user.is_premium %}
+            <div class="settings-item mt-4" style="border-top: 1px solid #e5e7eb; padding-top: 16px;">
+                <div>
+                    <strong>ترقية الحساب إلى STOCKFLOW PLUS</strong>
+                    <div class="text-muted small">استفد من كل مميزات النظام المميزة مثل تقارير متقدمة، دعم أولوية، وتخصيص أكبر للوحة التحكم.</div>
+                </div>
+                <div>
+                    <a href="{{ url_for('subscribe_plus') }}" class="btn btn-warning" style="font-weight:600;">
+                        <i class="fas fa-crown me-1"></i>
+                        ترقية الحساب
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function ensurePageSpinner() {
+            var spinner = document.getElementById('pageSpinner');
+            if (!spinner) {
+                var style = document.createElement('style');
+                style.textContent = ".spinner-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;justify-content:center;align-items:center}.spinner-overlay.active{display:flex;animation:fadeIn 0.3s ease}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.elegant-spinner{position:relative;width:80px;height:80px}.elegant-spinner::before,.elegant-spinner::after{content:'';position:absolute;border-radius:50%}.elegant-spinner::before{width:80px;height:80px;border:4px solid transparent;border-top-color:#667eea;border-right-color:#764ba2;animation:spinOuter 1.2s linear infinite}.elegant-spinner::after{width:50px;height:50px;top:15px;left:15px;border:4px solid transparent;border-bottom-color:#667eea;border-left-color:#764ba2;animation:spinInner 1.2s linear infinite reverse}@keyframes spinOuter{to{transform:rotate(360deg)}}@keyframes spinInner{to{transform:rotate(360deg)}}";
+                document.head.appendChild(style);
+                spinner = document.createElement('div');
+                spinner.className = 'spinner-overlay';
+                spinner.id = 'pageSpinner';
+                spinner.innerHTML = '<div class="elegant-spinner"><div class="spinner-dot"></div></div>';
+                document.body.appendChild(spinner);
+            }
+            return spinner;
+        }
+
+        window.addEventListener('pageshow', function(){
+            var s = document.getElementById('pageSpinner');
+            if (s) { s.classList.remove('active'); }
+        });
+
+        document.addEventListener('DOMContentLoaded', function(){
+            var homeLink = document.querySelector('a.nav-link[href*="company_dashboard"]');
+            var upgradeLink = document.querySelector('a[href*="subscribe_plus"]');
+            [homeLink, upgradeLink].forEach(function(link){
+                if (link) {
+                    link.addEventListener('click', function(e){
+                        e.preventDefault();
+                        var s = ensurePageSpinner();
+                        s.classList.add('active');
+                        var href = this.getAttribute('href');
+                        setTimeout(function(){ window.location.href = href; }, 150);
+                    }, { passive: false });
+                }
+            });
+            var backBtn = document.getElementById('settingsBackBtn');
+            if (backBtn) {
+                backBtn.addEventListener('click', function(e){
+                    e.preventDefault();
+                    var s = ensurePageSpinner();
+                    s.classList.add('active');
+                    var href = this.getAttribute('href');
+                    setTimeout(function(){ window.location.href = href; }, 150);
+                }, { passive: false });
+            }
+        });
+
+        window.addEventListener('popstate', function(){
+            var s = document.getElementById('pageSpinner');
+            if (s) { s.classList.remove('active'); }
+        });
+
+        document.addEventListener('visibilitychange', function(){
+            if (!document.hidden) {
+                var s = document.getElementById('pageSpinner');
+                if (s) { s.classList.remove('active'); }
+            }
+        });
+    </script>
+</body>
+</html>

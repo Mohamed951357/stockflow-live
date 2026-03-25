@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الشركات | لوحة التحكم</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #06b6d4;
+            --light-bg: #f8fafc;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --card-shadow-hover: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #334155;
+        }
+
+        /* Modern Header */
+        .modern-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .logo-text h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .logo-text p {
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Stats Cards Section */
+        .stats-section {
+            margin-bottom: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary-color), transparent);
+            opacity: 0.1;
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-icon.companies { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; }
+        .stat-icon.active { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+        .stat-icon.inactive { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+        .stat-icon.premium { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .stat-change.positive { color: var(--success-color); }
+        .stat-change.negative { color: var(--danger-color); }
+
+        /* Search and Filter Section */
+        .search-filter-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: #f8fafc;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-color);
+            font-size: 1.2rem;
+        }
+
+        .view-toggle {
+            display: flex;
+            background: rgba(37, 99, 235, 0.1);
+            border-radius: 25px;
+            padding: 0.25rem;
+            margin-bottom: 1rem;
+            justify-content: center;
+        }
+
+        .view-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 20px;
+            font-weight: 600;
+            transition: var(--transition);
+            cursor: pointer;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .view-btn.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 10px rgba(37, 99, 235, 0.3);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: var(--transition);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Company Cards */
+        .companies-section {
+            margin-bottom: 2rem;
+        }
+
+        .companies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .company-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .company-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), transparent);
+            opacity: 0.1;
+            border-radius: 50%;
+            transform: translate(20px, -20px);
+        }
+
+        .company-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .company-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .company-info h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .company-username {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .company-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+        .status-inactive { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
+
+        .company-details {
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .detail-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: white;
+        }
+
+        .detail-icon.email { background: var(--info-color); }
+        .detail-icon.phone { background: var(--success-color); }
+        .detail-icon.date { background: var(--warning-color); }
+
+        .company-premium {
+            margin-bottom: 1.5rem;
+        }
+
+        .premium-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .premium-dates {
+            font-size: 0.8rem;
+            color: var(--secondary-color);
+        }
+
+        .company-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            flex: 1;
+            justify-content: center;
+            min-width: 80px;
+        }
+
+        .action-btn.primary { background: var(--primary-color); color: white; }
+        .action-btn.success { background: var(--success-color); color: white; }
+        .action-btn.warning { background: var(--warning-color); color: white; }
+        .action-btn.danger { background: var(--danger-color); color: white; }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Table View */
+        .table-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .modern-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+        }
+
+        .modern-table thead {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .modern-table th {
+            padding: 1rem;
+            text-align: right;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .modern-table tbody tr {
+            border-bottom: 1px solid #e2e8f0;
+            transition: var(--transition);
+        }
+
+        .modern-table tbody tr:hover {
+            background: #f8fafc;
+            transform: scale(1.01);
+        }
+
+        .modern-table td {
+            padding: 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .header-actions {
+                justify-content: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .companies-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-buttons {
+                justify-content: center;
+            }
+
+            .company-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .company-actions {
+                justify-content: center;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Fade In Animation */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hidden Elements */
+        .hidden {
+            display: none !important;
+        }
+
+        /* No Results Message */
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            margin: 2rem 0;
+        }
+
+        .no-results i {
+            font-size: 4rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .no-results h3 {
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .no-results p {
+            color: var(--secondary-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Modern Header -->
+    <header class="modern-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>نظام إدارة الشركات</h1>
+                    <p>لوحة التحكم الإدارية</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="{{ url_for('admin_dashboard') }}" class="btn-outline">
+                    <i class="fas fa-chart-line"></i>
+                    لوحة التحكم
+                </a>
+                <a href="{{ url_for('logout') }}" class="btn-gradient">
+                    <i class="fas fa-sign-out-alt"></i>
+                    تسجيل الخروج
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Page Title and Add Button -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="text-white fw-bold">
+                    <i class="fas fa-users-cog me-2"></i>
+                    إدارة الشركات
+                </h2>
+                <p class="text-white-50 mb-0">إدارة حسابات الشركات والمستخدمين</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('add_user') }}" class="btn-gradient">
+                    <i class="fas fa-plus"></i>
+                    إضافة شركة جديدة
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <section class="stats-section fade-in">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon companies">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="stat-value" id="totalCompaniesCountManage">{{ companies|length }}</div>
+                    <div class="stat-label">إجمالي الشركات</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+12% من الشهر الماضي</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon active">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-value" id="activeCompaniesCountManage">{{ companies|selectattr('is_active', 'equalto', true)|list|length }}</div>
+                    <div class="stat-label">شركات نشطة</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+8% من الأسبوع الماضي</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon inactive">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-value">{{ companies|selectattr('is_active', 'equalto', false)|list|length }}</div>
+                    <div class="stat-label">شركات غير نشطة</div>
+                    <div class="stat-change negative">
+                        <i class="fas fa-arrow-down"></i>
+                        <span>-5% من الأسبوع الماضي</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon premium">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="stat-value">{{ companies|selectattr('is_premium', 'equalto', true)|list|length }}</div>
+                    <div class="stat-label">شركات مميزة</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+15% من الشهر الماضي</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search and Filter Section -->
+        <section class="search-filter-section fade-in">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن شركة بالاسم أو البريد الإلكتروني أو رقم الهاتف...">
+            </div>
+            
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="cards">
+                    <i class="fas fa-th-large"></i>
+                    بطاقات
+                </button>
+                <button class="view-btn" data-view="table">
+                    <i class="fas fa-table"></i>
+                    جدول
+                </button>
+            </div>
+
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">
+                    <i class="fas fa-list"></i>
+                    الكل
+                </button>
+                <button class="filter-btn" data-filter="active">
+                    <i class="fas fa-check-circle"></i>
+                    نشطة
+                </button>
+                <button class="filter-btn" data-filter="inactive">
+                    <i class="fas fa-times-circle"></i>
+                    غير نشطة
+                </button>
+                <button class="filter-btn" data-filter="premium">
+                    <i class="fas fa-crown"></i>
+                    مميزة
+                </button>
+                <button class="filter-btn" data-filter="inactive_2_months">
+                    <i class="fas fa-user-clock"></i>
+                    لم يسجل منذ شهرين
+                </button>
+            </div>
+        </section>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="fade-in">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'info' }} alert-dismissible fade show" role="alert">
+                            <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' if category == 'error' else 'info-circle' }} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Company Name Change Requests Section -->
+        {% if pending_name_change_requests %}
+        <section class="companies-section fade-in" style="margin-bottom: 2rem;">
+            <div class="card" style="border-radius: 12px; box-shadow: var(--card-shadow);">
+                <div class="card-header" style="background: rgba(37, 99, 235, 0.1); border-bottom: 1px solid #e2e8f0;">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>
+                        طلبات تغيير أسماء الشركات
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped align-middle">
+                            <thead>
+                                <tr>
+                                    <th>الشركة</th>
+                                    <th>الاسم الحالي</th>
+                                    <th>الاسم المطلوب</th>
+                                    <th>تاريخ الطلب</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for req in pending_name_change_requests %}
+                                <tr>
+                                    <td>{{ req.company.company_name }}</td>
+                                    <td>{{ req.old_name }}</td>
+                                    <td>{{ req.new_name }}</td>
+                                    <td>{{ req.created_at.strftime('%Y-%m-%d %H:%M') if req.created_at else '' }}</td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('approve_company_name_change', request_id=req.id) }}" style="display:inline-block;">
+                                            <button type="submit" class="btn btn-sm btn-success">
+                                                <i class="fas fa-check"></i>
+                                                موافقة
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ url_for('reject_company_name_change', request_id=req.id) }}" style="display:inline-block; margin-right: 5px;">
+                                            <input type="hidden" name="admin_comment" value="">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-times"></i>
+                                                رفض
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Companies Section -->
+        <section class="companies-section fade-in">
+            <!-- Cards View -->
+            <div id="cardsView" class="companies-grid">
+                {% for company in companies %}
+                <div class="company-card" data-company-id="{{ company.id }}" data-company-name="{{ company.company_name }}" data-username="{{ company.username }}" data-company-email="{{ company.email }}" data-company-phone="{{ company.phone }}" data-status="{{ 'active' if company.is_active else 'inactive' }}" data-premium="{{ 'premium' if company.is_premium else 'regular' }}" data-last-login="{{ company.last_login_iso or '' }}">
+                    <div class="company-header">
+                        <div class="company-info">
+                            <h3>{{ company.company_name }}</h3>
+                            <p class="company-username">@{{ company.username }}</p>
+                        </div>
+                        <div class="company-status status-{{ 'active' if company.is_active else 'inactive' }}">
+                            {{ 'نشطة' if company.is_active else 'غير نشطة' }}
+                        </div>
+                    </div>
+
+                    <div class="company-details">
+                        <div class="detail-item">
+                            <div class="detail-icon email">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <span>{{ company.email }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-icon phone">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <span>{{ company.phone }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-icon date">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                            <span>مسجل منذ {{ company.created_at_formatted.split(' ')[0] }}</span>
+                        </div>
+                    </div>
+
+                    {% if company.is_premium %}
+                    <div class="company-premium">
+                        <div class="premium-badge">
+                            <i class="fas fa-crown"></i>
+                            حساب مميز
+                        </div>
+                        <div class="premium-dates">
+                            <small>من {{ company.premium_activation_date_formatted.split(' ')[0] }} إلى {{ company.premium_end_date_formatted.split(' ')[0] if company.premium_end_date_formatted else 'غير محدد' }}</small>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="company-actions">
+                        <button class="action-btn {{ 'warning' if company.is_active else 'success' }}" 
+                                data-user-id="{{ company.id }}" 
+                                data-is-active="{{ 'true' if company.is_active else 'false' }}" 
+                                onclick="toggleUserStatus(this)" 
+                                title="{{ 'إلغاء التفعيل' if company.is_active else 'تفعيل' }}">
+                            <i class="fas fa-{{ 'times' if company.is_active else 'check' }}"></i>
+                            {{ 'إلغاء' if company.is_active else 'تفعيل' }}
+                        </button>
+                        <button class="action-btn primary" 
+                                data-user-id="{{ company.id }}" 
+                                data-username="{{ company.username }}" 
+                                onclick="openEditPasswordModal(this)" 
+                                title="تغيير كلمة المرور">
+                            <i class="fas fa-key"></i>
+                            كلمة المرور
+                        </button>
+                        {% if not company.is_premium %}
+                        <button class="action-btn warning" 
+                                data-user-id="{{ company.id }}" 
+                                onclick="activatePremiumTrial(this)" 
+                                title="تفعيل التجربة المميزة">
+                            <i class="fas fa-crown"></i>
+                            تجربة
+                        </button>
+                        <button class="action-btn info" 
+                                data-user-id="{{ company.id }}" 
+                                onclick="activatePermanentPremium(this)" 
+                                title="تفعيل الاشتراك الدائم">
+                            <i class="fas fa-infinity"></i>
+                            دائم
+                        </button>
+                        <button class="action-btn secondary" 
+                                data-user-id="{{ company.id }}" 
+                                onclick="resetPremiumTrial(this)" 
+                                title="إعادة تعيين حالة التجربة">
+                            <i class="fas fa-undo"></i>
+                            إعادة
+                        </button>
+                        {% else %}
+                        <button class="action-btn success" 
+                                data-user-id="{{ company.id }}" 
+                                onclick="renewPremium(this)" 
+                                title="تجديد الاشتراك المميز">
+                            <i class="fas fa-sync"></i>
+                            تجديد
+                        </button>
+                        <button class="action-btn danger" 
+                                data-user-id="{{ company.id }}" 
+                                onclick="cancelPremium(this)" 
+                                title="إلغاء الاشتراك المميز">
+                            <i class="fas fa-times-circle"></i>
+                            إلغاء
+                        </button>
+                        {% endif %}
+                        <button class="action-btn danger" 
+                                data-user-id="{{ company.id }}" 
+                                data-username="{{ company.username }}" 
+                                onclick="confirmDelete(this)" 
+                                title="حذف الشركة">
+                            <i class="fas fa-trash"></i>
+                            حذف
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Table View -->
+            <div id="tableView" class="table-container hidden">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>الشركة</th>
+                            <th>اسم المستخدم</th>
+                            <th>البريد الإلكتروني</th>
+                            <th>رقم الهاتف</th>
+                            <th>تاريخ التسجيل</th>
+                            <th>الحالة</th>
+                            <th>العضوية</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="companiesTableBody">
+                        {% for company in companies %}
+                        <tr data-company-name="{{ company.company_name }}" data-username="{{ company.username }}" data-company-email="{{ company.email }}" data-company-phone="{{ company.phone }}" data-status="{{ 'active' if company.is_active else 'inactive' }}" data-premium="{{ 'premium' if company.is_premium else 'regular' }}" data-last-login="{{ company.last_login_iso or '' }}">
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1rem;">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600;">{{ company.company_name }}</div>
+                                        <small style="color: var(--secondary-color);">{{ company.username }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ company.username }}</td>
+                            <td>{{ company.email }}</td>
+                            <td>{{ company.phone }}</td>
+                            <td>{{ company.created_at_formatted.split(' ')[0] }}</td>
+                            <td>
+                                <span class="company-status status-{{ 'active' if company.is_active else 'inactive' }}">
+                                    {{ 'نشطة' if company.is_active else 'غير نشطة' }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if company.is_premium %}
+                                <span class="premium-badge" style="font-size: 0.7rem;">
+                                    <i class="fas fa-crown"></i>
+                                    مميز
+                                </span>
+                                {% else %}
+                                <span style="color: var(--secondary-color); font-size: 0.8rem;">عادية</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="company-actions" style="justify-content: flex-start;">
+                                    <button class="action-btn {{ 'warning' if company.is_active else 'success' }}" 
+                                            style="padding: 0.4rem 0.8rem; font-size: 0.7rem;" 
+                                            data-user-id="{{ company.id }}" 
+                                            data-is-active="{{ 'true' if company.is_active else 'false' }}" 
+                                            onclick="toggleUserStatus(this)" 
+                                            title="{{ 'إلغاء التفعيل' if company.is_active else 'تفعيل' }}">
+                                        <i class="fas fa-{{ 'times' if company.is_active else 'check' }}"></i>
+                                    </button>
+                                    <button class="action-btn primary" 
+                                            style="padding: 0.4rem 0.8rem; font-size: 0.7rem;" 
+                                            data-user-id="{{ company.id }}" 
+                                            data-username="{{ company.username }}" 
+                                            onclick="openEditPasswordModal(this)" 
+                                            title="تغيير كلمة المرور">
+                                        <i class="fas fa-key"></i>
+                                    </button>
+                                    {% if not company.is_premium %}
+                                    <button class="action-btn warning" 
+                                            style="padding: 0.4rem 0.8rem; font-size: 0.7rem;" 
+                                            data-user-id="{{ company.id }}" 
+                                            onclick="activatePremiumTrial(this)" 
+                                            title="تفعيل التجربة المميزة">
+                                        <i class="fas fa-crown"></i>
+                                    </button>
+                                    <button class="action-btn info" 
+                                            style="padding: 0.4rem 0.8rem; font-size: 0.7rem;" 
+                                            data-user-id="{{ company.id }}" 
+                                            onclick="activatePermanentPremium(this)" 
+                                            title="تفعيل الاشتراك الدائم">
+                                        <i class="fas fa-infinity"></i>
+                                    </button>
+                                    <button class="action-btn secondary" 
+                                            style="padding: 0.4rem 0.8rem; font-size: 0.7rem;" 
+                                            data-user-id="{{ company.id }}" 
+                                            onclick="resetPremiumTrial(this)" 
+                                            title="إعادة تعيين حالة التجربة">
+                                        <i class="fas fa-undo"></i>
+                                    </button>
+                                    {% else %}
+                                    <button class="action-btn success" 
+                                            style="padding: 0.4rem 0.8rem; font-size: 0.7rem;" 
+                                            data-user-id="{{ company.id }}" 
+                                            onclick="renewPremium(this)" 
+                                            title="تجديد الاشتراك المميز">
+                                        <i class="fas fa-sync"></i>
+                                    </button>
+                                    <button class="action-btn danger" 
+                                            style="padding: 0.4rem 0.8rem; font-size: 0.7rem;" 
+                                            data-user-id="{{ company.id }}" 
+                                            onclick="cancelPremium(this)" 
+                                            title="إلغاء الاشتراك المميز">
+                                        <i class="fas fa-times-circle"></i>
+                                    </button>
+                                    {% endif %}
+                                    <button class="action-btn danger" 
+                                            style="padding: 0.4rem 0.8rem; font-size: 0.7rem;" 
+                                            data-user-id="{{ company.id }}" 
+                                            data-username="{{ company.username }}" 
+                                            onclick="confirmDelete(this)" 
+                                            title="حذف الشركة">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- No Results Message -->
+            <div id="noResults" class="no-results hidden">
+                <i class="fas fa-search"></i>
+                <h3>لا توجد نتائج</h3>
+                <p>لم يتم العثور على شركات تطابق معايير البحث الخاصة بك.</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Edit Password Modal -->
+    <div class="modal fade" id="editPasswordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-key me-2"></i>
+                        تغيير كلمة مرور الشركة
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editPasswordForm">
+                        <input type="hidden" id="editUsername" name="username">
+                        <input type="hidden" id="editUserId" name="user_id">
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">كلمة المرور الجديدة</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="newPassword" name="new_password" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('newPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-outline-secondary" type="button" onclick="copyPassword('newPassword')" title="نسخ كلمة المرور">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">تأكيد كلمة المرور</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="confirmPassword" name="confirm_password" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('confirmPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-secondary w-100" onclick="generateRandomPassword()">
+                                <i class="fas fa-random me-2"></i>
+                                توليد كلمة مرور عشوائية
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-primary" onclick="savePassword()">
+                        <i class="fas fa-save me-2"></i>
+                        حفظ التغييرات
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        تأكيد الحذف
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>هل أنت متأكد من أنك تريد حذف الشركة <strong id="deleteCompanyName"></strong>؟</p>
+                    <div class="alert alert-warning">
+                        <strong><i class="fas fa-exclamation-triangle me-2"></i>تحذير:</strong> سيتم حذف جميع البيانات المرتبطة بهذه الشركة بشكل دائم ولا يمكن استرجاعها.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>
+                        إلغاء
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="deleteUser()">
+                        <i class="fas fa-trash me-2"></i>
+                        حذف الشركة
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Global variables
+        let currentView = 'cards';
+        let currentFilter = 'all';
+        let deleteUserId = '';
+        let deleteUsername = '';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add fade-in animation to elements
+            const elements = document.querySelectorAll('.fade-in');
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    el.style.transition = 'all 0.6s ease-out';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Initialize search
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', filterCompanies);
+
+            // Initialize filter buttons
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.filter;
+                    filterCompanies();
+                });
+            });
+
+            // Initialize view toggle
+            const viewButtons = document.querySelectorAll('.view-btn');
+            viewButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    viewButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    toggleView(this.dataset.view);
+                });
+            });
+
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+
+        // Toggle between card and table view
+        function toggleView(view) {
+            currentView = view;
+            const cardsView = document.getElementById('cardsView');
+            const tableView = document.getElementById('tableView');
+
+            if (view === 'cards') {
+                cardsView.classList.remove('hidden');
+                tableView.classList.add('hidden');
+            } else {
+                cardsView.classList.add('hidden');
+                tableView.classList.remove('hidden');
+            }
+        }
+
+        // Filter companies based on search and filter
+        function filterCompanies() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const companies = document.querySelectorAll('.company-card, .modern-table tbody tr');
+            const noResults = document.getElementById('noResults');
+            let visibleCount = 0;
+
+            companies.forEach(company => {
+                const name = (company.dataset.companyName || '').toLowerCase();
+                const username = (company.dataset.username || '').toLowerCase();
+                const email = (company.dataset.companyEmail || '').toLowerCase();
+                const phone = (company.dataset.companyPhone || '').toLowerCase();
+                const status = company.dataset.status;
+                const premium = company.dataset.premium;
+                const lastLoginStr = company.dataset.lastLogin;
+
+                const matchesSearch = name.includes(searchTerm) || username.includes(searchTerm) || email.includes(searchTerm) || phone.includes(searchTerm);
+                
+                let matchesFilter = false;
+                if (currentFilter === 'all') {
+                    matchesFilter = true;
+                } else if (currentFilter === 'active' && status === 'active') {
+                    matchesFilter = true;
+                } else if (currentFilter === 'inactive' && status === 'inactive') {
+                    matchesFilter = true;
+                } else if (currentFilter === 'premium' && premium === 'premium') {
+                    matchesFilter = true;
+                } else if (currentFilter === 'inactive_2_months') {
+                    const now = new Date();
+                    const twoMonthsAgo = new Date();
+                    twoMonthsAgo.setMonth(now.getMonth() - 2);
+                    
+                    if (!lastLoginStr || lastLoginStr === 'None' || lastLoginStr === '') {
+                        matchesFilter = true;
+                    } else {
+                        // lastLoginStr is ISO format (e.g., 2023-10-27T10:00:00)
+                        const loginDate = new Date(lastLoginStr);
+                        if (!isNaN(loginDate.getTime()) && loginDate < twoMonthsAgo) {
+                            matchesFilter = true;
+                        }
+                    }
+                }
+
+                if (matchesSearch && matchesFilter) {
+                    company.style.display = '';
+                    company.style.opacity = '1';
+                    company.style.transform = 'translateY(0)';
+                    visibleCount++;
+                } else {
+                    company.style.opacity = '0';
+                    company.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        company.style.display = 'none';
+                    }, 300);
+                }
+            });
+
+            // Show/hide no results message
+            if (visibleCount === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+            }
+        }
+
+        // Toggle password visibility
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const button = input.nextElementSibling;
+            const icon = button.querySelector('i');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Generate random password
+        function generateRandomPassword() {
+            const length = 8;
+            const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                password += charset.charAt(Math.floor(Math.random() * charset.length));
+            }
+            document.getElementById('newPassword').value = password;
+            document.getElementById('confirmPassword').value = password;
+        }
+
+        // Open edit password modal
+        function openEditPasswordModal(button) {
+            const userId = button.dataset.userId;
+            const username = button.dataset.username;
+            
+            document.getElementById('editUserId').value = userId;
+            document.getElementById('editUsername').value = username;
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            new bootstrap.Modal(document.getElementById('editPasswordModal')).show();
+        }
+
+        // Save password
+        function savePassword() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const userId = document.getElementById('editUserId').value;
+
+            if (newPassword !== confirmPassword) {
+                alert('كلمات المرور غير متطابقة!');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                alert('كلمة المرور يجب أن تكون 6 أحرف على الأقل!');
+                return;
+            }
+
+            // Send AJAX request to update password via JSON API
+            fetch(`/generate_new_password/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ new_password: newPassword })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.success) {
+                    alert('تم تغيير كلمة المرور بنجاح!');
+                    bootstrap.Modal.getInstance(document.getElementById('editPasswordModal')).hide();
+                } else {
+                    const msg = (data && (data.message || data.error)) || 'حدث خطأ أثناء تغيير كلمة المرور';
+                    alert(msg);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('حدث خطأ أثناء تغيير كلمة المرور');
+            });
+        }
+
+        function copyPassword(inputId) {
+            const input = document.getElementById(inputId);
+            const value = input.value || '';
+            if (!value) {
+                alert('لا توجد كلمة مرور للنسخ');
+                return;
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(value)
+                    .then(() => alert('تم نسخ كلمة المرور إلى الحافظة'))
+                    .catch(() => alert('تعذر نسخ كلمة المرور'));
+            } else {
+                try {
+                    const temp = document.createElement('textarea');
+                    temp.value = value;
+                    document.body.appendChild(temp);
+                    temp.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(temp);
+                    alert('تم نسخ كلمة المرور إلى الحافظة');
+                } catch (e) {
+                    alert('تعذر نسخ كلمة المرور');
+                }
+            }
+        }
+
+        // Confirm delete
+        function confirmDelete(button) {
+            const userId = button.dataset.userId;
+            const username = button.dataset.username;
+            
+            if (confirm(`هل أنت متأكد من أنك تريد حذف الشركة "${username}"؟ لا يمكن التراجع عن هذا الإجراء.`)) {
+                deleteUser(userId);
+            }
+        }
+
+        // Delete user
+        function deleteUser(userId) {
+            if (!userId) return;
+
+            fetch(`/delete_user/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('تم حذف الشركة بنجاح!');
+                    location.reload();
+                } else {
+                    alert('حدث خطأ: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('حدث خطأ أثناء حذف الشركة');
+            })
+            .finally(() => {
+                bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal')).hide();
+            });
+        }
+
+        // Toggle user status
+        function toggleUserStatus(button) {
+            const userId = button.dataset.userId;
+            const isActive = button.dataset.isActive === 'true';
+            
+            if (isActive) {
+                // إذا كان الحساب نشطاً، اطلب سبب الإلغاء
+                showDeactivationModal(userId);
+            } else {
+                // إذا كان الحساب غير نشط، قم بالتفعيل مباشرة
+                performToggle(userId, true);
+            }
+        }
+
+        // Show deactivation modal
+        function showDeactivationModal(userId) {
+            const modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.innerHTML = `
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                تأكيد إلغاء التفعيل
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>هل أنت متأكد من أنك تريد إلغاء تفعيل هذه الشركة؟</p>
+                            <div class="mb-3">
+                                <label for="deactivationReason" class="form-label">سبب الإلغاء <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="deactivationReason" rows="3" 
+                                          placeholder="يرجى كتابة سبب إلغاء التفعيل..." required></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-2"></i>
+                                إلغاء
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="confirmDeactivation(${userId})">
+                                <i class="fas fa-user-slash me-2"></i>
+                                تأكيد الإلغاء
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            const bootstrapModal = new bootstrap.Modal(modal);
+            bootstrapModal.show();
+            
+            // إزالة المودال من DOM عند الإغلاق
+            modal.addEventListener('hidden.bs.modal', () => {
+                document.body.removeChild(modal);
+            });
+        }
+
+        // Confirm deactivation
+        function confirmDeactivation(userId) {
+            const reason = document.getElementById('deactivationReason').value.trim();
+            
+            if (!reason) {
+                alert('يرجى كتابة سبب الإلغاء');
+                return;
+            }
+            
+            // إغلاق المودال
+            const modal = document.querySelector('.modal.show');
+            if (modal) {
+                bootstrap.Modal.getInstance(modal).hide();
+            }
+            
+            // تنفيذ الإلغاء مع السبب
+            performToggle(userId, false, reason);
+        }
+
+        // Perform toggle with optional reason
+        function performToggle(userId, activate, reason = '') {
+            fetch(`/toggle_user/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    deactivation_reason: reason
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('حدث خطأ: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('حدث خطأ أثناء تغيير حالة الشركة');
+            });
+        }
+
+        function resetPremiumTrial(button) {
+            const userId = button.dataset.userId;
+            if (!confirm('هل تريد إعادة تعيين حالة التجربة لهذه الشركة؟')) return;
+            fetch(`/reset_premium_trial/${userId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message || 'تم إعادة تعيين حالة التجربة بنجاح');
+                    location.reload();
+                } else {
+                    alert('حدث خطأ: ' + (data.message || 'تعذر التنفيذ'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('حدث خطأ أثناء إعادة تعيين حالة التجربة');
+            });
+        }
+        // Activate premium trial
+        function activatePremiumTrial(button) {
+            const userId = button.dataset.userId;
+            
+            if (confirm('هل أنت متأكد من أنك تريد تفعيل التجربة المميزة لهذه الشركة؟')) {
+                fetch(`/activate_premium_trial/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('تم تفعيل التجربة المميزة بنجاح!');
+                        location.reload();
+                    } else {
+                        alert('حدث خطأ: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('حدث خطأ أثناء تفعيل التجربة المميزة');
+                });
+            }
+        }
+
+        // Activate permanent premium
+        function activatePermanentPremium(button) {
+            const userId = button.dataset.userId;
+            
+            if (confirm('هل أنت متأكد من أنك تريد تفعيل الاشتراك الدائم لهذه الشركة؟ سيتم تفعيله بالمدة المحددة في الإعدادات.')) {
+                fetch(`/activate_permanent_premium/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('تم تفعيل الاشتراك الدائم بنجاح!');
+                        location.reload();
+                    } else {
+                        alert('حدث خطأ: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('حدث خطأ أثناء تفعيل الاشتراك الدائم');
+                });
+            }
+        }
+
+        // Renew premium subscription
+        function renewPremium(button) {
+            const userId = button.dataset.userId;
+            
+            if (confirm('هل أنت متأكد من أنك تريد تجديد الاشتراك المميز لهذه الشركة؟')) {
+                fetch(`/renew_premium/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('تم تجديد الاشتراك المميز بنجاح!');
+                        location.reload();
+                    } else {
+                        alert('حدث خطأ: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('حدث خطأ أثناء تجديد الاشتراك المميز');
+                });
+            }
+        }
+
+        // Cancel premium subscription
+        function cancelPremium(button) {
+            const userId = button.dataset.userId;
+            
+            if (confirm('هل أنت متأكد من أنك تريد إلغاء الاشتراك المميز لهذه الشركة؟')) {
+                fetch(`/cancel_premium/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('تم إلغاء الاشتراك المميز بنجاح!');
+                        location.reload();
+                    } else {
+                        alert('حدث خطأ: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('حدث خطأ أثناء إلغاء الاشتراك المميز');
+                });
+            }
+        }
+    </script>
+    <script>
+        function parseNumberFromElement(el) {
+            const text = el.innerText || '';
+            const numMatch = text.match(/\d+/);
+            return numMatch ? parseInt(numMatch[0], 10) : 0;
+        }
+        function animateNumber(el, target) {
+            const start = parseNumberFromElement(el);
+            const diff = target - start;
+            if (diff === 0) return;
+            const duration = 400;
+            const startTime = performance.now();
+            function step(now) {
+                const t = Math.min(1, (now - startTime) / duration);
+                const value = Math.round(start + diff * t);
+                el.innerText = String(value);
+                if (t < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+        async function refreshCompanyCountsManage() {
+            try {
+                const res = await fetch('/stats/company_counts', { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                const data = await res.json();
+                if (res.ok && data && data.success) {
+                    const totalEl = document.getElementById('totalCompaniesCountManage');
+                    const activeEl = document.getElementById('activeCompaniesCountManage');
+                    if (totalEl && typeof data.total_companies === 'number') {
+                        animateNumber(totalEl, data.total_companies);
+                    }
+                    if (activeEl && typeof data.active_companies === 'number') {
+                        animateNumber(activeEl, data.active_companies);
+                    }
+                }
+            } catch (e) {}
+        }
+        refreshCompanyCountsManage();
+        setInterval(refreshCompanyCountsManage, 10000);
+    </script>
+</body>
+</html>
