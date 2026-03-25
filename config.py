@@ -11,16 +11,18 @@ class Config:
     DATABASE_AUTH_TOKEN = os.environ.get('DATABASE_AUTH_TOKEN')
     
     if DATABASE_URL:
-        # For Turso with SQLAlchemy, we use the sqlite protocol with the auth_token as a query parameter.
-        # SQLAlchemy will use the sqlite3 driver, and libsql-experimental provides the necessary extensions.
+        # For Turso with SQLAlchemy, the recommended URI format is 'libsql://...'
+        # However, SQLAlchemy needs a dialect. With libsql-experimental, it often works as 'sqlite://' 
+        # but the environment must handle the extension.
+        # On Vercel, we'll try to use the most compatible format.
         if DATABASE_URL.startswith('libsql://'):
-            # Replace libsql:// with sqlite://
-            base_url = DATABASE_URL.replace('libsql://', 'sqlite:///')
+            # If we have a token, we must use the sqlite protocol with the token as a param
+            # because the standard sqlite3 driver doesn't know libsql://
+            clean_url = DATABASE_URL.replace('libsql://', 'sqlite:///')
             if DATABASE_AUTH_TOKEN:
-                # Append auth_token for Turso authentication
-                SQLALCHEMY_DATABASE_URI = f"{base_url}?auth_token={DATABASE_AUTH_TOKEN}"
+                SQLALCHEMY_DATABASE_URI = f"{clean_url}?auth_token={DATABASE_AUTH_TOKEN}"
             else:
-                SQLALCHEMY_DATABASE_URI = base_url
+                SQLALCHEMY_DATABASE_URI = clean_url
         else:
             SQLALCHEMY_DATABASE_URI = DATABASE_URL
     else:
@@ -41,7 +43,6 @@ class Config:
     PERMANENT_SESSION_LIFETIME = timedelta(days=30)
     SESSION_COOKIE_NAME = 'bonus_pharma_session'
     SESSION_COOKIE_HTTPONLY = True
-    # Default to True on production (Vercel), False for local development
     SESSION_COOKIE_SECURE = os.environ.get('COOKIE_SECURE', 'true').lower() in ['true', '1', 'yes', 'on']
     SESSION_COOKIE_SAMESITE = os.environ.get('COOKIE_SAMESITE', 'Lax')
     SESSION_COOKIE_PATH = '/'

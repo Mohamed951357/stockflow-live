@@ -161,6 +161,15 @@ def create_app():
         return global_data
 
     # Register blueprints
+    @app.route('/health')
+    def health_check():
+        from models import SystemSetting
+        try:
+            setting = SystemSetting.query.first()
+            return jsonify({"status": "healthy", "db": "connected", "sample_setting": setting.setting_key if setting else "none"})
+        except Exception as e:
+            return jsonify({"status": "unhealthy", "error": str(e)}), 500
+
     app.register_blueprint(survey_bp, url_prefix='')
     app.register_blueprint(community_bp)
     app.register_blueprint(admin_community_bp)
