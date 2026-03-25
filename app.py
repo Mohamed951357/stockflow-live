@@ -11,7 +11,7 @@ import logging
 import rarfile
 from groq import Groq
 import pytz
-from sqlalchemy import or_, and_, func, text
+from sqlalchemy import or_, and_, func, text, create_engine
 from whitenoise import WhiteNoise
 
 # Define CAIRO_TIMEZONE locally
@@ -22,7 +22,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Register libsql dialect for SQLAlchemy
-# Vercel Serverless environment often has issues with dynamic library loading
 try:
     from sqlalchemy.dialects import registry
     # Attempt to register libsql dialect if possible
@@ -86,8 +85,14 @@ def create_app():
 
     # تهيئة SQLAlchemy مع التطبيق
     try:
-        db.init_app(app)
-        logger.info("DB initialized successfully")
+        # Explicitly configure engine for Turso/libsql to avoid Bind key 'None' error
+        if app.config.get('SQLALCHEMY_DATABASE_URI'):
+            uri = app.config.get('SQLALCHEMY_DATABASE_URI')
+            app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+                "echo": False,
+            }
+            db.init_app(app)
+            logger.info("DB initialized successfully")
     except Exception as e:
         logger.error(f"Failed to initialize DB: {e}")
 
@@ -134,16 +139,20 @@ def create_app():
     def health_check():
         try:
             # Simple query to verify connection
-            db.session.execute(text('SELECT 1'))
-            return jsonify({
-                "status": "healthy", 
-                "database": "connected",
-                "message": "Turso connection established via Vercel"
-            })
+            with app.app_context():
+                result = db.session.execute(text('SELECT 1')).fetchone()
+                return jsonify({
+                    "status": "healthy", 
+                    "database": "connected",
+                    "message": "Turso connection established via Vercel",
+                    "test_query": result[0] if result else "No result"
+                })
         except Exception as e:
+            logger.error(f"Health check failed: {e}")
             return jsonify({
                 "status": "error",
-                "message": str(e)
+                "message": str(e),
+                "type": type(e).__name__
             }), 500
 
     # Register blueprints
