@@ -60,10 +60,9 @@ from api_mobile import api_mobile_bp
 
 def create_app():
     logger.info("Starting create_app...")
-    # Vercel needs a writable instance path, but the default is read-only.
-    # We set it to /tmp which is writable in Vercel.
+    # Writable instance path for serverless/container environments
     instance_path = None
-    if os.environ.get('VERCEL'):
+    if os.environ.get('VERCEL') or os.environ.get('RAILWAY_ENVIRONMENT'):
         instance_path = '/tmp/instance'
         if not os.path.exists(instance_path):
             os.makedirs(instance_path, exist_ok=True)
@@ -90,11 +89,14 @@ def create_app():
         ad_images_folder = os.path.join(app.root_path, ad_images_folder)
         app.config['AD_IMAGES_FOLDER'] = ad_images_folder
 
-    # إنشاء المجلدات للتأكد من وجودها (فقط إذا لم نكن في بيئة Vercel للقراءة فقط)
+    # إنشاء المجلدات للتأكد من وجودها
     if not os.environ.get('VERCEL'):
         for folder in [app.config['UPLOAD_FOLDER'], app.config['LOGO_FOLDER'], app.config['AD_IMAGES_FOLDER'], app.config['APK_FOLDER']]:
-            if not os.path.exists(folder):
-                os.makedirs(folder)
+            try:
+                if not os.path.exists(folder):
+                    os.makedirs(folder, exist_ok=True)
+            except Exception as e:
+                logger.warning(f"Could not create folder {folder}: {e}")
 
     # تهيئة SQLAlchemy مع التطبيق
     try:
@@ -110,8 +112,8 @@ def create_app():
     migrate = Migrate()
     migrate.init_app(app, db, render_as_batch=True)
 
-    # Ensure all tables exist (disabled in Vercel to avoid schema mutation issues)
-    if not os.environ.get('VERCEL'):
+    # Ensure all tables exist (enabled in Railway, disabled in Vercel)
+    if os.environ.get('RAILWAY_ENVIRONMENT') or not os.environ.get('VERCEL'):
         try:
             with app.app_context():
                 db.create_all()
