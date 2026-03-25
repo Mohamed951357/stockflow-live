@@ -4,11 +4,11 @@ from pathlib import Path
 from datetime import timedelta
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
+    SECRET_KEY = os.environ.get('SECRET_KEY', '').strip() or secrets.token_hex(32)
     
-    # Turso Database Configuration
-    DATABASE_URL = os.environ.get('DATABASE_URL')
-    DATABASE_AUTH_TOKEN = os.environ.get('DATABASE_AUTH_TOKEN')
+    # Turso Database Configuration - Strip any whitespace/newlines
+    DATABASE_URL = os.environ.get('DATABASE_URL', '').strip()
+    DATABASE_AUTH_TOKEN = os.environ.get('DATABASE_AUTH_TOKEN', '').strip()
     
     if DATABASE_URL:
         # For Turso on Vercel with SQLAlchemy, we use sqlite.libsql:// and register the dialect
@@ -43,7 +43,7 @@ class Config:
     PERMANENT_SESSION_LIFETIME = timedelta(days=30)
     SESSION_COOKIE_NAME = 'bonus_pharma_session'
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SECURE = os.environ.get('COOKIE_SECURE', 'true').lower() == 'true'
+    SESSION_COOKIE_SECURE = os.environ.get('COOKIE_SECURE', 'true').lower().strip() == 'true'
     SESSION_COOKIE_SAMESITE = 'Lax'
     SESSION_COOKIE_PATH = '/'
     SESSION_REFRESH_EACH_REQUEST = True
@@ -52,17 +52,17 @@ class Config:
     REMEMBER_COOKIE_NAME = 'bonus_pharma_remember'
     REMEMBER_COOKIE_DURATION = timedelta(days=60)
     REMEMBER_COOKIE_HTTPONLY = True
-    REMEMBER_COOKIE_SECURE = os.environ.get('COOKIE_SECURE', 'true').lower() == 'true'
+    REMEMBER_COOKIE_SECURE = os.environ.get('COOKIE_SECURE', 'true').lower().strip() == 'true'
     REMEMBER_COOKIE_SAMESITE = 'Lax'
     REMEMBER_COOKIE_PATH = '/'
     REMEMBER_COOKIE_REFRESH_EACH_REQUEST = True
 
     # Flask-Mail settings
-    MAIL_SERVER = os.environ.get('MAIL_SERVER')
-    MAIL_PORT = int(os.environ.get('MAIL_PORT') or 587)
+    MAIL_SERVER = os.environ.get('MAIL_SERVER', '').strip()
+    MAIL_PORT = int(os.environ.get('MAIL_PORT', '587').strip())
     MAIL_USE_TLS = True
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME', '').strip()
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD', '').strip()
 
     # File upload settings
     MAX_CONTENT_LENGTH = 64 * 1024 * 1024
