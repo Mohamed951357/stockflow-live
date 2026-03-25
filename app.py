@@ -57,6 +57,7 @@ from admin_db_maintenance_routes import admin_db_maintenance_bp
 from api_mobile import api_mobile_bp
 
 def create_app():
+    logger.info("Starting create_app...")
     # Vercel needs a writable instance path, but the default is read-only.
     # We set it to /tmp which is writable in Vercel.
     instance_path = None
@@ -94,7 +95,14 @@ def create_app():
                 os.makedirs(folder)
 
     # تهيئة SQLAlchemy مع التطبيق
-    db.init_app(app)
+    try:
+        logger.info(f"Initializing DB with URI: {app.config.get('SQLALCHEMY_DATABASE_URI')}")
+        db.init_app(app)
+        logger.info("DB initialized successfully")
+    except Exception as e:
+        logger.error(f"Failed to initialize DB: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
 
     # Initialize Flask-Migrate
     migrate = Migrate()
