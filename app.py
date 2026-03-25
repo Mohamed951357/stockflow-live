@@ -24,8 +24,8 @@ logger = logging.getLogger(__name__)
 # Register libsql dialect for SQLAlchemy
 try:
     from sqlalchemy.dialects import registry
+    # Use the correct registration for libsql-client
     registry.register("libsql", "libsql_client.sqlalchemy", "LibSQLDialect")
-    registry.register("sqlite.libsql", "libsql_client.sqlalchemy", "LibSQLDialect")
 except Exception as e:
     logger.warning(f"Could not register libsql dialect: {e}")
 
@@ -70,15 +70,8 @@ def create_app():
 
     # تهيئة SQLAlchemy مع التطبيق
     try:
-        # Explicitly set the database URI for SQLAlchemy
-        # Vercel Serverless environment fix for Bind key 'None'
         db.init_app(app)
-        
-        # This is a critical fix for Flask-SQLAlchemy 3.x+ on Serverless
-        with app.app_context():
-            # Manually trigger engine creation to ensure it's bound to the session
-            db.engine
-            logger.info("DB Engine initialized successfully")
+        logger.info("DB initialized successfully")
     except Exception as e:
         logger.error(f"Failed to initialize DB: {e}")
 
@@ -121,29 +114,21 @@ def create_app():
     @app.route('/health')
     def health_check():
         try:
-            # Simple query using db.session to verify SQLAlchemy configuration
-            # Use db.session.execute which should now have a proper bind
-            result = db.session.execute(text('SELECT 1')).fetchone()
-            return jsonify({
-                "status": "healthy", 
-                "database": "connected",
-                "message": "Turso connection established via SQLAlchemy session",
-                "test_query": result[0] if result else "No result"
-            })
+            # Simple query using raw engine to verify connectivity first
+            uri = app.config.get('SQLALCHEMY_DATABASE_URI')
+            engine = create_engine(uri)
+            with engine.connect() as conn:
+                result = conn.execute(text('SELECT 1')).fetchone()
+                return jsonify({
+                    "status": "healthy", 
+                    "database": "connected",
+                    "test_query": result[0] if result else "No result"
+                })
         except Exception as e:
             logger.error(f"Health check failed: {e}")
-            # Try a fallback direct connection to confirm if it's just a bind issue or URI issue
-            try:
-                engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
-                with engine.connect() as conn:
-                    conn.execute(text('SELECT 1'))
-                fallback_msg = " (Fallback direct connection worked)"
-            except:
-                fallback_msg = " (Fallback direct connection also failed)"
-                
             return jsonify({
                 "status": "error",
-                "message": str(e) + fallback_msg,
+                "message": str(e),
                 "type": type(e).__name__
             }), 500
 

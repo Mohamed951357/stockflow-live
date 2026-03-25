@@ -11,14 +11,14 @@ class Config:
     DATABASE_AUTH_TOKEN = os.environ.get('DATABASE_AUTH_TOKEN', '').strip()
     
     if DATABASE_URL:
-        # For Turso on Vercel with SQLAlchemy, we use sqlite.libsql:// and register the dialect
+        # Simplified Turso connection for Vercel
+        # We use libsql:// directly as it's often supported by newer dialects
         if DATABASE_URL.startswith('libsql://'):
-            base_url = DATABASE_URL.replace('libsql://', 'sqlite.libsql://')
-            if DATABASE_AUTH_TOKEN and 'auth_token=' not in base_url:
-                separator = '&' if '?' in base_url else '?'
-                SQLALCHEMY_DATABASE_URI = f"{base_url}{separator}auth_token={DATABASE_AUTH_TOKEN}"
+            if DATABASE_AUTH_TOKEN and 'auth_token=' not in DATABASE_URL:
+                separator = '&' if '?' in DATABASE_URL else '?'
+                SQLALCHEMY_DATABASE_URI = f"{DATABASE_URL}{separator}auth_token={DATABASE_AUTH_TOKEN}"
             else:
-                SQLALCHEMY_DATABASE_URI = base_url
+                SQLALCHEMY_DATABASE_URI = DATABASE_URL
         else:
             SQLALCHEMY_DATABASE_URI = DATABASE_URL
     else:
@@ -59,7 +59,7 @@ class Config:
 
     # Flask-Mail settings
     MAIL_SERVER = os.environ.get('MAIL_SERVER', '').strip()
-    MAIL_PORT = int(os.environ.get('MAIL_PORT', '587').strip())
+    MAIL_PORT = int(os.environ.get('MAIL_PORT', '587').strip() or '587')
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME', '').strip()
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD', '').strip()
