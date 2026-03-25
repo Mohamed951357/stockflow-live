@@ -21,11 +21,12 @@ CAIRO_TIMEZONE = pytz.timezone('Africa/Cairo')
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Register libsql dialect for SQLAlchemy
+# Register libsql dialect for SQLAlchemy (libsql-experimental version)
 try:
     from sqlalchemy.dialects import registry
-    # Use the correct registration for libsql-client
-    registry.register("libsql", "libsql_client.sqlalchemy", "LibSQLDialect")
+    # Correct registration for libsql-experimental
+    registry.register("sqlite.libsql", "libsql_experimental.sqlalchemy", "LibSQLDialect")
+    registry.register("libsql", "libsql_experimental.sqlalchemy", "LibSQLDialect")
 except Exception as e:
     logger.warning(f"Could not register libsql dialect: {e}")
 
@@ -114,11 +115,9 @@ def create_app():
     @app.route('/health')
     def health_check():
         try:
-            # Simple query using raw engine to verify connectivity first
-            uri = app.config.get('SQLALCHEMY_DATABASE_URI')
-            engine = create_engine(uri)
-            with engine.connect() as conn:
-                result = conn.execute(text('SELECT 1')).fetchone()
+            # Test using db.session
+            with app.app_context():
+                result = db.session.execute(text('SELECT 1')).fetchone()
                 return jsonify({
                     "status": "healthy", 
                     "database": "connected",

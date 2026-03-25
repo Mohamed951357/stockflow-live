@@ -11,14 +11,14 @@ class Config:
     DATABASE_AUTH_TOKEN = os.environ.get('DATABASE_AUTH_TOKEN', '').strip()
     
     if DATABASE_URL:
-        # Simplified Turso connection for Vercel
-        # We use libsql:// directly as it's often supported by newer dialects
+        # For Turso with libsql-experimental, we MUST use sqlite.libsql://
         if DATABASE_URL.startswith('libsql://'):
-            if DATABASE_AUTH_TOKEN and 'auth_token=' not in DATABASE_URL:
-                separator = '&' if '?' in DATABASE_URL else '?'
-                SQLALCHEMY_DATABASE_URI = f"{DATABASE_URL}{separator}auth_token={DATABASE_AUTH_TOKEN}"
+            base_url = DATABASE_URL.replace('libsql://', 'sqlite.libsql://')
+            if DATABASE_AUTH_TOKEN and 'auth_token=' not in base_url:
+                separator = '&' if '?' in base_url else '?'
+                SQLALCHEMY_DATABASE_URI = f"{base_url}{separator}auth_token={DATABASE_AUTH_TOKEN}"
             else:
-                SQLALCHEMY_DATABASE_URI = DATABASE_URL
+                SQLALCHEMY_DATABASE_URI = base_url
         else:
             SQLALCHEMY_DATABASE_URI = DATABASE_URL
     else:
