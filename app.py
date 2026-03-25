@@ -55,7 +55,15 @@ from admin_db_maintenance_routes import admin_db_maintenance_bp
 from api_mobile import api_mobile_bp
 
 def create_app():
-    app = Flask(__name__)
+    # Vercel needs a writable instance path, but the default is read-only.
+    # We set it to /tmp which is writable in Vercel.
+    instance_path = None
+    if os.environ.get('VERCEL'):
+        instance_path = '/tmp/instance'
+        if not os.path.exists(instance_path):
+            os.makedirs(instance_path, exist_ok=True)
+
+    app = Flask(__name__, instance_path=instance_path)
     app.config.from_object(Config)
 
     # Use WhiteNoise to serve static files on Render
