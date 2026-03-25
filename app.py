@@ -46,17 +46,6 @@ except ImportError:
         AD_IMAGES_FOLDER = os.path.join('static', 'ad_images')
         APK_FOLDER = os.path.join('static', 'apk')
 
-# استيراد الدوال المساعدة
-from utils import update_database_schema, load_user, inject_global_data, ADMIN_ROLES, ALL_PERMISSIONS
-from views import register_views
-from survey_routes import survey_bp
-from community_routes import community_bp
-from admin_community_routes import admin_community_bp
-from community_bonus_routes import community_bonus_bp
-from product_reminder_routes import register_product_reminder_routes
-from admin_db_maintenance_routes import admin_db_maintenance_bp
-from api_mobile import api_mobile_bp
-
 def create_app():
     logger.info("Starting create_app...")
     
@@ -81,9 +70,11 @@ def create_app():
 
     # تهيئة SQLAlchemy مع التطبيق
     try:
-        # For Turso on Vercel, we need to ensure the URI is correctly handled
-        db.init_app(app)
-        logger.info("DB initialized successfully")
+        # Explicitly set the database URI for SQLAlchemy to ensure it's used as the default bind
+        if 'SQLALCHEMY_DATABASE_URI' in app.config:
+            app.config['SQLALCHEMY_BINDS'] = None # Ensure no conflicting binds
+            db.init_app(app)
+            logger.info("DB initialized successfully")
     except Exception as e:
         logger.error(f"Failed to initialize DB: {e}")
 
@@ -122,18 +113,18 @@ def create_app():
         global_data['now'] = datetime.utcnow()
         return global_data
 
-    # Health check route with direct engine connection to bypass bind issues
+    # Health check route
     @app.route('/health')
     def health_check():
         try:
-            # Use direct engine to verify connection
-            engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
-            with engine.connect() as conn:
-                result = conn.execute(text('SELECT 1')).fetchone()
+            # Simple query using db.session to verify SQLAlchemy configuration
+            with app.app_context():
+                # Use db.session.execute(text(...)) which is the standard way
+                result = db.session.execute(text('SELECT 1')).fetchone()
                 return jsonify({
                     "status": "healthy", 
                     "database": "connected",
-                    "message": "Turso connection established via direct engine",
+                    "message": "Turso connection established via SQLAlchemy",
                     "test_query": result[0] if result else "No result"
                 })
         except Exception as e:
@@ -141,8 +132,7 @@ def create_app():
             return jsonify({
                 "status": "error",
                 "message": str(e),
-                "type": type(e).__name__,
-                "uri": app.config['SQLALCHEMY_DATABASE_URI'].split('?')[0] # Safe URI for debugging
+                "type": type(e).__name__
             }), 500
 
     # Register blueprints
