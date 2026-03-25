@@ -11,27 +11,27 @@ class Config:
     DATABASE_AUTH_TOKEN = os.environ.get('DATABASE_AUTH_TOKEN')
     
     if DATABASE_URL:
-        # For Render/Turso with SQLAlchemy, we use the DATABASE_URL directly.
-        # If it starts with libsql://, we might need to adjust for the driver.
+        # For Turso with SQLAlchemy, we use the sqlite protocol with the auth_token as a query parameter.
+        # SQLAlchemy will use the sqlite3 driver, and libsql-experimental provides the necessary extensions.
         if DATABASE_URL.startswith('libsql://'):
-            # Using libsql-experimental or just sqlite with auth token for SQLAlchemy
-            SQLALCHEMY_DATABASE_URI = DATABASE_URL.replace('libsql://', 'sqlite:///')
+            # Replace libsql:// with sqlite://
+            base_url = DATABASE_URL.replace('libsql://', 'sqlite:///')
             if DATABASE_AUTH_TOKEN:
-                SQLALCHEMY_DATABASE_URI += f"?auth_token={DATABASE_AUTH_TOKEN}"
+                # Append auth_token for Turso authentication
+                SQLALCHEMY_DATABASE_URI = f"{base_url}?auth_token={DATABASE_AUTH_TOKEN}"
+            else:
+                SQLALCHEMY_DATABASE_URI = base_url
         else:
             SQLALCHEMY_DATABASE_URI = DATABASE_URL
     else:
         # Fallback to local SQLite for development
         _default_sqlite_path = str(Path(__file__).resolve().parent.joinpath('site.db')).replace('\\', '/')
-        _pa_sqlite_path = '/home/Bonuspharma1/db.sqlite3'
-        if os.name != 'nt' and os.path.exists(_pa_sqlite_path):
-            SQLALCHEMY_DATABASE_URI = f"sqlite:///{_pa_sqlite_path}"
-        else:
-            SQLALCHEMY_DATABASE_URI = f"sqlite:///{_default_sqlite_path}"
+        SQLALCHEMY_DATABASE_URI = f"sqlite:///{_default_sqlite_path}"
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-
-    UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', 'uploads')
+    
+    # Vercel specific: Ensure we don't try to use any local storage that's not /tmp
+    UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', '/tmp/uploads')
     STATIC_FOLDER = 'static'
     LOGO_FOLDER = 'logos'
     AD_IMAGES_FOLDER = 'ad_images'
@@ -41,7 +41,7 @@ class Config:
     PERMANENT_SESSION_LIFETIME = timedelta(days=30)
     SESSION_COOKIE_NAME = 'bonus_pharma_session'
     SESSION_COOKIE_HTTPONLY = True
-    # Default to True on production (Render), False for local development
+    # Default to True on production (Vercel), False for local development
     SESSION_COOKIE_SECURE = os.environ.get('COOKIE_SECURE', 'true').lower() in ['true', '1', 'yes', 'on']
     SESSION_COOKIE_SAMESITE = os.environ.get('COOKIE_SAMESITE', 'Lax')
     SESSION_COOKIE_PATH = '/'
