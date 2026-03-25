@@ -58,7 +58,14 @@ def create_app():
         if not os.path.exists(instance_path):
             os.makedirs(instance_path, exist_ok=True)
 
-    app = Flask(__name__, instance_path=instance_path)
+    # Vercel might not include empty directories or may have different root
+    template_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
+    if not os.path.exists(template_folder):
+        # If templates folder doesn't exist, use the current directory as fallback
+        # (Since many .html files are in the root)
+        template_folder = os.path.dirname(os.path.abspath(__file__))
+    
+    app = Flask(__name__, instance_path=instance_path, template_folder=template_folder)
     app.config.from_object(Config)
 
     # Use WhiteNoise to serve static files
