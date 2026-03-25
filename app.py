@@ -160,16 +160,27 @@ def create_app():
 
         return global_data
 
-    # Register blueprints
+    # Health check route
     @app.route('/health')
     def health_check():
         from models import SystemSetting
         try:
+            # Try to query a simple table to verify connection
             setting = SystemSetting.query.first()
-            return jsonify({"status": "healthy", "db": "connected", "sample_setting": setting.setting_key if setting else "none"})
+            return jsonify({
+                "status": "healthy", 
+                "database": "connected",
+                "message": "Turso connection established",
+                "data": setting.setting_key if setting else "No settings found"
+            })
         except Exception as e:
-            return jsonify({"status": "unhealthy", "error": str(e)}), 500
+            return jsonify({
+                "status": "error",
+                "message": str(e),
+                "type": type(e).__name__
+            }), 500
 
+    # Register blueprints
     app.register_blueprint(survey_bp, url_prefix='')
     app.register_blueprint(community_bp)
     app.register_blueprint(admin_community_bp)
