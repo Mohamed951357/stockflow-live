@@ -69,10 +69,11 @@ def create_app():
         ad_images_folder = os.path.join(app.root_path, ad_images_folder)
         app.config['AD_IMAGES_FOLDER'] = ad_images_folder
 
-    # إنشاء المجلدات للتأكد من وجودها
-    for folder in [app.config['UPLOAD_FOLDER'], app.config['LOGO_FOLDER'], app.config['AD_IMAGES_FOLDER'], app.config['APK_FOLDER']]:
-        if not os.path.exists(folder):
-            os.makedirs(folder)
+    # إنشاء المجلدات للتأكد من وجودها (فقط إذا لم نكن في بيئة Vercel للقراءة فقط)
+    if not os.environ.get('VERCEL'):
+        for folder in [app.config['UPLOAD_FOLDER'], app.config['LOGO_FOLDER'], app.config['AD_IMAGES_FOLDER'], app.config['APK_FOLDER']]:
+            if not os.path.exists(folder):
+                os.makedirs(folder)
 
     # تهيئة SQLAlchemy مع التطبيق
     db.init_app(app)
