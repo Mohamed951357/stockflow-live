@@ -22,12 +22,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # استيراد db من models.py
-from models import (
-    db, Admin, Company, ProductFile, ProductItem, ProductStockHistory,
-    Appointment, Notification, NotificationRead, SearchLog, FavoriteProduct, SystemSetting,
-    AdImage, CommunityMessage, AppDownloadLog, TobyRequestReport, PrivateMessage, BlockedProduct,
-    PrivateMessageEditLog, DbMaintenanceLog
-)
+from models import db
 
 # استيراد الإعدادات من config.py
 try:
@@ -112,6 +107,7 @@ def create_app():
 
     @app.before_request
     def revoke_expired_premium_if_needed():
+        from models import Company
         try:
             if current_user.is_authenticated and session.get('user_type') == 'company':
                 if hasattr(current_user, 'is_premium') and hasattr(current_user, 'premium_end_date'):
@@ -156,6 +152,7 @@ def create_app():
         global_data['now'] = datetime.utcnow()
         
         try:
+            from models import SystemSetting
             ramadan_theme_setting = SystemSetting.query.filter_by(setting_key='ramadan_theme_enabled').first()
             global_data['ramadan_theme_enabled'] = (ramadan_theme_setting.setting_value == 'true' if ramadan_theme_setting else False)
         except:
