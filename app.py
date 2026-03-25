@@ -24,7 +24,9 @@ logger = logging.getLogger(__name__)
 # Register libsql dialect for SQLAlchemy
 try:
     from sqlalchemy.dialects import registry
+    # Use 'sqlite.libsql' as the dialect name for libsql-experimental
     registry.register("libsql", "libsql_experimental.sqlalchemy", "LibSQLDialect")
+    registry.register("sqlite.libsql", "libsql_experimental.sqlalchemy", "LibSQLDialect")
 except Exception:
     pass
 

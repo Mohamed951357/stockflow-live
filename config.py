@@ -11,15 +11,14 @@ class Config:
     DATABASE_AUTH_TOKEN = os.environ.get('DATABASE_AUTH_TOKEN')
     
     if DATABASE_URL:
-        # For SQLAlchemy 2.0+ with libsql-experimental, the correct URI format is 'libsql://...'
-        # SQLAlchemy will use the libsql-experimental driver if it's installed.
-        # We ensure the token is appended correctly if not already present in the URL.
+        # For Turso on Vercel with SQLAlchemy, we use sqlite.libsql:// and register the dialect
         if DATABASE_URL.startswith('libsql://'):
+            base_url = DATABASE_URL.replace('libsql://', 'sqlite.libsql://')
             if DATABASE_AUTH_TOKEN and 'auth_token=' not in DATABASE_URL:
                 separator = '&' if '?' in DATABASE_URL else '?'
-                SQLALCHEMY_DATABASE_URI = f"{DATABASE_URL}{separator}auth_token={DATABASE_AUTH_TOKEN}"
+                SQLALCHEMY_DATABASE_URI = f"{base_url}{separator}auth_token={DATABASE_AUTH_TOKEN}"
             else:
-                SQLALCHEMY_DATABASE_URI = DATABASE_URL
+                SQLALCHEMY_DATABASE_URI = base_url
         else:
             SQLALCHEMY_DATABASE_URI = DATABASE_URL
     else:
