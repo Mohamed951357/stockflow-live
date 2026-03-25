@@ -21,12 +21,12 @@ CAIRO_TIMEZONE = pytz.timezone('Africa/Cairo')
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Register libsql dialect for SQLAlchemy (libsql-experimental version)
+# Register libsql dialect for SQLAlchemy (libsql-client version)
 try:
     from sqlalchemy.dialects import registry
-    # Correct registration for libsql-experimental
-    registry.register("sqlite.libsql", "libsql_experimental.sqlalchemy", "LibSQLDialect")
-    registry.register("libsql", "libsql_experimental.sqlalchemy", "LibSQLDialect")
+    # Correct registration for libsql-client
+    registry.register("sqlite.libsql", "libsql_client.sqlalchemy", "LibSQLDialect")
+    registry.register("libsql", "libsql_client.sqlalchemy", "LibSQLDialect")
 except Exception as e:
     logger.warning(f"Could not register libsql dialect: {e}")
 
@@ -115,7 +115,7 @@ def create_app():
     @app.route('/health')
     def health_check():
         try:
-            # Test using db.session
+            # Simple query using db.session
             with app.app_context():
                 result = db.session.execute(text('SELECT 1')).fetchone()
                 return jsonify({

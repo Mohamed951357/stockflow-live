@@ -11,7 +11,7 @@ class Config:
     DATABASE_AUTH_TOKEN = os.environ.get('DATABASE_AUTH_TOKEN', '').strip()
     
     if DATABASE_URL:
-        # For Turso with libsql-experimental, we MUST use sqlite.libsql://
+        # For Turso with libsql-client, we use sqlite.libsql://
         if DATABASE_URL.startswith('libsql://'):
             base_url = DATABASE_URL.replace('libsql://', 'sqlite.libsql://')
             if DATABASE_AUTH_TOKEN and 'auth_token=' not in base_url:
