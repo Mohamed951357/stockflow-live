@@ -11,30 +11,32 @@ class Config:
     DATABASE_AUTH_TOKEN = os.environ.get('DATABASE_AUTH_TOKEN')
     
     if DATABASE_URL:
-        # Standard approach for Turso on Vercel:
-        # Use sqlite protocol with the token as a query parameter.
+        # For SQLAlchemy 2.0+ with libsql-experimental, the correct URI format is 'libsql://...'
+        # SQLAlchemy will use the libsql-experimental driver if it's installed.
+        # We ensure the token is appended correctly if not already present in the URL.
         if DATABASE_URL.startswith('libsql://'):
-            base_url = DATABASE_URL.replace('libsql://', 'sqlite:///')
-            if DATABASE_AUTH_TOKEN:
-                SQLALCHEMY_DATABASE_URI = f"{base_url}?auth_token={DATABASE_AUTH_TOKEN}"
+            if DATABASE_AUTH_TOKEN and 'auth_token=' not in DATABASE_URL:
+                separator = '&' if '?' in DATABASE_URL else '?'
+                SQLALCHEMY_DATABASE_URI = f"{DATABASE_URL}{separator}auth_token={DATABASE_AUTH_TOKEN}"
             else:
-                SQLALCHEMY_DATABASE_URI = base_url
+                SQLALCHEMY_DATABASE_URI = DATABASE_URL
         else:
             SQLALCHEMY_DATABASE_URI = DATABASE_URL
     else:
+        # Fallback to local SQLite for development
         _default_sqlite_path = str(Path(__file__).resolve().parent.joinpath('site.db')).replace('\\', '/')
         SQLALCHEMY_DATABASE_URI = f"sqlite:///{_default_sqlite_path}"
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    # Paths for Vercel
+    # Vercel specific: Ensure we don't try to use any local storage that's not /tmp
     UPLOAD_FOLDER = '/tmp/uploads'
     STATIC_FOLDER = 'static'
     LOGO_FOLDER = 'logos'
     AD_IMAGES_FOLDER = 'ad_images'
     APK_FOLDER = 'apk_files'
 
-    # Session and Cookies
+    # ===== إعدادات الجلسة والكوكيز =====
     PERMANENT_SESSION_LIFETIME = timedelta(days=30)
     SESSION_COOKIE_NAME = 'bonus_pharma_session'
     SESSION_COOKIE_HTTPONLY = True
@@ -43,7 +45,7 @@ class Config:
     SESSION_COOKIE_PATH = '/'
     SESSION_REFRESH_EACH_REQUEST = True
 
-    # Remember Me
+    # Remember Me settings
     REMEMBER_COOKIE_NAME = 'bonus_pharma_remember'
     REMEMBER_COOKIE_DURATION = timedelta(days=60)
     REMEMBER_COOKIE_HTTPONLY = True
@@ -52,14 +54,14 @@ class Config:
     REMEMBER_COOKIE_PATH = '/'
     REMEMBER_COOKIE_REFRESH_EACH_REQUEST = True
 
-    # Mail settings
+    # Flask-Mail settings
     MAIL_SERVER = os.environ.get('MAIL_SERVER')
     MAIL_PORT = int(os.environ.get('MAIL_PORT') or 587)
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 
-    # Upload constraints
+    # File upload settings
     MAX_CONTENT_LENGTH = 64 * 1024 * 1024
     ALLOWED_LOGO_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'svg'}
     ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'html', 'htm'}
