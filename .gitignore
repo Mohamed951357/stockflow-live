@@ -12,3 +12,5 @@ static/ad_images/*
 static/apk/*
 .vscode/
 .idea/
+.vercel
+.env*.local

@@ -61,8 +61,9 @@ def create_app():
     app = Flask(__name__, instance_path=instance_path)
     app.config.from_object(Config)
 
-    # Use WhiteNoise to serve static files on Render
-    app.wsgi_app = WhiteNoise(app.wsgi_app, root='static/', prefix='static/')
+    # Use WhiteNoise to serve static files
+    if os.path.exists('static'):
+        app.wsgi_app = WhiteNoise(app.wsgi_app, root='static/', prefix='static/')
 
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
     app.config['MAX_CONTENT_LENGTH'] = 64 * 1024 * 1024
@@ -151,12 +152,23 @@ def create_app():
         global_data['user_is_company'] = (current_user.is_authenticated and session.get('user_type') == 'company')
         global_data['now'] = datetime.utcnow()
         
-        try:
-            from models import SystemSetting
-            ramadan_theme_setting = SystemSetting.query.filter_by(setting_key='ramadan_theme_enabled').first()
-            global_data['ramadan_theme_enabled'] = (ramadan_theme_setting.setting_value == 'true' if ramadan_theme_setting else False)
-        except:
-            global_data['ramadan_theme_enabled'] = False
+        global_data['ramadan_theme_enabled'] = False
+        if os.environ.get('VERCEL'):
+            try:
+                from models import SystemSetting
+                ramadan_theme_setting = SystemSetting.query.filter_by(setting_key='ramadan_theme_enabled').first()
+                if ramadan_theme_setting:
+                    global_data['ramadan_theme_enabled'] = (ramadan_theme_setting.setting_value == 'true')
+            except Exception as e:
+                logger.error(f"Error querying ramadan_theme_enabled: {e}")
+        else:
+            try:
+                from models import SystemSetting
+                ramadan_theme_setting = SystemSetting.query.filter_by(setting_key='ramadan_theme_enabled').first()
+                if ramadan_theme_setting:
+                    global_data['ramadan_theme_enabled'] = (ramadan_theme_setting.setting_value == 'true')
+            except Exception as e:
+                logger.error(f"Error querying ramadan_theme_enabled: {e}")
 
         return global_data
 

@@ -142,13 +142,19 @@ def inject_global_data(app, db):
     current_logo_path = None
 
     # يجب أن نكون ضمن App Context للوصول إلى قاعدة البيانات
-    with app.app_context():
-        logo_setting = SystemSetting.query.filter_by(setting_key='current_logo').first()
-        if logo_setting and logo_setting.setting_value:
-            # مسار موحد: دائماً 'static/logos/'
-            current_logo_path = url_for('static', filename=f'logos/{logo_setting.setting_value}')
-        else:
-            # Fallback للوجو الافتراضي
+    try:
+        with app.app_context():
+            logo_setting = SystemSetting.query.filter_by(setting_key='current_logo').first()
+            if logo_setting and logo_setting.setting_value:
+                # مسار موحد: دائماً 'static/logos/'
+                current_logo_path = url_for('static', filename=f'logos/{logo_setting.setting_value}')
+            else:
+                # Fallback للوجو الافتراضي
+                current_logo_path = url_for('static', filename='images/default_logo.png')
+    except Exception as e:
+        print(f"Error in inject_global_data: {e}")
+        # Fallback للوجو الافتراضي في حالة فشل قاعدة البيانات
+        with app.test_request_context():
             current_logo_path = url_for('static', filename='images/default_logo.png')
 
     global_data['current_logo_path'] = current_logo_path
