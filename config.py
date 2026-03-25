@@ -11,7 +11,7 @@ class Config:
     DATABASE_AUTH_TOKEN = os.environ.get('DATABASE_AUTH_TOKEN')
     
     if DATABASE_URL:
-        # For Turso with SQLAlchemy, we use sqlite.libsql://
+        # For Turso on Vercel with SQLAlchemy, we use sqlite.libsql:// and register the dialect
         if DATABASE_URL.startswith('libsql://'):
             base_url = DATABASE_URL.replace('libsql://', 'sqlite.libsql://')
             if DATABASE_AUTH_TOKEN and 'auth_token=' not in base_url:
@@ -28,11 +28,8 @@ class Config:
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    # Storage settings
-    # On Railway, we can use local folders if they are part of the repo, 
-    # but for uploads we might want to use /tmp or a persistent volume.
-    # For now, let's stick to /tmp for simplicity if not in local dev.
-    if os.environ.get('RAILWAY_ENVIRONMENT'):
+    # Vercel specific: Ensure we don't try to use any local storage that's not /tmp
+    if os.environ.get('VERCEL'):
         UPLOAD_FOLDER = '/tmp/uploads'
     else:
         UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
