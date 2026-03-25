@@ -90,12 +90,13 @@ def create_app():
     migrate = Migrate()
     migrate.init_app(app, db, render_as_batch=True)
 
-    # Ensure all tables exist
-    try:
-        with app.app_context():
-            db.create_all()
-    except Exception as e:
-        logger.error(f"Error creating tables: {e}")
+    # Ensure all tables exist (disabled in Vercel to avoid schema mutation issues)
+    if not os.environ.get('VERCEL'):
+        try:
+            with app.app_context():
+                db.create_all()
+        except Exception as e:
+            logger.error(f"Error creating tables: {e}")
 
     # إعداد نظام تسجيل الدخول
     login_manager = LoginManager()
