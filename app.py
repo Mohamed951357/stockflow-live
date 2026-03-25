@@ -24,7 +24,6 @@ logger = logging.getLogger(__name__)
 # Register libsql dialect for SQLAlchemy
 try:
     from sqlalchemy.dialects import registry
-    # Attempt to register libsql dialect if possible
     registry.register("libsql", "libsql_client.sqlalchemy", "LibSQLDialect")
     registry.register("sqlite.libsql", "libsql_client.sqlalchemy", "LibSQLDialect")
 except Exception as e:
@@ -61,14 +60,12 @@ from api_mobile import api_mobile_bp
 def create_app():
     logger.info("Starting create_app...")
     
-    # Vercel needs a writable instance path
     instance_path = None
     if os.environ.get('VERCEL'):
         instance_path = '/tmp/instance'
         if not os.path.exists(instance_path):
             os.makedirs(instance_path, exist_ok=True)
 
-    # Template folder fallback
     template_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
     if not os.path.exists(template_folder):
         template_folder = os.path.dirname(os.path.abspath(__file__))
@@ -76,7 +73,6 @@ def create_app():
     app = Flask(__name__, instance_path=instance_path, template_folder=template_folder)
     app.config.from_object(Config)
 
-    # Use WhiteNoise to serve static files
     if os.path.exists('static'):
         app.wsgi_app = WhiteNoise(app.wsgi_app, root='static/', prefix='static/')
 
@@ -85,22 +81,15 @@ def create_app():
 
     # تهيئة SQLAlchemy مع التطبيق
     try:
-        # Explicitly configure engine for Turso/libsql to avoid Bind key 'None' error
-        if app.config.get('SQLALCHEMY_DATABASE_URI'):
-            uri = app.config.get('SQLALCHEMY_DATABASE_URI')
-            app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-                "echo": False,
-            }
-            db.init_app(app)
-            logger.info("DB initialized successfully")
+        # For Turso on Vercel, we need to ensure the URI is correctly handled
+        db.init_app(app)
+        logger.info("DB initialized successfully")
     except Exception as e:
         logger.error(f"Failed to initialize DB: {e}")
 
-    # Initialize Flask-Migrate
     migrate = Migrate()
     migrate.init_app(app, db, render_as_batch=True)
 
-    # Ensure all tables exist (disabled in Vercel to avoid schema mutation issues)
     if not os.environ.get('VERCEL'):
         try:
             with app.app_context():
@@ -108,7 +97,6 @@ def create_app():
         except Exception as e:
             logger.error(f"Error creating tables: {e}")
 
-    # إعداد نظام تسجيل الدخول
     login_manager = LoginManager()
     login_manager.init_app(app)
     login_manager.login_view = 'login'
@@ -134,17 +122,18 @@ def create_app():
         global_data['now'] = datetime.utcnow()
         return global_data
 
-    # Health check route
+    # Health check route with direct engine connection to bypass bind issues
     @app.route('/health')
     def health_check():
         try:
-            # Simple query to verify connection
-            with app.app_context():
-                result = db.session.execute(text('SELECT 1')).fetchone()
+            # Use direct engine to verify connection
+            engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+            with engine.connect() as conn:
+                result = conn.execute(text('SELECT 1')).fetchone()
                 return jsonify({
                     "status": "healthy", 
                     "database": "connected",
-                    "message": "Turso connection established via Vercel",
+                    "message": "Turso connection established via direct engine",
                     "test_query": result[0] if result else "No result"
                 })
         except Exception as e:
@@ -152,7 +141,8 @@ def create_app():
             return jsonify({
                 "status": "error",
                 "message": str(e),
-                "type": type(e).__name__
+                "type": type(e).__name__,
+                "uri": app.config['SQLALCHEMY_DATABASE_URI'].split('?')[0] # Safe URI for debugging
             }), 500
 
     # Register blueprints
