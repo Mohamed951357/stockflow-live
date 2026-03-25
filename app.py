@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, f
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, current_user, login_required, logout_user
 import os
+import sys
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash
 import json
@@ -24,7 +25,6 @@ logger = logging.getLogger(__name__)
 # Register libsql dialect for SQLAlchemy (libsql-client version)
 try:
     from sqlalchemy.dialects import registry
-    # Correct registration for libsql-client
     registry.register("sqlite.libsql", "libsql_client.sqlalchemy", "LibSQLDialect")
     registry.register("libsql", "libsql_client.sqlalchemy", "LibSQLDialect")
 except Exception as e:
@@ -111,25 +111,39 @@ def create_app():
         global_data['now'] = datetime.utcnow()
         return global_data
 
-    # Health check route
+    # Ultra-comprehensive health check for diagnosis
     @app.route('/health')
     def health_check():
+        diagnosis = {
+            "status": "diagnosing",
+            "env": {
+                "python_version": sys.version,
+                "vercel": os.environ.get('VERCEL', 'No'),
+                "database_url_present": bool(os.environ.get('DATABASE_URL')),
+                "auth_token_present": bool(os.environ.get('DATABASE_AUTH_TOKEN'))
+            },
+            "steps": []
+        }
+        
         try:
-            # Simple query using db.session
+            diagnosis["steps"].append("Checking config URI...")
+            uri = app.config.get('SQLALCHEMY_DATABASE_URI', 'None')
+            diagnosis["uri_prefix"] = uri.split('?')[0] if uri else "None"
+            
+            diagnosis["steps"].append("Testing SQLAlchemy session...")
             with app.app_context():
                 result = db.session.execute(text('SELECT 1')).fetchone()
-                return jsonify({
-                    "status": "healthy", 
-                    "database": "connected",
-                    "test_query": result[0] if result else "No result"
-                })
+                diagnosis["sqlalchemy_session"] = "Success: " + str(result[0])
+                
+            diagnosis["status"] = "healthy"
+            return jsonify(diagnosis)
+            
         except Exception as e:
-            logger.error(f"Health check failed: {e}")
-            return jsonify({
-                "status": "error",
-                "message": str(e),
-                "type": type(e).__name__
-            }), 500
+            import traceback
+            diagnosis["status"] = "error"
+            diagnosis["error"] = str(e)
+            diagnosis["traceback"] = traceback.format_exc()
+            return jsonify(diagnosis), 200 # Return 200 so we can actually see the JSON
 
     # Register blueprints
     app.register_blueprint(survey_bp, url_prefix='')
