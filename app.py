@@ -21,6 +21,13 @@ CAIRO_TIMEZONE = pytz.timezone('Africa/Cairo')
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Register libsql dialect for SQLAlchemy
+try:
+    from sqlalchemy.dialects import registry
+    registry.register("libsql", "libsql_experimental.sqlalchemy", "LibSQLDialect")
+except Exception:
+    pass
+
 # استيراد db من models.py
 from models import db
 
